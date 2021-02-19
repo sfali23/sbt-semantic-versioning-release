@@ -34,12 +34,14 @@ object VersioningHelper {
           )
       } else if (config.newPreRelease) {
         // If latest version is not a pre-release and if we are making a new pre-release, then bump patch
-        if (validPreReleasePart) {
+        // TODO: enable if we are going to re-enable pre-release config
+        /*if (validPreReleasePart) {
           throw new IllegalArgumentException(
-            s"""Cannot bump version because the latest version is '$latestVersion', which is already a pre-release 
+            s"""Cannot bump version because the latest version is '$latestVersion', which is already a pre-release
                |version""".stripMargin.replaceNewLines
           )
-        } else VersionComponent.PATCH
+        } else*/
+        VersionComponent.PATCH
       } else if (!validPreReleasePart) {
         // If latest version is not a pre-release then bump patch
         VersionComponent.PATCH
