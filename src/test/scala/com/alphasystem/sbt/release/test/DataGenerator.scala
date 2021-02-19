@@ -99,6 +99,21 @@ object DataGenerator {
     }
   }
 
+  private[release] def tableFor8[T, A, B, C, D, E, F, G, H](
+    basePath: String,
+    resourceName: String,
+    headers: (String, String, String, String, String, String, String, String),
+    toDataTuple: T => (A, B, C, D, E, F, G, H)
+  )(implicit decoder: Decoder[T]
+  ): TableFor8[A, B, C, D, E, F, G, H] = {
+    decode[List[T]](toJson(basePath, resourceName)) match {
+      case Left(ex) => throw ex
+      case Right(values) =>
+        val rows = values.map(value => toDataTuple(value))
+        Table(headers, rows: _*)
+    }
+  }
+
   private def toJsonRow(
     headers: List[String]
   )(dataLine: Array[String]

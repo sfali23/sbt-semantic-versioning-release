@@ -7,6 +7,8 @@ import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.prop.TableDrivenPropertyChecks
 
+import scala.util.matching.Regex
+
 class MajorMinorPatchBumpingSpec
     extends AnyFunSuite
     with TableDrivenPropertyChecks
@@ -259,6 +261,105 @@ class MajorMinorPatchBumpingSpec
         }
       }
     }
+    //
+    test(
+      s"bumping major version with tag pattern and versions matching for release should not work (annotated: $annotated)"
+    ) {
+      new TestSpec {
+        override protected def populateRepository(): Unit =
+          testRepository
+            .commitAndTag("foo-0.1.1", annotated)
+            .commitAndTag("bar-0.1.2", annotated)
+            .commitAndTag("bar-0.0.1", annotated)
+            .commitAndTag("bar-0.0.2", annotated)
+            .commit()
+
+        override protected def assertion: Assertion = {
+          val config =
+            defaultConfiguration
+              .copy(
+                snapshot = false,
+                tagPattern = "^bar-".r,
+                tagPrefix = "bar-",
+                versionsMatching = VersionsMatching(major = 0),
+                componentToBump = VersionComponent.MAJOR
+              )
+          val caught =
+            intercept[IllegalArgumentException](
+              SemanticBuildVersion(workingDir, config).determineVersion
+            )
+          caught.getMessage shouldBe
+            s"""Determined tag '${config.tagPrefix}1.0.0' is filtered out by your configuration; this is 
+               |not supported. Check your filtering and tag-prefix configuration. You may also be bumping the wrong 
+               |component; if so, bump the component that will give you the intended version, or manually create a tag 
+               |with the intended version on the commit to be released."""
+              .stripMargin
+              .replaceNewLines
+        }
+      }
+    }
+    //
+    test(
+      s"matching major version should not match on minor version component (annotated: $annotated)"
+    ) {
+      new TestSpec {
+        override protected def populateRepository(): Unit =
+          testRepository
+            .commitAndTag("v5.4.2", annotated)
+            .commitAndTag("v6.5.3", annotated)
+            .makeChanges()
+
+        override protected def assertion: Assertion =
+          SemanticBuildVersion(
+            workingDir,
+            defaultConfiguration.copy(versionsMatching =
+              VersionsMatching(major = 5)
+            )
+          ).determineVersion shouldBe "5.4.3-SNAPSHOT"
+      }
+    }
+    //
+    test(
+      s"matching major version should not match on parts of major version component (annotated: $annotated)"
+    ) {
+      new TestSpec {
+        override protected def populateRepository(): Unit =
+          testRepository
+            .commitAndTag("v5.4.2", annotated)
+            .commitAndTag("v15.14.12", annotated)
+            .makeChanges()
+
+        override protected def assertion: Assertion =
+          SemanticBuildVersion(
+            workingDir,
+            defaultConfiguration.copy(versionsMatching =
+              VersionsMatching(major = 5)
+            )
+          ).determineVersion shouldBe "5.4.3-SNAPSHOT"
+      }
+    }
+    //
+    test(
+      s"matching patch version should not match on parts of patch version component (annotated: $annotated)"
+    ) {
+      new TestSpec {
+        override protected def populateRepository(): Unit =
+          testRepository
+            .commitAndTag("v5.4.3-pre.1", annotated)
+            .commitAndTag("v5.4.32", annotated)
+            .makeChanges()
+
+        override protected def assertion: Assertion =
+          SemanticBuildVersion(
+            workingDir,
+            defaultConfiguration.copy(
+              preReleasePrefix = "pre",
+              versionsMatching =
+                VersionsMatching(major = 5, minor = 4, patch = 3)
+            )
+          ).determineVersion shouldBe "5.4.3-pre.2-SNAPSHOT"
+      }
+    }
   }
 
   test(
@@ -415,6 +516,56 @@ class MajorMinorPatchBumpingSpec
         }
       }
   }
+
+  forAll(
+    DataGenerator
+      .tableFor8(
+        getClass.getSimpleName,
+        classOf[DataSet4].getSimpleName,
+        DataSet4.Headers,
+        (value: DataSet4) => DataSet4.unapply(value).get
+      )
+  ) {
+    (
+      bump: VersionComponent,
+      `type`: String,
+      matching: VersionsMatching,
+      tagPattern: Regex,
+      tagPrefix: String,
+      tagNames: List[String],
+      annotated: Boolean,
+      expectedVersion: String
+    ) =>
+      test(
+        s"bumping ${bump.name().toLowerCase()} version with tag pattern and versions matching for ${`type`} (annotated: $annotated)"
+      ) {
+        val snapshot = `type` == "snapshot"
+        new TestSpec {
+          override protected def populateRepository(): Unit = {
+            tagNames.foreach(tag => testRepository.commitAndTag(tag, annotated))
+            if (snapshot) {
+              testRepository.makeChanges()
+            } else {
+              testRepository.commit()
+            }
+          }
+
+          override protected def assertion: Assertion = {
+            val config = defaultConfiguration.copy(
+              snapshot = snapshot,
+              versionsMatching = matching,
+              tagPattern = tagPattern,
+              tagPrefix = tagPrefix,
+              componentToBump = bump
+            )
+            SemanticBuildVersion(
+              workingDir,
+              config
+            ).determineVersion shouldBe expectedVersion
+          }
+        }
+      }
+  }
 }
 
 object MajorMinorPatchBumpingSpec {
@@ -459,6 +610,31 @@ object MajorMinorPatchBumpingSpec {
       "bump",
       "type",
       "matching",
+      "tagNames",
+      "annotated",
+      "expectedVersion"
+    )
+  }
+
+  private case class DataSet4(
+    bump: VersionComponent = VersionComponent.NONE,
+    `type`: String = "",
+    matching: VersionsMatching = VersionsMatching(),
+    tagPattern: Regex = "".r,
+    tagPrefix: String = "",
+    tagNames: List[String] = Nil,
+    annotated: Boolean = false,
+    expectedVersion: String = "")
+
+  private object DataSet4 {
+
+    val Headers
+      : (String, String, String, String, String, String, String, String) = (
+      "bump",
+      "type",
+      "matching",
+      "tagPattern",
+      "tagPrefix",
       "tagNames",
       "annotated",
       "expectedVersion"
