@@ -222,6 +222,43 @@ class MajorMinorPatchBumpingSpec
           ).determineVersion shouldBe "3.1.2"
       }
     }
+    //
+    test(
+      s"bumping major version with versions matching for release should not work (annotated: $annotated)"
+    ) {
+      new TestSpec {
+        override protected def populateRepository(): Unit =
+          testRepository
+            .commitAndTag("v0.1.1", annotated)
+            .commitAndTag("v0.1.2", annotated)
+            .commitAndTag("v0.0.1", annotated)
+            .commitAndTag("v0.0.2", annotated)
+            .commit()
+
+        override protected def assertion: Assertion = {
+          val configuration =
+            defaultConfiguration
+              .copy(
+                componentToBump = VersionComponent.MAJOR,
+                snapshot = false,
+                versionsMatching = VersionsMatching(major = 0)
+              )
+          val caught =
+            intercept[IllegalArgumentException](
+              SemanticBuildVersion(
+                workingDir,
+                configuration
+              ).determineVersion
+            )
+          caught.getMessage shouldBe s"""Determined tag '${configuration.tagPrefix}1.0.0' is filtered out by your configuration; this is not 
+                                        |supported. Check your filtering and tag-prefix configuration. You may also be bumping the wrong component; 
+                                        |if so, bump the component that will give you the intended version, or manually create a tag with the 
+                                        |intended version on the commit to be released."""
+            .stripMargin
+            .replaceNewLines
+        }
+      }
+    }
   }
 
   test(
