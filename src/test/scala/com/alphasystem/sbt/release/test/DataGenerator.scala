@@ -121,26 +121,28 @@ object DataGenerator {
     headers
       .zip(dataLine)
       .collect {
+        case (header, item) if header == "bump" =>
+          val bump =
+            if (item == "null") VersionComponent.NONE
+            else VersionComponent.valueOf(item)
+          s""""$header": ${bump.asJson.noSpaces}"""
+
+        case (header, item) if header == "tagNames" =>
+          s""""$header": ${toTagNames(item).asJson.noSpaces}"""
+
+        case (header, item) if header == "matching" =>
+          s""""$header": ${toVersionMatching(item).asJson.noSpaces}"""
+
+        case (header, item) if item == "true" || item == "false" =>
+          s""""$header": $item"""
+
         case (header, item) if item != "null" =>
-          if (header == "tagNames") {
-            s""""$header": ${toTagNames(item).asJson.noSpaces}"""
-          } else if (header == "matching") {
-            //
-            s""""$header": ${toVersionMatching(item)
-              .asJson
-              .noSpaces}"""
-          } else if (item == "true" || item == "false") {
-            s""""$header": $item"""
-          } else if (header == "bump") {
-            s""""$header": ${VersionComponent.valueOf(item).asJson.noSpaces}"""
-          } else {
-            s""""$header": "$item""""
-          }
+          s""""$header": "${item.replaceAll(",", "")}""""
 
       }
       .mkString("{", ",", "}")
 
   private def parseLine(line: String) =
-    line.split("\\|").map(_.replaceAll("'", "")).map(_.trim)
+    line.split("\\|").map(_.trim)
 
 }
