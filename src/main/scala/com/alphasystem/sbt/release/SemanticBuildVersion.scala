@@ -123,9 +123,9 @@ class SemanticBuildVersion(
           .stripMargin
           .replaceNewLines
       )
-    } else if (filteredTags.contains(result)) {
+    } else if (filterTags(Set(s"${_currentConfig.tagPrefix}$result")).isEmpty) {
       throw new IllegalArgumentException(
-        s"""Determined tag '${_currentConfig.tagPrefix}$result'  is filtered out by your configuration; this is not 
+        s"""Determined tag '${_currentConfig.tagPrefix}$result' is filtered out by your configuration; this is not 
            |supported. Check your filtering and tag-prefix configuration. You may also be bumping the wrong component; 
            |if so, bump the component that will give you the intended version, or manually create a tag with the 
            |intended version on the commit to be released."""
