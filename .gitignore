@@ -1,0 +1,19 @@
+*.class
+*.log
+.project
+.sonar
+# IDEA
+.idea/**
+.bsp/**
+
+null/**
+
+# sbt specific
+**/.sbtserver.lock
+**/.sbtserver
+.cache
+.history
+.lib/
+target/
+lib_managed/
+src_managed/
