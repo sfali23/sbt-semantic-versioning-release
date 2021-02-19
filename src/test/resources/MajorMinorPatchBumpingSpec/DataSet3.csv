@@ -1,0 +1,11 @@
+bump |type    |matching                      |tagNames                        |annotated|expectedVersion
+PATCH|snapshot|[major: 0, minor: 1]          |[v0.1.1, v0.1.2, v0.0.1, v0.0.2]|false    |0.1.3-SNAPSHOT
+PATCH|snapshot|[major: 0, minor: 1]          |[v0.1.1, v0.1.2, v0.0.1, v0.0.2]|true     |0.1.3-SNAPSHOT
+PATCH|release |[major: 1]                    |[v1.1.1, v1.1.2, v0.0.1, v0.0.2]|false    |1.1.3
+PATCH|release |[major: 1]                    |[v1.1.1, v1.1.2, v0.0.1, v0.0.2]|true     |1.1.3
+MINOR|snapshot|[major: 1, minor: 1, patch: 2]|[v1.1.1, v1.1.2, v0.0.1, v0.0.2]|false    |1.2.0-SNAPSHOT
+MINOR|snapshot|[major: 1, minor: 1, patch: 2]|[v1.1.1, v1.1.2, v0.0.1, v0.0.2]|true     |1.2.0-SNAPSHOT
+MINOR|release |[major: 1]                    |[v1.2.1, v1.2.2, v2.2.1, v2.2.2]|false    |1.3.0
+MINOR|release |[major: 1]                    |[v1.2.1, v1.2.2, v2.2.1, v2.2.2]|true     |1.3.0
+MAJOR|snapshot|[major: 3]                    |[v3.1.1, v3.1.2, v2.0.1, v2.0.2]|false    |4.0.0-SNAPSHOT
+MAJOR|snapshot|[major: 3]                    |[v3.1.1, v3.1.2, v2.0.1, v2.0.2]|true     |4.0.0-SNAPSHOT

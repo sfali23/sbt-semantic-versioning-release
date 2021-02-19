@@ -1,0 +1,13 @@
+bump |type    |annotated|expectedVersion
+PATCH|snapshot|false    |0.0.3-SNAPSHOT
+PATCH|snapshot|true     |0.0.3-SNAPSHOT
+PATCH|release |false    |0.0.3
+PATCH|release |true     |0.0.3
+MINOR|snapshot|false    |0.1.0-SNAPSHOT
+MINOR|snapshot|true     |0.1.0-SNAPSHOT
+MINOR|release |false    |0.1.0
+MINOR|release |true     |0.1.0
+MAJOR|snapshot|false    |1.0.0-SNAPSHOT
+MAJOR|snapshot|true     |1.0.0-SNAPSHOT
+MAJOR|release |false    |1.0.0
+MAJOR|release |true     |1.0.0
