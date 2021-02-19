@@ -136,7 +136,7 @@ class SetupVersionComponentUsingAutobumpConfiguration private (
       val patch = autoBump.patch(message)
       highestAutobumpPatternComponent match {
         case VersionComponent.MAJOR if autoBump.minorPattern.nonEmpty =>
-          Seq(VersionComponent.MINOR, VersionComponent.PATCH).contains(
+          !Seq(VersionComponent.MINOR, VersionComponent.PATCH).contains(
             componentToAutobump
           ) && patch
 
