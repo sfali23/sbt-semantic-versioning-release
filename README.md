@@ -1,0 +1,1 @@
+# sbt-semantic-versioning-release
