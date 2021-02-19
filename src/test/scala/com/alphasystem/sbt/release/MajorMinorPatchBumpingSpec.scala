@@ -124,9 +124,7 @@ class MajorMinorPatchBumpingSpec
         }
       }
     }
-  }
-
-  forAll(AnnotatedTestData) { (annotated: Boolean) =>
+    //
     test(
       s"version without matching tags is default starting release version (annotated: $annotated)"
     ) {
@@ -150,6 +148,80 @@ class MajorMinorPatchBumpingSpec
         }
       }
     }
+    //
+    test(
+      s"version with prior tag and uncommitted changes is next snapshot version (annotated: $annotated)"
+    ) {
+      new TestSpec {
+        override protected def populateRepository(): Unit =
+          testRepository
+            .commitAndTag("v0.0.1", annotated)
+            .makeChanges()
+
+        override protected def assertion: Assertion =
+          SemanticBuildVersion(
+            workingDir,
+            defaultConfiguration
+          ).determineVersion shouldBe "0.0.2-SNAPSHOT"
+      }
+    }
+    //
+    test(
+      s"version with prior tag and committed changes is next release version (annotated: $annotated)"
+    ) {
+      new TestSpec {
+        override protected def populateRepository(): Unit =
+          testRepository
+            .commitAndTag("v0.0.1", annotated)
+            .makeChanges()
+            .commit()
+
+        override protected def assertion: Assertion =
+          SemanticBuildVersion(
+            workingDir,
+            defaultConfiguration.copy(snapshot = false)
+          ).determineVersion shouldBe "0.0.2"
+      }
+    }
+    //
+    test(
+      s"checking out tag produces same version as tag (annotated: $annotated)"
+    ) {
+      new TestSpec {
+        override protected def populateRepository(): Unit =
+          testRepository
+            .commitAndTag("v3.1.2", annotated)
+            .commitAndTag("v3.1.3", annotated)
+            .commitAndTag("v3.1.4", annotated)
+            .checkout("v3.1.2")
+
+        override protected def assertion: Assertion =
+          SemanticBuildVersion(
+            workingDir,
+            defaultConfiguration.copy(snapshot = false)
+          ).determineVersion shouldBe "3.1.2"
+      }
+    }
+    //
+    test(
+      s"checking out tag produces same version as tag even if other tags are present (annotated: $annotated)"
+    ) {
+      new TestSpec {
+        override protected def populateRepository(): Unit =
+          testRepository
+            .commitAndTag("v3.1.2", annotated)
+            .commitAndTag("v3.1.3", annotated)
+            .commitAndTag("v3.1.4", annotated)
+            .checkout("v3.1.2")
+            .tag("foo", annotated)
+
+        override protected def assertion: Assertion =
+          SemanticBuildVersion(
+            workingDir,
+            defaultConfiguration.copy(snapshot = false)
+          ).determineVersion shouldBe "3.1.2"
+      }
+    }
   }
 
   test(
@@ -169,45 +241,6 @@ class MajorMinorPatchBumpingSpec
     }
   }
 
-  forAll(AnnotatedTestData) { (annotated: Boolean) =>
-    test(
-      s"version with prior tag and uncommitted changes is next snapshot version (annotated: $annotated)"
-    ) {
-      new TestSpec {
-        override protected def populateRepository(): Unit =
-          testRepository
-            .commitAndTag("v0.0.1", annotated)
-            .makeChanges()
-
-        override protected def assertion: Assertion =
-          SemanticBuildVersion(
-            workingDir,
-            defaultConfiguration
-          ).determineVersion shouldBe "0.0.2-SNAPSHOT"
-      }
-    }
-  }
-
-  forAll(AnnotatedTestData) { (annotated: Boolean) =>
-    test(
-      s"version with prior tag and committed changes is next release version (annotated: $annotated)"
-    ) {
-      new TestSpec {
-        override protected def populateRepository(): Unit =
-          testRepository
-            .commitAndTag("v0.0.1", annotated)
-            .makeChanges()
-            .commit()
-
-        override protected def assertion: Assertion =
-          SemanticBuildVersion(
-            workingDir,
-            defaultConfiguration.copy(snapshot = false)
-          ).determineVersion shouldBe "0.0.2"
-      }
-    }
-  }
-
   test(
     "version with custom snapshot suffix"
   ) {
@@ -221,49 +254,6 @@ class MajorMinorPatchBumpingSpec
           workingDir,
           config
         ).determineVersion shouldBe "0.1.0-CURRENT"
-      }
-    }
-  }
-
-  forAll(AnnotatedTestData) { (annotated: Boolean) =>
-    test(
-      s"checking out tag produces same version as tag (annotated: $annotated)"
-    ) {
-      new TestSpec {
-        override protected def populateRepository(): Unit =
-          testRepository
-            .commitAndTag("v3.1.2", annotated)
-            .commitAndTag("v3.1.3", annotated)
-            .commitAndTag("v3.1.4", annotated)
-            .checkout("v3.1.2")
-
-        override protected def assertion: Assertion =
-          SemanticBuildVersion(
-            workingDir,
-            defaultConfiguration.copy(snapshot = false)
-          ).determineVersion shouldBe "3.1.2"
-      }
-    }
-  }
-
-  forAll(AnnotatedTestData) { (annotated: Boolean) =>
-    test(
-      s"checking out tag produces same version as tag even if other tags are present (annotated: $annotated)"
-    ) {
-      new TestSpec {
-        override protected def populateRepository(): Unit =
-          testRepository
-            .commitAndTag("v3.1.2", annotated)
-            .commitAndTag("v3.1.3", annotated)
-            .commitAndTag("v3.1.4", annotated)
-            .checkout("v3.1.2")
-            .tag("foo", annotated)
-
-        override protected def assertion: Assertion =
-          SemanticBuildVersion(
-            workingDir,
-            defaultConfiguration.copy(snapshot = false)
-          ).determineVersion shouldBe "3.1.2"
       }
     }
   }
