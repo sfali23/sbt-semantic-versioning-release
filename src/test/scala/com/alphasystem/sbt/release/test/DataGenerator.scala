@@ -137,7 +137,8 @@ object DataGenerator {
           s""""$header": $item"""
 
         case (header, item) if item != "null" =>
-          s""""$header": "${item.replaceAll(",", "")}""""
+          val value = if (item.startsWith("\"")) item else s""""$item""""
+          s""""$header": $value"""
 
       }
       .mkString("{", ",", "}")
