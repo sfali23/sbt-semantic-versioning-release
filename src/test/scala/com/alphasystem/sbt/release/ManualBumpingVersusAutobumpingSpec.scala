@@ -25,7 +25,6 @@ class ManualBumpingVersusAutobumpingSpec
       .tableFor8(
         getClass.getSimpleName,
         classOf[DataSet1].getSimpleName,
-        DataSet1.Headers,
         (value: DataSet1) => DataSet1.unapply(value).get
       )
   ) {
@@ -79,7 +78,6 @@ class ManualBumpingVersusAutobumpingSpec
       .tableFor8(
         getClass.getSimpleName,
         classOf[DataSet2].getSimpleName,
-        DataSet2.Headers,
         (value: DataSet2) => DataSet2.unapply(value).get
       )
   ) {
@@ -144,21 +142,6 @@ object ManualBumpingVersusAutobumpingSpec {
     annotated: Boolean = false,
     expectedVersion: String = "")
 
-  private object DataSet1 {
-
-    val Headers
-      : (String, String, String, String, String, String, String, String) = (
-      "autobumpTag",
-      "preReleaseTag",
-      "bump",
-      "newPreRelease",
-      "promoteToRelease",
-      "forceBump",
-      "annotated",
-      "expectedVersion"
-    )
-  }
-
   private case class DataSet2(
     autobumpTag: Option[String] = None,
     preReleaseTag: Option[String] = None,
@@ -168,19 +151,4 @@ object ManualBumpingVersusAutobumpingSpec {
     forceBump: Boolean = false,
     annotated: Boolean = false,
     expectedExceptionMessage: String = "")
-
-  private object DataSet2 {
-
-    val Headers
-      : (String, String, String, String, String, String, String, String) = (
-      "autobumpTag",
-      "preReleaseTag",
-      "bump",
-      "newPreRelease",
-      "promoteToRelease",
-      "forceBump",
-      "annotated",
-      "expectedExceptionMessage"
-    )
-  }
 }

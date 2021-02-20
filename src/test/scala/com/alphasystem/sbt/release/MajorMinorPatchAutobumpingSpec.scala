@@ -37,7 +37,6 @@ class MajorMinorPatchAutobumpingSpec
     DataGenerator.tableFor7(
       getClass.getSimpleName,
       classOf[DataSet].getSimpleName,
-      DataSet.Headers,
       (value: DataSet) => DataSet.unapply(value).get
     )
   ) {
@@ -164,17 +163,4 @@ object MajorMinorPatchAutobumpingSpec {
     autobumpTag: String = "",
     annotated: Boolean = false,
     expectedVersion: String = "")
-
-  private object DataSet {
-
-    val Headers: (String, String, String, String, String, String, String) = (
-      "tagPattern",
-      "tagPrefix",
-      "matching",
-      "tagNames",
-      "autobumpTag",
-      "annotated",
-      "expectedVersion"
-    )
-  }
 }
