@@ -118,7 +118,7 @@ object VersioningHelper {
           | version, use newPreRelease instead""".stripMargin.replaceNewLines
       )
     }
-    if (config.newPreRelease) {
+    if (config.newPreRelease && !isValidPreReleasePart(latestVersion)) {
       latestVersion = s"$latestVersion-${config.preReleasePrefix}1"
     }
     latestVersion
