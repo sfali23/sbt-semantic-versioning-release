@@ -1,6 +1,6 @@
 package com.alphasystem.sbt.release
 
-import com.alphasystem.sbt.release.test.DataGenerator
+import com.alphasystem.sbt.release.test._
 import io.circe.generic.auto._
 import org.scalatest.Assertion
 import org.scalatest.funsuite.AnyFunSuite

@@ -1,0 +1,5 @@
+snapshot | annotated | expectedVersion
+false    | false     | 0.1.0-pre.1
+true     | false     | 0.1.0-pre.1-SNAPSHOT
+false    | true      | 0.1.0-pre.1
+true     | true      | 0.1.0-pre.1-SNAPSHOT
