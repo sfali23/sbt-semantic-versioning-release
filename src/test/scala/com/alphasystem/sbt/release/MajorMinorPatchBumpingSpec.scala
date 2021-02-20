@@ -71,7 +71,6 @@ class MajorMinorPatchBumpingSpec
       .tableFor3(
         getClass.getSimpleName,
         classOf[DataSet1].getSimpleName,
-        DataSet1.Headers,
         (value: DataSet1) => DataSet1.unapply(value).get
       )
   ) {
@@ -401,7 +400,6 @@ class MajorMinorPatchBumpingSpec
       .tableFor4(
         getClass.getSimpleName,
         classOf[DataSet2].getSimpleName,
-        DataSet2.Headers,
         (value: DataSet2) => DataSet2.unapply(value).get
       )
   ) {
@@ -474,7 +472,6 @@ class MajorMinorPatchBumpingSpec
       .tableFor6(
         getClass.getSimpleName,
         classOf[DataSet3].getSimpleName,
-        DataSet3.Headers,
         (value: DataSet3) => DataSet3.unapply(value).get
       )
   ) {
@@ -522,7 +519,6 @@ class MajorMinorPatchBumpingSpec
       .tableFor8(
         getClass.getSimpleName,
         classOf[DataSet4].getSimpleName,
-        DataSet4.Headers,
         (value: DataSet4) => DataSet4.unapply(value).get
       )
   ) {
@@ -575,26 +571,11 @@ object MajorMinorPatchBumpingSpec {
     bump: VersionComponent = VersionComponent.NONE,
     expectedVersion: String = "")
 
-  private object DataSet1 {
-
-    val Headers: (String, String, String) = (
-      "startingVersion",
-      "bump",
-      "expectedVersion"
-    )
-  }
-
   private case class DataSet2(
     bump: VersionComponent = VersionComponent.NONE,
     `type`: String = "",
     annotated: Boolean = false,
     expectedVersion: String = "")
-
-  private object DataSet2 {
-
-    val Headers: (String, String, String, String) =
-      ("bump", "type", "annotated", "expectedVersion")
-  }
 
   private case class DataSet3(
     bump: VersionComponent = VersionComponent.NONE,
@@ -603,18 +584,6 @@ object MajorMinorPatchBumpingSpec {
     tagNames: List[String] = Nil,
     annotated: Boolean = false,
     expectedVersion: String = "")
-
-  private object DataSet3 {
-
-    val Headers: (String, String, String, String, String, String) = (
-      "bump",
-      "type",
-      "matching",
-      "tagNames",
-      "annotated",
-      "expectedVersion"
-    )
-  }
 
   private case class DataSet4(
     bump: VersionComponent = VersionComponent.NONE,
@@ -625,19 +594,4 @@ object MajorMinorPatchBumpingSpec {
     tagNames: List[String] = Nil,
     annotated: Boolean = false,
     expectedVersion: String = "")
-
-  private object DataSet4 {
-
-    val Headers
-      : (String, String, String, String, String, String, String, String) = (
-      "bump",
-      "type",
-      "matching",
-      "tagPattern",
-      "tagPrefix",
-      "tagNames",
-      "annotated",
-      "expectedVersion"
-    )
-  }
 }
