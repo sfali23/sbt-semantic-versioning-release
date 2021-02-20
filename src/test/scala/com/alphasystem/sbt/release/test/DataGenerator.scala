@@ -82,6 +82,26 @@ object DataGenerator {
     }
   }
 
+  private def headerFor5(headers: List[String]) =
+    headers match {
+      case List(a, b, c, d, e) => (a, b, c, d, e)
+    }
+
+  private[release] def tableFor5[T, A, B, C, D, E](
+    basePath: String,
+    resourceName: String,
+    toDataTuple: T => (A, B, C, D, E)
+  )(implicit decoder: Decoder[T]
+  ): TableFor5[A, B, C, D, E] = {
+    val (headers, json) = toJson(basePath, resourceName)
+    decode[List[T]](json) match {
+      case Left(ex) => throw ex
+      case Right(values) =>
+        val rows = values.map(value => toDataTuple(value))
+        Table(headerFor5(headers), rows: _*)
+    }
+  }
+
   private def headerFor6(headers: List[String]) =
     headers match {
       case List(a, b, c, d, e, f) => (a, b, c, d, e, f)
