@@ -1,5 +1,6 @@
 package com.alphasystem.sbt.semver.release
 
+import com.alphasystem.sbt.semver.release.common.TestRepository
 import org.scalatest.Assertion
 
 import java.io.File
