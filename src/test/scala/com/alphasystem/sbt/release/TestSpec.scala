@@ -11,7 +11,7 @@ trait TestSpec {
   protected val workingDir = new File(s"/tmp/${UUID.randomUUID()}")
   protected val testRepository: TestRepository = TestRepository(workingDir)
 
-  protected def populateRepository(): Unit
+  protected def populateRepository(): Unit = ()
   protected def assertion: Assertion
 
   private def runTest(): Unit = {
