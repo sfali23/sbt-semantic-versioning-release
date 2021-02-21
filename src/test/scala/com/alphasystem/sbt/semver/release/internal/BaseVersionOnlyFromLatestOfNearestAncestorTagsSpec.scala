@@ -1,5 +1,6 @@
-package com.alphasystem.sbt.semver.release
+package com.alphasystem.sbt.semver.release.internal
 
+import com.alphasystem.sbt.semver.release.{ internal, _ }
 import com.alphasystem.sbt.semver.release.test._
 import org.scalatest.Assertion
 import org.scalatest.funsuite.AnyFunSuite
@@ -69,7 +70,7 @@ class BaseVersionOnlyFromLatestOfNearestAncestorTagsSpec
         override protected def assertion: Assertion =
           SemanticBuildVersion(
             workingDir,
-            SemanticBuildVersionConfiguration(snapshot = false)
+            internal.SemanticBuildVersionConfiguration(snapshot = false)
           ).determineVersion shouldBe "2.0.1"
       }
     }
@@ -111,7 +112,7 @@ class BaseVersionOnlyFromLatestOfNearestAncestorTagsSpec
         override protected def assertion: Assertion =
           SemanticBuildVersion(
             workingDir,
-            SemanticBuildVersionConfiguration(snapshot = false)
+            internal.SemanticBuildVersionConfiguration(snapshot = false)
           ).determineVersion shouldBe "2.0.1"
       }
     }
@@ -135,7 +136,7 @@ class BaseVersionOnlyFromLatestOfNearestAncestorTagsSpec
         override protected def assertion: Assertion = {
           val semanticBuildVersion = SemanticBuildVersion(
             workingDir,
-            SemanticBuildVersionConfiguration(snapshot = false)
+            internal.SemanticBuildVersionConfiguration(snapshot = false)
           )
           val caught = intercept[IllegalArgumentException](
             semanticBuildVersion.determineVersion

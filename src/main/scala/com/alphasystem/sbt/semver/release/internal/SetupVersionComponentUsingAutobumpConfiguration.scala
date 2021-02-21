@@ -1,4 +1,6 @@
-package com.alphasystem.sbt.semver.release
+package com.alphasystem.sbt.semver.release.internal
+
+import com.alphasystem.sbt.semver.release._
 
 class SetupVersionComponentUsingAutobumpConfiguration private (
   config: SemanticBuildVersionConfiguration) {

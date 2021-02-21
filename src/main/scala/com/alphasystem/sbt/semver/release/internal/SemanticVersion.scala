@@ -1,4 +1,4 @@
-package com.alphasystem.sbt.semver.release
+package com.alphasystem.sbt.semver.release.internal
 
 case class SemanticVersion(major: Int, minor: Int, patch: Int) {
 

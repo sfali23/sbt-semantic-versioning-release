@@ -1,4 +1,4 @@
-package com.alphasystem.sbt.semver.release
+package com.alphasystem.sbt.semver.release.internal
 
 import com.alphasystem.sbt.semver.release.common.TestRepository
 import org.scalatest.Assertion
@@ -13,6 +13,7 @@ trait TestSpec {
   protected val testRepository: TestRepository = TestRepository(workingDir)
 
   protected def populateRepository(): Unit = ()
+
   protected def assertion: Assertion
 
   private def runTest(): Unit = {

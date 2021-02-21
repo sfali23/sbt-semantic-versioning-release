@@ -1,4 +1,4 @@
-package com.alphasystem.sbt.semver.release
+package com.alphasystem.sbt.semver.release.internal
 
 import scala.util.matching.Regex
 

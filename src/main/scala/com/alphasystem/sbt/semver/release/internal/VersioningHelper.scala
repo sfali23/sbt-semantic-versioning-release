@@ -1,4 +1,6 @@
-package com.alphasystem.sbt.semver.release
+package com.alphasystem.sbt.semver.release.internal
+
+import com.alphasystem.sbt.semver.release._
 
 import scala.util.matching.Regex
 
@@ -11,7 +13,7 @@ object VersioningHelper {
 
   /** Determine the next version to bump.
     *
-    * @param config current configuration
+    * @param config        current configuration
     * @param latestVersion latest version from version control
     * @return next [[VersionComponent]]
     */

@@ -1,4 +1,4 @@
-package com.alphasystem.sbt.semver.release
+package com.alphasystem.sbt.semver.release.internal
 
 import com.alphasystem.sbt.semver.release.test._
 import org.scalatest.Assertion

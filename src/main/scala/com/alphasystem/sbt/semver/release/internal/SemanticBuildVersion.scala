@@ -1,6 +1,7 @@
-package com.alphasystem.sbt.semver.release
+package com.alphasystem.sbt.semver.release.internal
 
 import com.alphasystem.sbt.semver.release.common.JGitAdapter
+import com.alphasystem.sbt.semver.release.{ internal, _ }
 import org.eclipse.jgit.lib.Constants
 import org.eclipse.jgit.revwalk.RevCommit
 
@@ -240,6 +241,6 @@ object SemanticBuildVersion {
   def apply(
     workingDir: File,
     config: SemanticBuildVersionConfiguration =
-      SemanticBuildVersionConfiguration()
+      internal.SemanticBuildVersionConfiguration()
   ) = new SemanticBuildVersion(workingDir, config)
 }

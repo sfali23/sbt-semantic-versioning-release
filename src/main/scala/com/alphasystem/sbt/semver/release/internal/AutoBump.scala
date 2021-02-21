@@ -1,6 +1,7 @@
-package com.alphasystem.sbt.semver.release
+package com.alphasystem.sbt.semver.release.internal
 
-import AutoBump._
+import com.alphasystem.sbt.semver.release.internal.AutoBump._
+
 import scala.util.matching.Regex
 
 case class AutoBump(

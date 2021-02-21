@@ -1,5 +1,6 @@
-package com.alphasystem.sbt.semver.release
+package com.alphasystem.sbt.semver.release.internal
 
+import com.alphasystem.sbt.semver.release.internal
 import com.alphasystem.sbt.semver.release.test._
 import org.scalatest.Assertion
 import org.scalatest.funspec.AnyFunSpec
@@ -113,7 +114,7 @@ class SemanticBuildVersionSpec
           override protected def assertion: Assertion =
             SemanticBuildVersion(
               workingDir,
-              SemanticBuildVersionConfiguration()
+              internal.SemanticBuildVersionConfiguration()
             ).latestVersion shouldBe Some("0.0.1")
         }
       }
@@ -134,7 +135,7 @@ class SemanticBuildVersionSpec
           override protected def assertion: Assertion =
             SemanticBuildVersion(
               workingDir,
-              SemanticBuildVersionConfiguration()
+              internal.SemanticBuildVersionConfiguration()
             ).determineVersion shouldBe "0.0.2-SNAPSHOT"
         }
       }
@@ -153,7 +154,7 @@ class SemanticBuildVersionSpec
           override protected def assertion: Assertion = {
             val sbv = SemanticBuildVersion(
               workingDir,
-              SemanticBuildVersionConfiguration()
+              internal.SemanticBuildVersionConfiguration()
             )
             sbv.determineVersion
             sbv.currentConfig.snapshot shouldBe false
