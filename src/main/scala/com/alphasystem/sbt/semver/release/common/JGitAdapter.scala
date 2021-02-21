@@ -1,4 +1,4 @@
-package com.alphasystem.sbt.semver.release
+package com.alphasystem.sbt.semver.release.common
 
 import org.eclipse.jgit.api.Git
 import org.eclipse.jgit.lib.{ Constants, ObjectId, Ref, Repository }

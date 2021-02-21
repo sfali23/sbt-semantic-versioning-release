@@ -1,5 +1,6 @@
 package com.alphasystem.sbt.semver.release
 
+import com.alphasystem.sbt.semver.release.common.JGitAdapter
 import org.eclipse.jgit.lib.Constants
 import org.eclipse.jgit.revwalk.RevCommit
 
