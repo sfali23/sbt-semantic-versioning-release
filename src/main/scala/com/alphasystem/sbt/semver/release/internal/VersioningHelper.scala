@@ -127,7 +127,10 @@ object VersioningHelper {
   }
 
   def isValidPreReleasePart(version: String): Boolean =
-    PreReleasePartRegex.findAllIn(version).nonEmpty
+    PreReleasePartRegex.findFirstIn(version).nonEmpty
+
+  def isValidStartingVersion(version: String): Boolean =
+    VersionStartRegex.findFirstIn(version).nonEmpty
 
   private def bumpPreReleaseVersion(latestVersion: String) = {
     val preReleasePart = "^[^-]*-".r.replaceAllIn(latestVersion, "")
