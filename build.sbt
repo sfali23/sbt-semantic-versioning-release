@@ -1,8 +1,10 @@
 lazy val `sbt-semantic-versioning-release` = project
   .in(file("."))
-  .withId("sbt-semantic-versioning-release")
   .enablePlugins(SbtPlugin, ScalafmtPlugin, GitPlugin)
   .settings(
+    organization := "com.github.sfali23.sbt",
+    name := "sbt-semver-release",
+    version := "0.1.0-SNAPSHOT",
     scalaVersion in ThisBuild := "2.12.12",
     libraryDependencies ++= Seq(
       "org.eclipse.jgit" % "org.eclipse.jgit"       % "5.10.0.202012080955-r",
