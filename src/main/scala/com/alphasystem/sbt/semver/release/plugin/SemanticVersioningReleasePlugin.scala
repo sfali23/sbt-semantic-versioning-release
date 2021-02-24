@@ -6,12 +6,9 @@ import sbt.Keys._
 import sbt._
 import sbtrelease.ReleasePlugin
 import sbtrelease.ReleasePlugin.autoImport.ReleaseTransformations._
-import sbtrelease.ReleasePlugin.autoImport.{
-  ReleaseStep,
-  releaseProcess,
-  releaseVersion
-}
+import sbtrelease.ReleasePlugin.autoImport._
 
+import java.io.File
 import scala.util.matching.Regex
 
 object SemanticVersioningReleasePlugin extends AutoPlugin {
@@ -46,7 +43,6 @@ object SemanticVersioningReleasePlugin extends AutoPlugin {
     val majorVersionsMatching = settingKey[Int]("majorVersionsMatching")
     val minorVersionsMatching = settingKey[Int]("minorVersionsMatching")
     val patchVersionsMatching = settingKey[Int]("patchVersionsMatching")
-    val pushTag = settingKey[Boolean]("pushTag")
 
     object ReleaseKeys {
       val versionToBe = AttributeKey[String]("Next version")
@@ -105,7 +101,24 @@ object SemanticVersioningReleasePlugin extends AutoPlugin {
       }
     }
 
+  private def initializeReleaseVersionFile =
+    Def.setting {
+      val file = File.createTempFile("version_", ".sbt")
+      val ver =
+        if (releaseUseGlobalVersion.value)
+          (version in ThisBuild).value
+        else version.value
+
+      file.deleteOnExit()
+      IO.write(
+        file,
+        s"""version in ThisBuild := "$ver""""
+      )
+      file
+    }
+
   override def projectSettings: Seq[Def.Setting[_]] = Seq[Setting[_]](
+    releaseVersionFile := initializeReleaseVersionFile.value,
     startingVersion := getStartingVersion.value,
     tagPrefix := DefaultTagPrefix,
     tagPattern := DefaultTagPattern,
@@ -127,7 +140,6 @@ object SemanticVersioningReleasePlugin extends AutoPlugin {
     majorVersionsMatching := -1,
     minorVersionsMatching := -1,
     patchVersionsMatching := -1,
-    pushTag := true,
     determineVersion :=
       SemanticBuildVersion(
         baseDirectory.value,
