@@ -6,6 +6,7 @@ lazy val `sbt-semantic-versioning-release` = project
   .settings(
     organization := "com.github.sfali23.sbt",
     name := "sbt-semver-release",
+    version in ThisBuild := "0.1.0-SNAPSHOT",
     scalaVersion in ThisBuild := "2.12.12",
     // Don't update crossSbtVersions!
     // https://github.com/sbt/sbt/issues/5049
