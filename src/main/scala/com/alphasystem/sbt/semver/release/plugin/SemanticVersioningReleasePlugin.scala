@@ -40,10 +40,6 @@ object SemanticVersioningReleasePlugin extends AutoPlugin {
       "This option defines the prefix for the preRelease. Default value is \"RC.\"."
     )
 
-    val autoBumpEnable = settingKey[Boolean](
-      "This option defines the flag to enable autoBump. Default value is \"true\"."
-    )
-
     val forceBump = settingKey[Boolean](
       s"""This option defines the flag to enable forceBump. Default value is "false". This option can be set
          | via system property "sbt.release.forceBump"."""
@@ -141,7 +137,6 @@ object SemanticVersioningReleasePlugin extends AutoPlugin {
         tagPattern = tagPattern.value,
         snapshotSuffix = snapshotSuffix.value,
         preReleasePrefix = preReleasePrefix.value,
-        autoBumpEnable = autoBumpEnable.value,
         forceBump = forceBump.value,
         promoteToRelease = promoteToRelease.value,
         snapshot = snapshot.value,
@@ -202,7 +197,6 @@ object SemanticVersioningReleasePlugin extends AutoPlugin {
     tagPattern := DefaultTagPattern,
     snapshotSuffix := DefaultSnapshotSuffix,
     preReleasePrefix := DefaultPreReleasePrefix,
-    autoBumpEnable := DefaultAutoBumpEnable,
     forceBump := DefaultForceBump,
     promoteToRelease := DefaultPromoteToRelease,
     snapshot := DefaultSnapshot,

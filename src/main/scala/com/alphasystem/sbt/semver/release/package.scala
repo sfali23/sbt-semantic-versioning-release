@@ -9,7 +9,6 @@ package object release {
   val DefaultTagPattern: Regex = "\\d++\\.\\d++\\.\\d++".r
   val DefaultSnapshotSuffix: String = "SNAPSHOT"
   val DefaultPreReleasePrefix: String = "RC."
-  val DefaultAutoBumpEnable: Boolean = true
   val DefaultForceBump: Boolean = false
   val DefaultPromoteToRelease: Boolean = false
   val DefaultSnapshot: Boolean = true
