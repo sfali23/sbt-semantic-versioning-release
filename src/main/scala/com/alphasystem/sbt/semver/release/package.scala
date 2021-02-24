@@ -15,6 +15,21 @@ package object release {
   val DefaultNewPreRelease: Boolean = false
   val DefaultComponentToBump: VersionComponent = VersionComponent.NONE
 
+  private val SystemPropertyNamePrefix = "sbt.release."
+
+  val ForceBumpSystemPropertyName = s"${SystemPropertyNamePrefix}forceBump"
+
+  val NewPreReleaseSystemPropertyName =
+    s"${SystemPropertyNamePrefix}newPreRelease"
+
+  val PromoteToReleaseSystemPropertyName =
+    s"${SystemPropertyNamePrefix}promoteToRelease"
+
+  val SnapshotSystemPropertyName = s"${SystemPropertyNamePrefix}snapshot"
+
+  val ComponentToBumpSystemPropertyName =
+    s"${SystemPropertyNamePrefix}componentToBump"
+
   implicit class StringOps(src: String) {
     def replaceNewLines: String = src.replaceAll(System.lineSeparator(), "")
   }

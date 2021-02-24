@@ -9,6 +9,7 @@ import sbtrelease.ReleasePlugin.autoImport.ReleaseTransformations._
 import sbtrelease.ReleasePlugin.autoImport._
 
 import java.io.File
+import scala.util.Properties
 import scala.util.matching.Regex
 
 object SemanticVersioningReleasePlugin extends AutoPlugin {
@@ -56,7 +57,7 @@ object SemanticVersioningReleasePlugin extends AutoPlugin {
 
     val promoteToRelease = settingKey[Boolean](
       s"""This option defines the flag to enable promote-to-release. Default value is "false". This option can be set
-         | via system property "sbt.release.newPreRelease" as well as via "\\[promote]" regular expression."""
+         | via system property "sbt.release.promoteToRelease" as well as via "\\[promote]" regular expression."""
         .stripMargin
         .replaceNewLines
     )
@@ -71,7 +72,8 @@ object SemanticVersioningReleasePlugin extends AutoPlugin {
     val componentToBump = settingKey[Option[String]](
       s"""This option defines the component to bump. Default value is "NONE", which corresponds to bumping 
          |the lowest precedence component. Acceptable values are "PRE_RELEASE", "PATCH", "MINOR", "MAJOR", going from 
-         |lowest precedence to highest precedence."""
+         |lowest precedence to highest precedence. This option can be set via system property 
+         |"sbt.release.componentToBump"."""
         .stripMargin
         .replaceNewLines
     )
@@ -160,6 +162,15 @@ object SemanticVersioningReleasePlugin extends AutoPlugin {
       )
     }
 
+  private def initializeSettingFromSystemProperty(
+    propertyName: String,
+    defaultValue: Boolean
+  ) =
+    Properties
+      .propOrNone(propertyName)
+      .map(_.toBoolean)
+      .getOrElse(defaultValue)
+
   private def getStartingVersion =
     Def.setting {
       val versionInBuild = (version in ThisBuild).value
@@ -197,11 +208,27 @@ object SemanticVersioningReleasePlugin extends AutoPlugin {
     tagPattern := DefaultTagPattern,
     snapshotSuffix := DefaultSnapshotSuffix,
     preReleasePrefix := DefaultPreReleasePrefix,
-    forceBump := DefaultForceBump,
-    promoteToRelease := DefaultPromoteToRelease,
-    snapshot := DefaultSnapshot,
-    newPreRelease := DefaultNewPreRelease,
-    componentToBump := Some(DefaultComponentToBump.name()),
+    forceBump := initializeSettingFromSystemProperty(
+      ForceBumpSystemPropertyName,
+      DefaultForceBump
+    ),
+    promoteToRelease := initializeSettingFromSystemProperty(
+      PromoteToReleaseSystemPropertyName,
+      DefaultPromoteToRelease
+    ),
+    snapshot := initializeSettingFromSystemProperty(
+      SnapshotSystemPropertyName,
+      DefaultSnapshot
+    ),
+    newPreRelease := initializeSettingFromSystemProperty(
+      NewPreReleaseSystemPropertyName,
+      DefaultNewPreRelease
+    ),
+    componentToBump := Some(
+      Properties
+        .propOrNone(ComponentToBumpSystemPropertyName)
+        .getOrElse(DefaultComponentToBump.name())
+    ),
     autoBumpMajorPattern := Some(AutoBump.DefaultMajorPattern),
     autoBumpMinorPattern := Some(AutoBump.DefaultMinorPattern),
     autoBumpPatchPattern := Some(AutoBump.DefaultPatchPattern),
