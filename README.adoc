@@ -1,0 +1,195 @@
+= SBT Semantic Versioning Release
+:sectnums:
+:toc:
+:idprefix: id_
+:sbt_release_url: https://github.com/sbt/sbt-release
+
+This project is inspired by the https://github.com/vivin/gradle-semantic-build-versioning[Semantic build-versioning for Gradle] plugin.
+
+== Introduction
+
+This SBT plugin is an extension to {sbt_release_url}[sbt-release] plugin.
+
+=== Differences with sbt-release
+
+Git::
+This plugin depends on `Git`.
+
+version.sbt::
+This plugin doesn't require the `version.sbt`, since it relies on `Git` tags to find the latest version. Setting version
+in your `build.sbt` would be enough. Since `sbt-release` needs to have a `version.sbt` file, this plugin creates a temporary
+`version.sbt` file, which would be deleted once JVM exists. Following release steps are not required in this plugin:
+* `commitReleaseVersion`
+* `setNextVersion`
+* `commitNextVersion`
+* `pushChanges`
+
+Therefore, the default release process is:
+
+[source]
+----
+releaseProcess := Seq[ReleaseStep](
+      checkSnapshotDependencies,
+      inquireVersions,
+      runClean,
+      runTest,
+      setReleaseVersion,
+      tagRelease,
+      publishArtifacts
+    )
+----
+
+== Usage
+TBD
+
+== Plugin Settings
+Following are plugin settings:
+
+=== componentToBump
+This property bumps the version. It can be set to the values `MAJOR`, `MINOR`, `PATCH` or `PRE-RELEASE`.
+
+Assuming that the base version is `x.y.z`, and the value of `componentToBump` is:
+
+MAJOR::
+The new version will be `(x + 1).0.0`; if the base version is a pre-release version, the pre-release version-component is
+discarded, and the new version will still be `(x + 1).0.0`.
+
+MINOR::
+The new version will be `x.(y + 1).0`; if the base version is a pre-release version, the pre-release version-component is
+discarded, and the new version will still be `x.(y + 1).0`.
+
+PATCH::
+The new version will be `x.y.(z + 1)`; if the base version is a pre-release version, the pre-release version-component is
+discarded, and the new version will still be `x.y.(z + 1)`.
+
+PRE-RELEASE::
+The pre-release version is bumped. Pre-release versions are denoted by appending a hyphen, and a series of dot-separated identifiers
+that can only consist of alphanumeric characters and hyphens; numeric identifiers cannot contain leading-zeroes. Since pre-release
+versions are arbitrary, using this property requires some additional configuration (see <<id_pre_releases, pre-releases>>).
+ Assuming that the base version is `x.y.z-<identifier>`, the new version will be `x.y.z-<identifier\++>` where the value of `<identifier\++>`
+is determined based on a scheme defined by the pre-release configuration (see [bump](#prerelease.bump)).
+
+The behavior of this property is slightly different in the situation where the base version cannot be identified (usually when
+there are no ancestor tags). In this case, the base-version is set to the provided starting-version (or the default value of
+`0.1.0` if one is not provided; see <<id_startingversion, startigVersion>>). The requested version-component is bumped only if doing so will
+not cause a version series to be skipped; i.e., the starting version *will not be bumped* when the value of `componentToBump` is:
+
+MAJOR::
+The starting version has a non-zero major-version, a zero minor-version and a zero patch-version (i.e. `(x > 0).0.0`)
+
+MINOR::
+The starting version has:
+* a non-zero minor-version and a zero patch-version (i.e. `x.(y > 0).0`)
+* a non-zero major-version and a zero patch-version (i.e. `(x > 0).y.0`)
+
+PATCH::
+The starting version has:
+* a non-zero patch-version (i.e. `x.y.(z > 0)`)
+* a non-zero minor-version (i.e. `x.(y > 0).z`)
+* a non-zero major-version (i.e. `(x > 0).y.z`)
+
+[NOTE]
+====
+* `pre-release` can only be used if the base version is already a pre-release version. If you want to create a new pre-release,
+use the `newPreRelease` property.
+* It is not possible to use `pre-release` with `promoteToRelease` or `newPreRelease`.
+* `pre-release` can fail if you have filtered tags in such a way (see [Filtering tags](#filtering-tags) and [`pattern`](#prerelease.pattern))
+that the base version does not have a pre-release identifier.
+====
+
+=== forceBump
+This property defines the flag to enable forceBump. Default value is *false*. This option can be set via system property *sbt.release.forceBump*.
+
+If you use autobumping (see [Automatic bumping based on commit messages](#automatic-bumping-based-on-commit-messages)) and
+manual bumping together, the following precedence-rules apply, after determining the autobump and manual-bump version-components
+separately:
+
+* If you are attempting to manually bump a component with higher-precedence than the one autobump is attempting to bump,
+the manual bump wins.
+* If you are attempting to manually bump a component with lesser-precedence than the one autobump is attempting to bump,
+and the `forceBump` property is **not** set, the build fails.
+* If you are attempting to manually bump a component with lesser-precedence than the one autobump is attempting to bump,
+and the `forceBump` property is set, the manual bump wins. Note that this means that you are **intentionally disregarding**
+your commit messages (i.e., "I know what I'm doing; my commit messages were wrong").
+
+=== newPreRelease
+This property defines the flag to enable new-pre-release. Default value is *false*. This option can be set via system property
+*sbt.release.newPreRelease* as well as by *[new-pre-release]* in the commit message.
+
+This property creates a new pre-release version by bumping the requested version-component and then adding the starting pre-release
+version from the pre-release configuration (see <<id_pre_releases, pre-release>>). It has the following behavior:
+
+* When used by itself it will bump the patch version and then append the starting pre-release version as specified in the
+pre-release configuration. Assuming that the base version is `x.y.z`, the new version will be `x.y.(z + 1)-<startingVersion>`
+(see [`startingVersion`](#prerelease.startingversion)).
+* When used with `componentToBump=patch`, the behavior is the same as using `newPreRelease` by itself.
+* When used with `componentToBump=minor`, it will bump the minor version and then append the starting pre-release version as
+specified in the pre-release configuration. Assuming that the base version is `x.y.z`, the new version will be `x.(y + 1).0-<startingVersion>`
+(see [`startingVersion`](#prerelease.startingversion)).
+* When used with `componentToBump=major`, it will bump the major version and then append the starting pre-release version as
+specified in the pre-release configuration. Assuming that the base version is `x.y.z`, the new version will be `(x + 1).0.0-<startingVersion>`
+(see [`startingVersion`](#prerelease.startingversion)).
+
+[NOTE]
+====
+* It is not possible to use `componentToBump=pre-release` along with `newPreRelease`.
+* If the base version cannot be identified, and a starting version is used, note that the behavior of `componentToBump` is still
+subject to the rules that prevent version series from being skipped when bumping.
+====
+
+=== promoteToRelease
+This property defines the flag to enable promote-to-release. Default value is *false*. This option can be set via system property
+*sbt.release.promoteToRelease* as well as via *[promote]* in the commit message.
+
+This property promotes a pre-release version to a release version. This is done by discarding the pre-release version-component.
+For example, assuming that the base version is `x.y.z-some.identifiers.here`, the new version will be `x.y.z`.
+*This property can only be used if the base version is a pre-release version*.
+
+=== startingVersion
+This option defines the starting version of the build in case there is no tag available to determine next version. Default
+value is *0.1.0-SNAPSHOT*. If not defined it will be deduced from project `version`.
+
+=== tagPrefix
+This option defines prefix to use when tagging a release. Default value is *v*.
+
+=== tagPattern
+This option defines the pattern to identify tag. Default value is *\d++\.\d++\.\d++*. This must a regular expression.
+
+=== snapshotSuffix
+This option defines the suffix for the snapshot version. Default value is *SNAPSHOT*.
+
+=== preReleasePrefix
+This option defines the prefix for the preRelease. Default value is *RC.*.
+
+
+=== Pre-releases
+
+'''
+
+[[id_snapshot, snapshot]]
+snapshot::
+This option defines the flag to make current release a snapshot release. Default value is *true*. This option can be set
+via system property *sbt.release.snapshot*.
+
+[[id_autoBumpMajorPattern, autoBumpMajorPattern]]
+autoBumpMajorPattern::
+This option defines the regular expression to bump *MAJOR* component. Default value is *\[major]*.
+
+[[id_autoBumpMinorPattern, autoBumpMinorPattern]]
+autoBumpMinorPattern::
+This option defines the regular expression to bump *MINOR* component. Default value is *\[minor]*.
+
+[[id_autoBumpPatchPattern, autoBumpPatchPattern]]
+autoBumpPatchPattern::
+This option defines the regular expression to bump *PATCH* component. Default value is *\[patch]*.
+
+[[id_autoBumpNewPreReleasePattern, autoBumpNewPreReleasePattern]]
+autoBumpNewPreReleasePattern::
+This option defines the regular expression to create a new *PRE_RELEASE* component. Default value is *\[new-pre-release]*.
+
+[[id_autoBumpPromoteToReleasePattern, autoBumpPromoteToReleasePattern]]
+autoBumpPromoteToReleasePattern::
+This option defines the regular expression to create a release from a *PRE_RELEASE*. Default value is *\[promote*.
+
+
+

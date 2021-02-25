@@ -21,7 +21,7 @@ object SemanticVersioningReleasePlugin extends AutoPlugin {
     )
 
     val startingVersion = settingKey[String](
-      """This option defines starting version of the build in case there is no tag available to determine next version. 
+      """This option defines the starting version of the build in case there is no tag available to determine next version. 
         |Default value is "0.1.0-SNAPSHOT".""".stripMargin.replaceNewLines
     )
 
@@ -92,13 +92,13 @@ object SemanticVersioningReleasePlugin extends AutoPlugin {
 
     val autoBumpNewPreReleasePattern =
       settingKey[Option[Regex]](
-        s"""This option defines the regular expression to bump "PRE_RELEASE" component. Default value is
+        s"""This option defines the regular expression to create a new "PRE_RELEASE" component. Default value is
            | "\\[new-pre-release]".""".stripMargin.replaceNewLines
       )
 
     val autoBumpPromoteToReleasePattern =
       settingKey[Option[Regex]](
-        s"""This option defines the regular expression to bump a . Default value is "\\[promote]"."""
+        s"""This option defines the regular expression to create a release from a pre-release. Default value is "\\[promote]"."""
       )
 
     val majorVersionsMatching = settingKey[Int](
