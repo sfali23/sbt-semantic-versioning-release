@@ -9,14 +9,16 @@ case class SemanticBuildVersionConfiguration(
   tagPrefix: String = DefaultTagPrefix,
   tagPattern: Regex = DefaultTagPattern,
   snapshotSuffix: String = DefaultSnapshotSuffix,
-  preReleasePrefix: String = DefaultPreReleasePrefix,
   forceBump: Boolean = DefaultForceBump,
   promoteToRelease: Boolean = DefaultPromoteToRelease,
   snapshot: Boolean = DefaultSnapshot,
   newPreRelease: Boolean = DefaultNewPreRelease,
   autoBump: AutoBump = AutoBump(),
   versionsMatching: VersionsMatching = VersionsMatching(),
-  componentToBump: VersionComponent = DefaultComponentToBump) {
+  componentToBump: VersionComponent = DefaultComponentToBump,
+  preReleaseConfig: PreReleaseConfig = PreReleaseConfig(),
+  preReleaseBump: (PreReleaseConfig, String) => String =
+    DefaultPreReleaseBump) {
 
   def isAutobumpEnabled: Boolean = autoBump.isEnabled
 

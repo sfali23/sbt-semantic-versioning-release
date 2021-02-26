@@ -1,5 +1,7 @@
 package com.alphasystem.sbt.semver
 
+import com.alphasystem.sbt.semver.release.internal.PreReleaseConfig
+
 import scala.util.matching.Regex
 
 package object release {
@@ -8,12 +10,20 @@ package object release {
   val DefaultTagPrefix: String = "v"
   val DefaultTagPattern: Regex = "\\d++\\.\\d++\\.\\d++".r
   val DefaultSnapshotSuffix: String = "SNAPSHOT"
-  val DefaultPreReleasePrefix: String = "RC."
+  val DefaultPreReleaseStartingVersion: String = "RC.1"
   val DefaultForceBump: Boolean = false
   val DefaultPromoteToRelease: Boolean = false
   val DefaultSnapshot: Boolean = true
   val DefaultNewPreRelease: Boolean = false
   val DefaultComponentToBump: VersionComponent = VersionComponent.NONE
+
+  val DefaultPreReleaseBump: (PreReleaseConfig, String) => String =
+    (config: PreReleaseConfig, latestVersion: String) => {
+      val preReleaseComponents = config.splitComponents(latestVersion)
+      val prefix = preReleaseComponents.dropRight(1).mkString("")
+      val nextVersion = preReleaseComponents.last.toInt + 1
+      s"$prefix$nextVersion"
+    }
 
   private val SystemPropertyNamePrefix = "sbt.release."
 
