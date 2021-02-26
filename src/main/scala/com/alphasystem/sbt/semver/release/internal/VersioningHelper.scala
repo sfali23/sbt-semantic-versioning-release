@@ -61,17 +61,17 @@ object VersioningHelper {
       case VersionComponent.MAJOR =>
         val label = latest.bumpMajor.toLabel
         if (config.newPreRelease)
-          s"$label-${config.preReleasePrefix}1"
+          s"$label-${config.preReleaseConfig.startingVersion}"
         else label
       case VersionComponent.MINOR =>
         val label = latest.bumpMinor.toLabel
         if (config.newPreRelease)
-          s"$label-${config.preReleasePrefix}1"
+          s"$label-${config.preReleaseConfig.startingVersion}"
         else label
       case VersionComponent.PATCH =>
         val label = latest.bumpPatch.toLabel
         if (config.newPreRelease)
-          s"$label-${config.preReleasePrefix}1"
+          s"$label-${config.preReleaseConfig.startingVersion}"
         else label
       case VersionComponent.PRE_RELEASE =>
         if (!isValidPreReleasePart(latestVersion)) {
@@ -82,7 +82,7 @@ object VersioningHelper {
               .replaceNewLines
           )
         } else {
-          s"${latest.toLabel}-${bumpPreReleaseVersion(latestVersion)}"
+          s"${latest.toLabel}-${config.preReleaseBump(config.preReleaseConfig, latestVersion)}"
         }
       case VersionComponent.NONE => latest.toLabel
     }
@@ -121,7 +121,8 @@ object VersioningHelper {
       )
     }
     if (config.newPreRelease && !isValidPreReleasePart(latestVersion)) {
-      latestVersion = s"$latestVersion-${config.preReleasePrefix}1"
+      latestVersion =
+        s"$latestVersion-${config.preReleaseConfig.startingVersion}"
     }
     latestVersion
   }
@@ -131,13 +132,6 @@ object VersioningHelper {
 
   def isValidStartingVersion(version: String): Boolean =
     VersionStartRegex.nonEmpty(version)
-
-  private def bumpPreReleaseVersion(latestVersion: String) = {
-    val preReleasePart = "^[^-]*-".r.replaceAllIn(latestVersion, "")
-    val preReleaseComponents = preReleasePart.split("(?<=\\D)(?=\\d)")
-    val preReleasePrefix = preReleaseComponents.dropRight(1).mkString("")
-    s"$preReleasePrefix${preReleaseComponents.last.toInt + 1}"
-  }
 
   private def createSemanticVersion(
     latestVersion: String,
