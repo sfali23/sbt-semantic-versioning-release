@@ -10,10 +10,8 @@ case class PreReleaseConfig(
 
   def pattern: Regex = ("\\d++\\.\\d++\\.\\d++-" + preReleasePartPattern).r
 
-  def splitComponents(latestVersion: String): List[String] = {
-    val preReleasePart = "^[^-]*-".r.replaceAllIn(latestVersion, "")
-    preReleasePart.split("(?<=\\D)(?=\\d)").toList
-  }
+  def splitComponents(latestVersion: String): List[String] =
+    latestVersion.split("(?<=\\D)(?=\\d)").toList
 
   private def validate(): Unit = {
     if (!VersioningHelper.isValidPreReleasePart(s"0.1.0-$startingVersion")) {

@@ -11,6 +11,8 @@ object VersioningHelper {
   val PreReleasePartRegex: Regex =
     "(?<=^\\d+\\.\\d+\\.\\d+)-(?<preReleasePart>.*)$".r
 
+  private val MainVersionPartRegex = "^[^-]*-".r
+
   /** Determine the next version to bump.
     *
     * @param config        current configuration
@@ -82,7 +84,11 @@ object VersioningHelper {
               .replaceNewLines
           )
         } else {
-          s"${latest.toLabel}-${config.preReleaseBump(config.preReleaseConfig, latestVersion)}"
+          val bumpedPreReleasePart = config.preReleaseBump(
+            config.preReleaseConfig,
+            MainVersionPartRegex.replaceAllIn(latestVersion, "")
+          )
+          s"${latest.toLabel}-$bumpedPreReleasePart"
         }
       case VersionComponent.NONE => latest.toLabel
     }
