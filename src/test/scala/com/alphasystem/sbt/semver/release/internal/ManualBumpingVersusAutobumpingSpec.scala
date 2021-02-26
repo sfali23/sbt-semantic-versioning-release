@@ -97,7 +97,7 @@ class ManualBumpingVersusAutobumpingSpec
       test(
         s"""autobumping $autobumpTagMsg version, preReleaseTag $preReleaseTagMsg, manually bumping $bump version, 
            |manual newPreRelease $newPreRelease, manual promoteToRelease $promoteToRelease, forceBump $forceBump - 
-           |should fail (annotated: $annotated)""".stripMargin
+           |should fail (annotated: $annotated)""".stripMargin.replaceNewLines
       ) {
         new TestSpec {
           override protected def populateRepository(): Unit =
