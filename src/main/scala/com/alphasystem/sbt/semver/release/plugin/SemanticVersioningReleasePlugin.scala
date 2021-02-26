@@ -16,6 +16,9 @@ object SemanticVersioningReleasePlugin extends AutoPlugin {
 
   object autoImport {
 
+    type PreReleaseConfig =
+      com.alphasystem.sbt.semver.release.internal.PreReleaseConfig
+
     val determineVersion = taskKey[String](
       "A task to determine the next version to be without bumping actual version."
     )
@@ -24,6 +27,11 @@ object SemanticVersioningReleasePlugin extends AutoPlugin {
       """This option defines the starting version of the build in case there is no tag available to determine next version. 
         |Default value is "0.1.0-SNAPSHOT".""".stripMargin.replaceNewLines
     )
+
+    val preReleaseStartingVersion =
+      settingKey[String](
+        "This option defines starting version of the pre-release. Default value is \"RC.1\"."
+      )
 
     val tagPrefix = settingKey[String](
       "This option defines prefix to use when tagging a release. Default value is \"v\"."
@@ -35,10 +43,6 @@ object SemanticVersioningReleasePlugin extends AutoPlugin {
 
     val snapshotSuffix = settingKey[String](
       "This option defines the suffix for snapshot. Default value is \"SNAPSHOT\"."
-    )
-
-    val preReleasePrefix = settingKey[String](
-      "This option defines the prefix for the preRelease. Default value is \"RC.\"."
     )
 
     val forceBump = settingKey[Boolean](
@@ -77,6 +81,14 @@ object SemanticVersioningReleasePlugin extends AutoPlugin {
         .stripMargin
         .replaceNewLines
     )
+
+    val preReleasePattern = settingKey[String](
+      """This option defines regular expression to filter tags based on pre-release pattern. Default value 
+        |is \".*+$\"""".stripMargin.replaceNewLines
+    )
+
+    val preReleaseBump =
+      settingKey[(PreReleaseConfig, String) => String]("preReleaseBump")
 
     val autoBumpMajorPattern = settingKey[Option[Regex]](
       s"""This option defines the regular expression to bump "MAJOR" component. Default value is "\\[major]"."""
@@ -138,7 +150,6 @@ object SemanticVersioningReleasePlugin extends AutoPlugin {
         tagPrefix = tagPrefix.value,
         tagPattern = tagPattern.value,
         snapshotSuffix = snapshotSuffix.value,
-        preReleasePrefix = preReleasePrefix.value,
         forceBump = forceBump.value,
         promoteToRelease = promoteToRelease.value,
         snapshot = snapshot.value,
@@ -158,7 +169,12 @@ object SemanticVersioningReleasePlugin extends AutoPlugin {
         componentToBump = componentToBump
           .value
           .map(VersionComponent.valueOf)
-          .getOrElse(DefaultComponentToBump)
+          .getOrElse(DefaultComponentToBump),
+        preReleaseConfig = PreReleaseConfig(
+          preReleaseStartingVersion.value,
+          preReleasePartPattern = preReleasePattern.value
+        ),
+        preReleaseBump = preReleaseBump.value
       )
     }
 
@@ -204,10 +220,10 @@ object SemanticVersioningReleasePlugin extends AutoPlugin {
   override def projectSettings: Seq[Def.Setting[_]] = Seq[Setting[_]](
     releaseVersionFile := initializeReleaseVersionFile.value,
     startingVersion := getStartingVersion.value,
+    preReleaseStartingVersion := DefaultPreReleaseStartingVersion,
     tagPrefix := DefaultTagPrefix,
     tagPattern := DefaultTagPattern,
     snapshotSuffix := DefaultSnapshotSuffix,
-    preReleasePrefix := DefaultPreReleasePrefix,
     forceBump := initializeSettingFromSystemProperty(
       ForceBumpSystemPropertyName,
       DefaultForceBump
@@ -229,6 +245,10 @@ object SemanticVersioningReleasePlugin extends AutoPlugin {
         .propOrNone(ComponentToBumpSystemPropertyName)
         .getOrElse(DefaultComponentToBump.name())
     ),
+    preReleaseBump := { (config: PreReleaseConfig, latestVersion: String) =>
+      DefaultPreReleaseBump(config, latestVersion)
+    },
+    preReleasePattern := ".*+$",
     autoBumpMajorPattern := Some(AutoBump.DefaultMajorPattern),
     autoBumpMinorPattern := Some(AutoBump.DefaultMinorPattern),
     autoBumpPatchPattern := Some(AutoBump.DefaultPatchPattern),

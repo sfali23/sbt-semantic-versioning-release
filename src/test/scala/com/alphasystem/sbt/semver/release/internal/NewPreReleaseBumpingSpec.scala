@@ -17,7 +17,7 @@ class NewPreReleaseBumpingSpec
 
   private val defaultConfiguration =
     SemanticBuildVersionConfiguration(
-      preReleasePrefix = "pre.",
+      preReleaseConfig = PreReleaseConfig(startingVersion = "pre.1"),
       tagPrefix = "",
       newPreRelease = true
     )
@@ -50,8 +50,8 @@ class NewPreReleaseBumpingSpec
         else s" with bump ${bumpComponent.name().toLowerCase}"
       val bumpMsg2 = if (bumpComponent.isNone) " with " else " and "
       test(
-        s"""${snapshotMsg}new pre-release version $with_without_msg prior ${preReleaseMsg}version$bumpMsg1$bumpMsg2
-        startingVersion $startingVersion (annotated: $annotated)"""
+        s"""${snapshotMsg}new pre-release version $with_without_msg prior ${preReleaseMsg}version$bumpMsg1$bumpMsg2 
+           |startingVersion $startingVersion (annotated: $annotated)"""
           .stripMargin
           .replaceNewLines
       ) {

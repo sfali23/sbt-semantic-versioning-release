@@ -1,23 +1,22 @@
 package com.alphasystem.sbt.semver.release.internal
 
-import scala.util.Try
 import scala.util.matching.Regex
 
 case class PreReleaseConfig(
-  startingVersion: String,
+  startingVersion: String = "RC.1",
   preReleasePartPattern: String = ".*+$") {
-
-  private var preReleasePrefix = ""
-  private var preReleaseVersion = 0
 
   validate()
 
   def pattern: Regex = ("\\d++\\.\\d++\\.\\d++-" + preReleasePartPattern).r
 
-  def bump: String = s"$preReleasePrefix${preReleaseVersion + 1}"
+  def splitComponents(latestVersion: String): List[String] = {
+    val preReleasePart = "^[^-]*-".r.replaceAllIn(latestVersion, "")
+    preReleasePart.split("(?<=\\D)(?=\\d)").toList
+  }
 
   private def validate(): Unit = {
-    if (!VersioningHelper.isValidPreReleasePart(startingVersion)) {
+    if (!VersioningHelper.isValidPreReleasePart(s"0.1.0-$startingVersion")) {
       throw new IllegalArgumentException(
         s"Starting version ($startingVersion) is not a valid prerelease version"
       )
@@ -39,17 +38,5 @@ case class PreReleaseConfig(
         )
       }
     }
-
-    val preReleasePart = "^[^-]*-".r.replaceAllIn(startingVersion, "")
-    val preReleaseComponents = preReleasePart.split("(?<=\\D)(?=\\d)")
-    if (Try(preReleaseComponents.last.toInt).toOption.isEmpty) {
-      // last part of pre-release must be numeric
-      throw new IllegalArgumentException(
-        "pre-release must have at least one numeric part"
-      )
-    }
-
-    preReleasePrefix = preReleaseComponents.dropRight(1).mkString("")
-    preReleaseVersion = preReleaseComponents.last.toInt
   }
 }

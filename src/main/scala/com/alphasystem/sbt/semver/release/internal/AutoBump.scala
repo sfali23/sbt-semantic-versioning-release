@@ -1,5 +1,6 @@
 package com.alphasystem.sbt.semver.release.internal
 
+import com.alphasystem.sbt.semver.release._
 import com.alphasystem.sbt.semver.release.internal.AutoBump._
 
 import scala.util.matching.Regex
@@ -25,7 +26,7 @@ case class AutoBump(
     matchValue(input, promoteToReleasePattern)
 
   private def matchValue(input: String, regex: Option[Regex]): Boolean =
-    regex.exists(_.findFirstIn(input).nonEmpty)
+    regex.exists(_.nonEmpty(input))
 
   def isEnabled: Boolean =
     majorPattern.nonEmpty ||
