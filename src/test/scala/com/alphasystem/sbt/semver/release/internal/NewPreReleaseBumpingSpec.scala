@@ -17,7 +17,7 @@ class NewPreReleaseBumpingSpec
 
   private val defaultConfiguration =
     SemanticBuildVersionConfiguration(
-      preReleasePrefix = "pre.",
+      preReleaseConfig = PreReleaseConfig(startingVersion = "pre.1"),
       tagPrefix = "",
       newPreRelease = true
     )

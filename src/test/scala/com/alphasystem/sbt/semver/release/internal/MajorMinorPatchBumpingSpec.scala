@@ -353,7 +353,7 @@ class MajorMinorPatchBumpingSpec
           SemanticBuildVersion(
             workingDir,
             defaultConfiguration.copy(
-              preReleasePrefix = "pre",
+              preReleaseConfig = PreReleaseConfig(startingVersion = "pre.1"),
               versionsMatching =
                 VersionsMatching(major = 5, minor = 4, patch = 3)
             )
