@@ -209,16 +209,13 @@ class SemanticBuildVersion(
   // TODO: missing pre-release
   private def filterTags(tags: Set[String]): Set[String] = {
     tags
-      .filter(tag => _currentConfig.tagPattern.findFirstIn(tag).nonEmpty)
-      .filter(tag =>
-        SemanticBuildVersion.VersionPattern.findFirstIn(tag).nonEmpty
-      )
+      .filter(tag => _currentConfig.tagPattern.nonEmpty(tag))
+      .filter(tag => SemanticBuildVersion.VersionPattern.nonEmpty(tag))
       .filter(tag =>
         !_currentConfig.versionsMatching.isEnabled || _currentConfig
           .versionsMatching
           .toPattern
-          .findFirstIn(tag)
-          .nonEmpty
+          .nonEmpty(tag)
       )
     /*.filter { tag =>
         _currentConfig.preReleaseConfig.isEmpty ||
