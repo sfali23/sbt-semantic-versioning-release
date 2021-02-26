@@ -217,11 +217,10 @@ class SemanticBuildVersion(
           .toPattern
           .nonEmpty(tag)
       )
-    /*.filter { tag =>
-        _currentConfig.preReleaseConfig.isEmpty ||
-        PreReleaseRegex.findAllIn(tag).nonEmpty ||
-        _currentConfig.preReleaseConfig.get.pattern.findAllIn(tag).nonEmpty
-      }*/
+      .filter { tag =>
+        PreReleaseRegex.isEmpty(tag) ||
+        _currentConfig.preReleaseConfig.pattern.nonEmpty(tag)
+      }
   }
 
 }
