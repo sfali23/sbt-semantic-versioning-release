@@ -1,12 +1,12 @@
-package com.alphasystem.sbt.semver.release.plugin
+package sbtsemverrelease
 
 import com.alphasystem.sbt.semver.release._
 import com.alphasystem.sbt.semver.release.internal._
 import sbt.Keys._
 import sbt._
 import sbtrelease.ReleasePlugin
-import sbtrelease.ReleasePlugin.autoImport.ReleaseTransformations._
 import sbtrelease.ReleasePlugin.autoImport._
+import sbtrelease.ReleaseStateTransformations._
 
 import java.io.File
 import scala.util.Properties
