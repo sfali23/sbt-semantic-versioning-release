@@ -1,9 +1,9 @@
 package com.alphasystem.sbt.semver.release
 
-import com.alphasystem.sbt.semver.release.internal.VersionsMatching
 import io.circe.{ Decoder, Encoder, Json }
 import org.scalatest.prop.TableDrivenPropertyChecks._
 import org.scalatest.prop.TableFor1
+import sbtsemverrelease.VersionsMatching
 
 import scala.util.matching.Regex
 package object test {

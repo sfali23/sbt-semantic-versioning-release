@@ -1,6 +1,6 @@
 package com.alphasystem.sbt.semver
 
-import com.alphasystem.sbt.semver.release.internal.PreReleaseConfig
+import sbtsemverrelease.PreReleaseConfig
 
 import scala.util.matching.Regex
 

@@ -1,6 +1,7 @@
 package com.alphasystem.sbt.semver.release.internal
 
 import com.alphasystem.sbt.semver.release._
+import sbtsemverrelease.{ AutoBump, PreReleaseConfig, VersionsMatching }
 
 import scala.util.matching.Regex
 

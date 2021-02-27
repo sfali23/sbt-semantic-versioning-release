@@ -16,9 +16,6 @@ object SemanticVersioningReleasePlugin extends AutoPlugin {
 
   object autoImport {
 
-    type PreReleaseConfig =
-      com.alphasystem.sbt.semver.release.internal.PreReleaseConfig
-
     val determineVersion = taskKey[String](
       "A task to determine the next version to be without bumping actual version."
     )
@@ -27,11 +24,6 @@ object SemanticVersioningReleasePlugin extends AutoPlugin {
       """This option defines the starting version of the build in case there is no tag available to determine next version. 
         |Default value is "0.1.0-SNAPSHOT".""".stripMargin.replaceNewLines
     )
-
-    val preReleaseStartingVersion =
-      settingKey[String](
-        "This option defines starting version of the pre-release. Default value is \"RC.1\"."
-      )
 
     val tagPrefix = settingKey[String](
       "This option defines prefix to use when tagging a release. Default value is \"v\"."
@@ -82,54 +74,21 @@ object SemanticVersioningReleasePlugin extends AutoPlugin {
         .replaceNewLines
     )
 
-    val preReleasePattern = settingKey[String](
-      """This option defines regular expression to filter tags based on pre-release pattern. Default value 
-        |is \".*+$\"""".stripMargin.replaceNewLines
-    )
-
     val preReleaseBump =
-      settingKey[(PreReleaseConfig, String) => String]("preReleaseBump")
-
-    val autoBumpMajorPattern = settingKey[Option[Regex]](
-      s"""This option defines the regular expression to bump "MAJOR" component. Default value is "\\[major]"."""
-    )
-
-    val autoBumpMinorPattern = settingKey[Option[Regex]](
-      s"""This option defines the regular expression to bump "MINOR" component. Default value is "\\[minor]"."""
-    )
-
-    val autoBumpPatchPattern = settingKey[Option[Regex]](
-      s"""This option defines the regular expression to bump "PATCH" component. Default value is "\\[patch]"."""
-    )
-
-    val autoBumpNewPreReleasePattern =
-      settingKey[Option[Regex]](
-        s"""This option defines the regular expression to create a new "PRE_RELEASE" component. Default value is
-           | "\\[new-pre-release]".""".stripMargin.replaceNewLines
+      settingKey[(PreReleaseConfig, String) => String](
+        "This option defines the function that "
       )
 
-    val autoBumpPromoteToReleasePattern =
-      settingKey[Option[Regex]](
-        s"""This option defines the regular expression to create a release from a pre-release. Default value is "\\[promote]"."""
-      )
-
-    val majorVersionsMatching = settingKey[Int](
-      s"""This option defines filtering of a particular major version. Default value is "-1", which is 
-         |corresponds to no matching.""".stripMargin.replaceNewLines
+    val autoBump = settingKey[AutoBump](
+      "This option allows you to specify how the build version should be automatically bumped based on the contents of commit messages."
     )
 
-    val minorVersionsMatching = settingKey[Int](
-      s"""This option defines filtering of a particular minor version. Default value is "-1", which is 
-         |corresponds to no matching."""
-        .stripMargin
-        .replaceNewLines
+    val versionsMatching = settingKey[VersionsMatching](
+      "The option defines filtering of tags based on particular version."
     )
 
-    val patchVersionsMatching = settingKey[Int](
-      s"""This option defines filtering of a particular patch version. Default value is "-1", which is 
-         |corresponds to no matching."""
-        .stripMargin
-        .replaceNewLines
+    val preRelease = settingKey[PreReleaseConfig](
+      "This option defines configuration for pre-release"
     )
 
     object ReleaseKeys {
@@ -154,26 +113,13 @@ object SemanticVersioningReleasePlugin extends AutoPlugin {
         promoteToRelease = promoteToRelease.value,
         snapshot = snapshot.value,
         newPreRelease = newPreRelease.value,
-        autoBump = AutoBump(
-          autoBumpMajorPattern.value,
-          autoBumpMinorPattern.value,
-          autoBumpPatchPattern.value,
-          autoBumpNewPreReleasePattern.value,
-          autoBumpPromoteToReleasePattern.value
-        ),
-        versionsMatching = VersionsMatching(
-          majorVersionsMatching.value,
-          minorVersionsMatching.value,
-          patchVersionsMatching.value
-        ),
+        autoBump = autoBump.value,
+        versionsMatching = versionsMatching.value,
         componentToBump = componentToBump
           .value
           .map(VersionComponent.valueOf)
           .getOrElse(DefaultComponentToBump),
-        preReleaseConfig = PreReleaseConfig(
-          preReleaseStartingVersion.value,
-          preReleasePartPattern = preReleasePattern.value
-        ),
+        preReleaseConfig = preRelease.value,
         preReleaseBump = preReleaseBump.value
       )
     }
@@ -220,7 +166,6 @@ object SemanticVersioningReleasePlugin extends AutoPlugin {
   override def projectSettings: Seq[Def.Setting[_]] = Seq[Setting[_]](
     releaseVersionFile := initializeReleaseVersionFile.value,
     startingVersion := getStartingVersion.value,
-    preReleaseStartingVersion := DefaultPreReleaseStartingVersion,
     tagPrefix := DefaultTagPrefix,
     tagPattern := DefaultTagPattern,
     snapshotSuffix := DefaultSnapshotSuffix,
@@ -248,17 +193,9 @@ object SemanticVersioningReleasePlugin extends AutoPlugin {
     preReleaseBump := { (config: PreReleaseConfig, latestVersion: String) =>
       DefaultPreReleaseBump(config, latestVersion)
     },
-    preReleasePattern := ".*+$",
-    autoBumpMajorPattern := Some(AutoBump.DefaultMajorPattern),
-    autoBumpMinorPattern := Some(AutoBump.DefaultMinorPattern),
-    autoBumpPatchPattern := Some(AutoBump.DefaultPatchPattern),
-    autoBumpNewPreReleasePattern := Some(AutoBump.DefaultNewPreReleasePattern),
-    autoBumpPromoteToReleasePattern := Some(
-      AutoBump.DefaultPromoteToReleasePattern
-    ),
-    majorVersionsMatching := -1,
-    minorVersionsMatching := -1,
-    patchVersionsMatching := -1,
+    autoBump := AutoBump(),
+    versionsMatching := VersionsMatching(),
+    preRelease := PreReleaseConfig(),
     determineVersion :=
       SemanticBuildVersion(
         baseDirectory.value,
