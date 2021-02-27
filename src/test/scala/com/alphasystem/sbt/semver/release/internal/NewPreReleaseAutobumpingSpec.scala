@@ -7,6 +7,7 @@ import org.scalatest.Assertion
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.prop.TableDrivenPropertyChecks
+import sbtsemverrelease.PreReleaseConfig
 
 class NewPreReleaseAutobumpingSpec
     extends AnyFunSuite
