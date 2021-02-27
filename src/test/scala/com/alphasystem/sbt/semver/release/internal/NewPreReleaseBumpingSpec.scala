@@ -51,7 +51,7 @@ class NewPreReleaseBumpingSpec
       val bumpMsg2 = if (bumpComponent.isNone) " with " else " and "
       test(
         s"""${snapshotMsg}new pre-release version $with_without_msg prior ${preReleaseMsg}version$bumpMsg1$bumpMsg2 
-           |startingVersion $startingVersion (annotated: $annotated)"""
+           |startingVersion $startingVersion & expectedVersion $expectedVersion  (annotated: $annotated)"""
           .stripMargin
           .replaceNewLines
       ) {
