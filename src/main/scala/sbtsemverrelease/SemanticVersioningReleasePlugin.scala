@@ -149,18 +149,22 @@ object SemanticVersioningReleasePlugin extends AutoPlugin {
 
   private def initializeReleaseVersionFile =
     Def.setting {
-      val file = File.createTempFile("version_", ".sbt")
-      val ver =
-        if (releaseUseGlobalVersion.value)
-          (version in ThisBuild).value
-        else version.value
+      val defaultFile = new File(baseDirectory.value, "version.sbt")
+      if (defaultFile.exists()) defaultFile
+      else {
+        val file = File.createTempFile("version_", ".sbt")
+        val ver =
+          if (releaseUseGlobalVersion.value)
+            (version in ThisBuild).value
+          else version.value
 
-      file.deleteOnExit()
-      IO.write(
-        file,
-        s"""version in ThisBuild := "$ver""""
-      )
-      file
+        file.deleteOnExit()
+        IO.write(
+          file,
+          s"""version in ThisBuild := "$ver""""
+        )
+        file
+      }
     }
 
   override def projectSettings: Seq[Def.Setting[_]] = Seq[Setting[_]](
