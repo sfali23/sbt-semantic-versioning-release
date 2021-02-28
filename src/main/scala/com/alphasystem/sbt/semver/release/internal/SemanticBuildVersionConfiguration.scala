@@ -19,7 +19,7 @@ case class SemanticBuildVersionConfiguration(
   componentToBump: VersionComponent = DefaultComponentToBump,
   preReleaseConfig: PreReleaseConfig = PreReleaseConfig(),
   preReleaseBump: (PreReleaseConfig, String) => String =
-    DefaultPreReleaseBump) {
+    defaultPreReleaseBump) {
 
   def isAutobumpEnabled: Boolean = autoBump.isEnabled
 

@@ -17,13 +17,15 @@ package object release {
   val DefaultNewPreRelease: Boolean = false
   val DefaultComponentToBump: VersionComponent = VersionComponent.NONE
 
-  val DefaultPreReleaseBump: (PreReleaseConfig, String) => String =
-    (config: PreReleaseConfig, latestVersion: String) => {
-      val preReleaseComponents = config.splitComponents(latestVersion)
-      val prefix = preReleaseComponents.dropRight(1).mkString("")
-      val nextVersion = preReleaseComponents.last.toInt + 1
-      s"$prefix$nextVersion"
-    }
+  def defaultPreReleaseBump(
+    config: PreReleaseConfig,
+    latestVersion: String
+  ): String = {
+    val preReleaseComponents = config.splitComponents(latestVersion)
+    val prefix = preReleaseComponents.dropRight(1).mkString("")
+    val nextVersion = preReleaseComponents.last.toInt + 1
+    s"$prefix$nextVersion"
+  }
 
   private val SystemPropertyNamePrefix = "sbt.release."
 

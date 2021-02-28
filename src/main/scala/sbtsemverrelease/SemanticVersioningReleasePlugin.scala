@@ -191,7 +191,7 @@ object SemanticVersioningReleasePlugin extends AutoPlugin {
         .getOrElse(DefaultComponentToBump.name())
     ),
     preReleaseBump := { (config: PreReleaseConfig, latestVersion: String) =>
-      DefaultPreReleaseBump(config, latestVersion)
+      defaultPreReleaseBump(config, latestVersion)
     },
     autoBump := AutoBump(),
     versionsMatching := VersionsMatching(),
