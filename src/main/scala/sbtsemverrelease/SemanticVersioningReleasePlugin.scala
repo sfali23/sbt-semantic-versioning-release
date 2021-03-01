@@ -1,6 +1,7 @@
 package sbtsemverrelease
 
 import com.alphasystem.sbt.semver.release._
+import com.alphasystem.sbt.semver.release.common.JGitAdapter
 import com.alphasystem.sbt.semver.release.internal._
 import sbt.Keys._
 import sbt._
@@ -9,8 +10,8 @@ import sbtrelease.ReleasePlugin.autoImport._
 import sbtrelease.ReleaseStateTransformations._
 
 import java.io.File
-import scala.util.Properties
 import scala.util.matching.Regex
+import scala.util.{ Properties, Try }
 
 object SemanticVersioningReleasePlugin extends AutoPlugin {
 
@@ -147,6 +148,21 @@ object SemanticVersioningReleasePlugin extends AutoPlugin {
       }
     }
 
+  private def initializeSnapshot = {
+    // JGitAdapter doesn't work well in tests where git is not initialized
+    Def.setting {
+      val computedValue =
+        Try(JGitAdapter(baseDirectory.value))
+          .toOption
+          .map(_.hasUncommittedChanges)
+          .getOrElse(DefaultSnapshot)
+      initializeSettingFromSystemProperty(
+        SnapshotSystemPropertyName,
+        computedValue
+      )
+    }
+  }
+
   private def initializeReleaseVersionFile =
     Def.setting {
       val defaultFile = new File(baseDirectory.value, "version.sbt")
@@ -181,10 +197,7 @@ object SemanticVersioningReleasePlugin extends AutoPlugin {
       PromoteToReleaseSystemPropertyName,
       DefaultPromoteToRelease
     ),
-    snapshot := initializeSettingFromSystemProperty(
-      SnapshotSystemPropertyName,
-      DefaultSnapshot
-    ),
+    snapshot := initializeSnapshot.value,
     newPreRelease := initializeSettingFromSystemProperty(
       NewPreReleaseSystemPropertyName,
       DefaultNewPreRelease
