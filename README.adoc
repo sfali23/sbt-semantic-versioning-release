@@ -1,0 +1,402 @@
+= SBT Semantic Versioning Release
+:sectnums:
+:toc:
+:toclevels: 4
+:idprefix: id_
+:sbt_release_url: https://github.com/sbt/sbt-release
+
+This project is inspired by the https://github.com/vivin/gradle-semantic-build-versioning[Semantic build-versioning for Gradle] plugin.
+
+== Introduction
+
+This SBT plugin is an extension to {sbt_release_url}[sbt-release] plugin.
+
+=== Differences with sbt-release
+
+Git::
+This plugin depends on `Git`.
+
+version.sbt::
+This plugin doesn't require the `version.sbt`, since it relies on `Git` tags to find the latest version. Setting version
+in your `build.sbt` would be enough. Following release steps are not required in this plugin:
+* `commitReleaseVersion`
+* `setNextVersion`
+* `commitNextVersion`
+* `pushChanges`
+
+Therefore, the default release process is:
+
+[source,sbt]
+----
+releaseProcess := Seq[ReleaseStep](
+      checkSnapshotDependencies,
+      inquireVersions,
+      runClean,
+      runTest,
+      setReleaseVersion,
+      tagRelease,
+      publishArtifacts
+    )
+----
+
+== Usage
+TBD
+
+== Plugin Settings
+Following are plugin settings:
+
+[[id_component_to_bump]]
+=== componentToBump
+This property bumps the version. It can be set to the values `MAJOR`, `MINOR`, `PATCH` or `PRE-RELEASE`.
+
+Assuming that the base version is `x.y.z`, and the value of `componentToBump` is:
+
+MAJOR::
+The new version will be `(x + 1).0.0`; if the base version is a pre-release version, the pre-release version-component is
+discarded, and the new version will still be `(x + 1).0.0`.
+
+MINOR::
+The new version will be `x.(y + 1).0`; if the base version is a pre-release version, the pre-release version-component is
+discarded, and the new version will still be `x.(y + 1).0`.
+
+PATCH::
+The new version will be `x.y.(z + 1)`; if the base version is a pre-release version, the pre-release version-component is
+discarded, and the new version will still be `x.y.(z + 1)`.
+
+PRE-RELEASE::
+The pre-release version is bumped. Pre-release versions are denoted by appending a hyphen, and a series of dot-separated identifiers
+that can only consist of alphanumeric characters and hyphens; numeric identifiers cannot contain leading-zeroes. Since pre-release
+versions are arbitrary, using this property requires some additional configuration (see <<id_pre_releases, pre-releases>>).
+ Assuming that the base version is `x.y.z-<identifier>`, the new version will be `x.y.z-<identifier\++>` where the value of `<identifier\++>`
+is determined based on a scheme defined by the pre-release configuration (see <<id_pre_release_bump, bump>>).
+
+The behavior of this property is slightly different in the situation where the base version cannot be identified (usually when
+there are no ancestor tags). In this case, the base-version is set to the provided `startingVersion, or the default value of
+`0.1.0` if one is not provided; see <<id_starting_version, startingVersion>>). The requested version-component is bumped only if doing so will
+not cause a version series to be skipped; i.e., the starting version *will not be bumped* when the value of `componentToBump` is:
+
+MAJOR::
+The starting version has a non-zero major-version, a zero minor-version, and a zero patch-version (i.e. `(x > 0).0.0`)
+
+MINOR::
+The starting version has:
+* a non-zero minor-version, and a zero patch-version (i.e. `x.(y > 0).0`)
+* a non-zero major-version, and a zero patch-version (i.e. `(x > 0).y.0`)
+
+PATCH::
+The starting version has:
+* a non-zero patch-version (i.e. `x.y.(z > 0)`)
+* a non-zero minor-version (i.e. `x.(y > 0).z`)
+* a non-zero major-version (i.e. `(x > 0).y.z`)
+
+[NOTE]
+====
+* `pre-release` can only be used if the base version is already a pre-release version. If you want to create a new pre-release,
+use the `newPreRelease` property.
+* It is not possible to use `pre-release` with `promoteToRelease` or `newPreRelease`.
+* `pre-release` can fail if you have filtered tags in such a way (see <<id_filtering_tags, Filtering tags>> and <<id_tag_pattern, `tagPattern`>>)
+that the base version does not have a pre-release identifier.
+====
+
+=== forceBump
+This property defines the flag to enable forceBump. Default value is *false*. This option can be set via system property *sbt.release.forceBump*.
+
+If you use autobumping (see <<id_autobump_on_commit, Automatic bumping based on commit messages>>) and
+manual bumping together, the following precedence-rules apply, after determining the autobump and manual-bump version-components
+separately:
+
+* If you are attempting to manually bump a component with higher-precedence than the one autobump is attempting to bump,
+the manual bump wins.
+* If you are attempting to manually bump a component with lesser-precedence than the one autobump is attempting to bump,
+and the `forceBump` property is **not** set, the build fails.
+* If you are attempting to manually bump a component with lesser-precedence than the one autobump is attempting to bump,
+and the `forceBump` property is set, the manual bump wins. Note that this means that you are *intentionally disregarding*
+your commit messages (i.e., "I know what I'm doing; my commit messages were wrong").
+
+[[id_new_pre_release]]
+=== newPreRelease
+This property defines the flag to enable new-pre-release. Default value is *false*. This option can be set via system property
+*sbt.release.newPreRelease* as well as by *[new-pre-release]* in the commit message.
+
+This property creates a new pre-release version by bumping the requested version-component and then adding the starting pre-release
+version from the pre-release configuration (see <<id_pre_releases, pre-release>>). It has the following behavior:
+
+* When used by itself it will bump the patch version and then append the starting pre-release version as specified in the
+pre-release configuration. Assuming that the base version is `x.y.z`, the new version will be `x.y.(z + 1)-<startingVersion>`
+(see <<id_pre_release_starting_version, `startingVersion`>>.
+* When used with `componentToBump=patch`, the behavior is the same as using `newPreRelease` by itself.
+* When used with `componentToBump=minor`, it will bump the minor version and then append the starting pre-release version as
+specified in the pre-release configuration. Assuming that the base version is `x.y.z`, the new version will be `x.(y + 1).0-<startingVersion>`
+(see <<id_pre_release_starting_version, `startingVersion`>>.
+* When used with `componentToBump=major`, it will bump the major version and then append the starting pre-release version as
+specified in the pre-release configuration. Assuming that the base version is `x.y.z`, the new version will be `(x + 1).0.0-<startingVersion>`
+(see <<id_pre_release_starting_version, `startingVersion`>>.
+
+[NOTE]
+====
+* It is not possible to use `componentToBump=pre-release` along with `newPreRelease`.
+* If the base version cannot be identified, and a starting version is used, note that the behavior of `componentToBump` is still
+subject to the rules that prevent version series from being skipped when bumping.
+====
+
+[[id_promote_to_release]]
+=== promoteToRelease
+This property defines the flag to enable promote-to-release. Default value is *false*. This option can be set via system property
+*sbt.release.promoteToRelease* as well as via *[promote]* in the commit message.
+
+This property promotes a pre-release version to a release version. This is done by discarding the pre-release version-component.
+For example, assuming that the base version is `x.y.z-some.identifiers.here`, the new version will be `x.y.z`.
+*This property can only be used if the base version is a pre-release version*.
+
+[[id_pre_releases]]
+=== Pre-releases
+This is how you can define your pre-release versioning-strategy. This is a special case because other than defining a basic
+syntax and ordering rules, the semantic-versioning specification has no other rules about pre-release identifiers. This means
+that some extra configuration is required if you want to generate pre-release versions.
+
+[source,sbt]
+----
+import sbtsemverrelease.PreReleaseConfig
+
+preRelease := PreReleaseConfig(startingVersion = "pre.0")
+----
+
+[[id_pre_release_starting_version]]
+==== startingVersion
+This option is required and describes the starting pre-release version of a new pre-release. This value will be used if
+<<id_new_pre_release, `newPreRelease`>> is invoked (either explicitly or via <<id_autobump_on_commit, Automatic bumping based on commit messages>>).
+The default value is `RC.1`.
+
+[[id_pre_release_pattern]]
+==== preReleasePattern
+This option has a function similar to <<id_tag_pattern, `tagPattern`>>, except that it allows you to restrict the set of tags
+considered to those tags with pre-release versions matching `pattern`. The value for this has to be a regular expression as a
+`String`. Its default value is `/.*+$/` (which corresponds to do not filter based on pre-release pattern). One thing to remember
+ is that starting anchors (`^`) cannot be used, because the actual regular-expression that is used is `\d++\.\d++\.\d++-$pattern`.
+Hence, if you are trying to filter tags based on pre-release versions starting with some string, it is enough to provide
+that string in the regular expression without prefixing it with `^`.
+
+NOTE: Filtering based on `preReleasePattern` is performed *after* tags have been filtered based on <<id_tag_pattern, `tagPattern`>>
+and <<id_version_matching, `versionMatching`>>.
+
+[[id_pre_release_bump]]
+==== preReleaseBump
+This property allows you to specify how pre-release versions should be incremented or bumped. This is expected to be a
+function that accepts two arguments (`PreReleaseConfig` and the latest version), and is expected to return a `String`,
+which will be incremented a pre-release version.
+
+.Default implementation of this function is following
+====
+[source,scala,subs="verbatim,quotes"]
+----
+import sbtsemverrelease.PreReleaseConfig
+
+def defaultPreReleaseBump(
+    config: PreReleaseConfig,
+    latestVersion: String
+  ): String = {
+    val preReleaseComponents = config.splitComponents(latestVersion)
+    // based on default pre-release config *preReleaseComponents* would be _["RC", ".", "1"]_
+    val prefix = preReleaseComponents.dropRight(1).mkString("") // _RC._
+    val nextVersion = preReleaseComponents.last.toInt + 1 // _2_
+    s"$prefix$nextVersion" // _RC.2_
+}
+
+// implementation of splitComponents is following
+
+/** Splits the given `preReleasePart` separating into numeric and non-numeric parts.
+    *
+    * For example:
+    *   If the input is '''alpha.0''' then result would be '''["alpha", ".", "0"]'''
+    *   If the input is '''alpha0''' then result would be '''["alpha", "0"]'''
+    *   If the input is '''pre.1-alpha.1''' then result would be '''["pre", ".", "1", "-", "alpha", ".", "1"]'''
+    * @param preReleasePart pre-release part of the current version
+    * @return List of different parts of pre-release part
+    */
+  def splitComponents(preReleasePart: String): List[String] =
+    preReleasePart
+      .split("(?<=[\\D.-])(?=[\\d.-])|(?<=[\\d.-])(?=[\\D.-])")
+      .toList
+
+----
+====
+
+[[id_autobump_on_commit]]
+=== Automatic bumping based on commit messages
+Sometimes you might want to automatically bump your version as part of your continuous-integration process. Without this option,
+you would have to explicitly configure your CI process to use the corresponding `componentToBump` property value, depending on
+the version component you want to bump. This is because the default behavior of the plugin is to bump the component with the
+least precedence. Instead, you can configure the plugin to automatically bump the desired version-component based on the contents
+of all your commit messages since the nearest ancestor-tags; this essentially means messages from all unreleased ancestor-commits.
+If multiple commit-messages apply, then the component with the highest precedence wins. This way you can note in each commit
+message whether the change is major or minor directly, and this plugin uses that information to calculate the next version-number to be used.
+
+==== autoBump
+This option allows you to specify how the build version should be automatically bumped based on the contents of commit messages. The
+full message of each applicable commit-message is checked to see if a match for any of specified pattern can be found. Note that in
+the case of multiple matches, the component with the highest precedence wins. This option has the following sub-options:
+
+majorPattern::
+If any relevant commit message contains a match for `majorPattern`, the major version will be bumped. This has to be a regular
+expression, and its default value is `\[major\]`, which means `[major]` anywhere in the commit message.
+
+minorPattern::
+If any relevant commit message contains a match for `minorPattern`, the minor version will be bumped. This has to be a regular
+expression, and its default value is `\[minor\]`, which means `[minor]` anywhere in the commit message.
+
+patchPattern::
+If any relevant commit message contains a match for `patchPattern`, the patch version will be bumped. This has to be a regular
+expression, and its default value is `\[patch\]`, which means `[patch]` anywhere in the commit message.
+
+newPreReleasePattern:: If any relevant commit message contains a match for `newPreReleasePattern`, then a new pre-release version
+will be created. If no major or minor-version bumping is specified via autobumping or manually, the new pre-release version will
+be created after bumping the patch version. Otherwise, the new pre-release version is created after bumping the appropriate component.
+The same restrictions and rules that apply to the <<id_new_pre_release, `newPreRelease`>> property apply here as well. This has to be a
+regular expression, and its default value is `\[new-pre-release\]`, which means `[new-pre-release]` anywhere in the message.
+
+promoteToReleasePattern::
+If any relevant commit message contains a match for `promoteToReleasePattern`, the version will be promoted to a release version.
+The same rules that apply to the <<id_promote_to_release,`promoteToRelease`>> property apply here as well. This has to be a regular
+expression, and its default value is `\[promote\]`, which means `[promote]` anywhere in any line.
+
+.Defining custom patterns to be used by `autoBump`
+====
+[source,scala]
+----
+import sbtsemverrelease.AutoBump
+
+autoBump := AutoBump(
+  // match "[bump-major]" on its own line without leading or trailing characters
+  majorPattern = Some("(?m)^\\[bump-major\\]$".r),
+
+   // match "[bump-minor]" on its own line without leading or trailing characters
+  minorPattern = Some("(?m)^\\[bump-minor\\]$".r),
+
+  // match "[bump-patch]" on its own line without leading or trailing characters
+  patchPattern = Some("?m)^\\[bump-patch\\]$".r),
+
+  // match "[make-new-pre-release]" on its own line without leading or trailing characters
+  newPreReleasePattern = Some("(?m)^\\[make-new-pre-release\\]$".r),
+
+  // match "[promote-to-release]" on its own line without leading or trailing characters
+  promoteToReleasePattern = Some("(?m)^\\[promote-to-release\\]$".r)
+)
+----
+====
+
+[NOTE]
+====
+* If none of the commit messages match the patterns in `autoBump`, the plugin assumes its default behavior and will bump
+the component with least-precedence.
+* Commit messages will not be checked against any pattern that is set to `None`. So if you are not planning on looking for
+patterns corresponding to certain types of version bumps or calculations, you can disable them by setting them to `None`
+(which also boosts performance slightly). It is also useful to do this in cases where you might want to prevent certain types
+of bumps from happening (e.g., prevent any accidental major-version bumps until it is time to release). If all patterns are
+set to `None`, autobumping is completely disabled, and commit messages are not retrieved; this can further improve performance
+if you do not plan on using autobumping at all. You can re-enable autobumping at any time by using the default value for
+a pattern or by setting a custom value.
+====
+
+[[id_filtering_tags]]
+=== Filtering tags
+These options let you restrict the set of tags considered when determining the base version.
+
+[NOTE]
+====
+Be careful when filtering tags because it can affect plugin-behavior. The plugin works by determining the base version from tags,
+so behavior can vary depending on whether certain tags have been filtered out or not:
+
+* If the filtering options are set such that none of the existing ancestor-tags match, the plugin will use the <<id_starting_version, `startingVersion`>>.
+* If the filtering options are set such that the base version is not a pre-release version and you are attempting to use
+<<id_component_to_bump, `componentToBump=pre-release`>>, the build will fail.
+====
+
+[[id_tag_pattern]]
+==== tagPattern
+This pattern tells the plugin to only consider those tags matching `tagPattern` when trying to determine the base version
+from the tags in your repository. The value for this option has to be a regular expression. Its default value is `\d++\.\d++\.\d++`,
+which means that all tags that contain a semantic-version portion are considered, while all others are ignored. This property
+can be used, for example, to tag and version different sub-projects under a root-project individually, while using the same repository.
+
+.Only tags that start with `foo` should be considered
+====
+[source,sbt]
+----
+tagPattern := "^foo".r
+----
+====
+
+[[id_version_matching]]
+==== versionMatching
+This option is similar in function to <<id_tag_pattern, `tagPattern`>>, except that it allows you to restrict the set of tags
+considered, based on the explicitly-specified major, minor, or patch versions. When specifying a version component to match,
+preceding components (if any) must also be specified. While the effect of `versionMatching` can also be accomplished by `tagPattern`,
+`versionMatching` provides a more convenient way to restrict the set of considered tags based on versions alone.
+
+.Only tags with major-version `2` should be considered:
+====
+[source,sbt]
+----
+import sbtsemverrelease.VersionsMatching
+
+versionMatching := VersionsMatching(major = 2)
+----
+====
+
+.Only tags with major and minor-version `1.2` should be considered:
+====
+[source,sbt]
+----
+import sbtsemverrelease.VersionsMatching
+
+versionMatching := VersionsMatching(major = 1, minor = 2)
+----
+====
+
+.Only tags with major, minor, and patch-version `1.2.0` should be considered:
+====
+[source,sbt]
+----
+import sbtsemverrelease.VersionsMatching
+
+versionMatching := VersionsMatching(major = 1, minor = 2, patch = 0)
+----
+====
+
+.Following configuration would fail, preceding components (if any) must also be specified:
+====
+[source,sbt]
+----
+import sbtsemverrelease.VersionsMatching
+
+versionMatching := VersionsMatching(patch = 2)
+----
+====
+
+NOTE: Filtering based on `versionMatching` is performed *after* tags have been filtered based on `tagPattern`.
+
+[[id_starting_version]]
+=== startingVersion
+This option defines the starting version of the build in case there is no tag available to determine next version. Default
+value is *0.1.0-SNAPSHOT*. If not defined it will be deduced from project `version`.
+
+=== tagPrefix
+This option defines prefix to use when tagging a release. Default value is *v*.
+
+=== snapshotSuffix
+This option defines the suffix for the snapshot version. Default value is *SNAPSHOT*.
+
+=== snapshot
+This option defines the flag to make current release a snapshot release. This option is calculated as follows:
+
+. The option is explicitly set in `build.sbt` using `snapshot` property.
+. The option is set by *sbt.release.snapshot* via system property.
+. The option is set via `hasUncommittedChanges` function of `Git`. If the function returns *true* then `snapshot` flag will be
+set to *true*, *false* otherwise.
+
+=== Checking out a tag
+It is useful to check out a tag when you want to create a build of an older version. If you do this, the plugin will detect
+that `HEAD` is pointing to a tag and will use the corresponding version as the version of the build. *It is not possible to
+bump or modify the version in any other manner if you have checked out a tag corresponding to that version and have not made
+additional changes. Also, for this to work as expected, the tag you are checking out must not be excluded by <<id_tag_pattern,`tagPattern`>>,
+<<id_version_matching, `versionMatching`>>, or <<id_pre_release_pattern, `pre-release pattern`>>.*

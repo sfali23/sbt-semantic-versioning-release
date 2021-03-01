@@ -7,6 +7,7 @@ import org.scalatest.Assertion
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.prop.TableDrivenPropertyChecks
+import sbtsemverrelease.PreReleaseConfig
 
 class NewPreReleaseBumpingSpec
     extends AnyFunSuite
@@ -51,7 +52,7 @@ class NewPreReleaseBumpingSpec
       val bumpMsg2 = if (bumpComponent.isNone) " with " else " and "
       test(
         s"""${snapshotMsg}new pre-release version $with_without_msg prior ${preReleaseMsg}version$bumpMsg1$bumpMsg2 
-           |startingVersion $startingVersion (annotated: $annotated)"""
+           |startingVersion $startingVersion & expectedVersion $expectedVersion  (annotated: $annotated)"""
           .stripMargin
           .replaceNewLines
       ) {

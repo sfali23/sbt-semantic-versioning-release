@@ -1,6 +1,7 @@
 package com.alphasystem.sbt.semver.release.internal
 
 import org.scalatest.funsuite.AnyFunSuite
+import sbtsemverrelease.PreReleaseConfig
 
 class PreReleaseConfigSpec extends AnyFunSuite {
 

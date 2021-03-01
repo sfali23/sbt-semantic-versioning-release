@@ -1,4 +1,6 @@
-package com.alphasystem.sbt.semver.release.internal
+package sbtsemverrelease
+
+import com.alphasystem.sbt.semver.release.internal.VersioningHelper
 
 import scala.util.matching.Regex
 
@@ -10,10 +12,19 @@ case class PreReleaseConfig(
 
   def pattern: Regex = ("\\d++\\.\\d++\\.\\d++-" + preReleasePartPattern).r
 
-  def splitComponents(latestVersion: String): List[String] = {
-    val preReleasePart = "^[^-]*-".r.replaceAllIn(latestVersion, "")
-    preReleasePart.split("(?<=\\D)(?=\\d)").toList
-  }
+  /** Splits the given `preReleasePart` separating into numeric and non-numeric parts.
+    *
+    * For example:
+    *   If the input is '''alpha.0''' then result would be '''["alpha", ".", "0"]'''
+    *   If the input is '''alpha0''' then result would be '''["alpha", "0"]'''
+    *   If the input is '''pre.1-alpha.1''' then result would be '''["pre", ".", "1", "-", "alpha", ".", "1"]'''
+    * @param preReleasePart pre-release part of the current version
+    * @return List of different parts of pre-release part
+    */
+  def splitComponents(preReleasePart: String): List[String] =
+    preReleasePart
+      .split("(?<=[\\D.-])(?=[\\d.-])|(?<=[\\d.-])(?=[\\D.-])")
+      .toList
 
   private def validate(): Unit = {
     if (!VersioningHelper.isValidPreReleasePart(s"0.1.0-$startingVersion")) {

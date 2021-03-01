@@ -1,6 +1,7 @@
 package com.alphasystem.sbt.semver.release.internal
 
 import com.alphasystem.sbt.semver.release._
+import sbtsemverrelease.{ AutoBump, PreReleaseConfig, VersionsMatching }
 
 import scala.util.matching.Regex
 
@@ -18,7 +19,7 @@ case class SemanticBuildVersionConfiguration(
   componentToBump: VersionComponent = DefaultComponentToBump,
   preReleaseConfig: PreReleaseConfig = PreReleaseConfig(),
   preReleaseBump: (PreReleaseConfig, String) => String =
-    DefaultPreReleaseBump) {
+    defaultPreReleaseBump) {
 
   def isAutobumpEnabled: Boolean = autoBump.isEnabled
 

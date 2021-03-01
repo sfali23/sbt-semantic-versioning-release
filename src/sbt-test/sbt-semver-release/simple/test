@@ -24,7 +24,7 @@
 $ exec git init .
 > update
 $ exec git add .
-$ exec git commit -m "initial commit with bump [major] version"
+$ exec git commit -m "initial commit with bump _major_ version"
 > compile
 > release with-defaults
 > checkContentsOfVersionSbt 1.0.0-SNAPSHOT

@@ -1,4 +1,5 @@
 import sbtrelease.ReleasePlugin.autoImport.releaseVersionFile
+import sbtsemverrelease.AutoBump
 import sbt.complete.DefaultParsers._
 
 publishTo := Some(Resolver.file("file", new File(".")))
@@ -8,6 +9,7 @@ lazy val root = (project in file("."))
     organization := "com.example",
     name := "simple",
     version in ThisBuild := "0.1.0-SNAPSHOT",
+    autoBump := AutoBump(majorPattern = Some("_major_".r)),
     Global / onChangedBuildSource := ReloadOnSourceChanges
   )
 
