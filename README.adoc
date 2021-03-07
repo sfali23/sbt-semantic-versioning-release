@@ -22,7 +22,6 @@ in your `build.sbt` would be enough. Following release steps are not required in
 * `commitReleaseVersion`
 * `setNextVersion`
 * `commitNextVersion`
-* `pushChanges`
 
 Therefore, the default release process is:
 
@@ -35,7 +34,8 @@ releaseProcess := Seq[ReleaseStep](
       runTest,
       setReleaseVersion,
       tagRelease,
-      publishArtifacts
+      publishArtifacts,
+      pushChanges
     )
 ----
 

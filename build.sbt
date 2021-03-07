@@ -4,14 +4,27 @@ lazy val `sbt-semantic-versioning-release` = project
   .in(file("."))
   .enablePlugins(SbtPlugin, ScalafmtPlugin)
   .settings(
-    organization := "com.github.sfali23.sbt",
+    organization := "io.github.sfali23",
     name := "sbt-semver-release",
     version in ThisBuild := "0.1.0-SNAPSHOT",
     scalaVersion in ThisBuild := "2.12.12",
+    javacOptions ++= Seq("-source", "1.8", "-target", "1.8"),
     // Don't update crossSbtVersions!
     // https://github.com/sbt/sbt/issues/5049
     crossSbtVersions := Vector("0.13.18", "1.1.6"),
-    publishMavenStyle := false,
+    sbtVersion in ThisBuild := "1.4.4",
+    publishMavenStyle := true,
+    licenses := Seq(
+      "APL2" -> url("http://www.apache.org/licenses/LICENSE-2.0.txt")
+    ),
+    developers := List(
+      Developer(
+        id = "sfali23",
+        name = "Syed Farhan Ali",
+        email = "f.syed.ali@gmail.com",
+        url = url("https://github.com/sfali23/sbt-semantic-versioning-release")
+      )
+    ),
     scalacOptions ++= Seq(
       "-deprecation",
       "-feature",

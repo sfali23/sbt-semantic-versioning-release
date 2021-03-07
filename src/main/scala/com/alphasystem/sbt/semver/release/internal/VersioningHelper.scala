@@ -11,6 +11,10 @@ object VersioningHelper {
   val PreReleasePartRegex: Regex =
     "(?<=^\\d+\\.\\d+\\.\\d+)-(?<preReleasePart>.*)$".r
 
+  private val SnapshotPartRegex: String => Regex =
+    (snapshotSuffix: String) =>
+      s"(?<=^\\d+\\.\\d+\\.\\d+-)($snapshotSuffix)$$".r
+
   private val MainVersionPartRegex = "^[^-]*-".r
 
   /** Determine the next version to bump.
@@ -24,7 +28,10 @@ object VersioningHelper {
     latestVersion: String
   ): VersionComponent = {
     if (config.componentToBump.isNone) {
-      val validPreReleasePart = isValidPreReleasePart(latestVersion)
+      val validPreReleasePart = !isSnapshotVersion(
+        latestVersion,
+        config.snapshotSuffix
+      ) && isValidPreReleasePart(latestVersion)
       if (config.promoteToRelease) {
         if (validPreReleasePart) {
           // We are promoting a pre-release to release, so nothing to bump
@@ -128,6 +135,12 @@ object VersioningHelper {
 
   def isValidPreReleasePart(version: String): Boolean =
     PreReleasePartRegex.nonEmpty(version)
+
+  private def isSnapshotVersion(
+    version: String,
+    snapshotSuffix: String
+  ): Boolean =
+    SnapshotPartRegex(snapshotSuffix).nonEmpty(version)
 
   def isValidStartingVersion(version: String): Boolean =
     VersionStartRegex.nonEmpty(version)

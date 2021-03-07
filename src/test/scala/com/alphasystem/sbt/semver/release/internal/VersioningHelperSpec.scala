@@ -1,6 +1,6 @@
 package com.alphasystem.sbt.semver.release.internal
 
-import com.alphasystem.sbt.semver.release.{ internal, _ }
+import com.alphasystem.sbt.semver.release._
 import org.scalatest.funspec.AnyFunSpec
 
 class VersioningHelperSpec extends AnyFunSpec {
@@ -51,13 +51,25 @@ class VersioningHelperSpec extends AnyFunSpec {
     }
 
     it(
-      "should bump `PATCH` latestVersion is not pre-release"
+      "should bump `PATCH` if latestVersion is not pre-release"
     ) {
       val config = SemanticBuildVersionConfiguration()
       assert(
         VersioningHelper.determineVersionToBump(
           config,
           "0.1.1"
+        ) === VersionComponent.PATCH
+      )
+    }
+
+    it(
+      "should bump `PATCH` if latestVersion is a snapshot"
+    ) {
+      val config = SemanticBuildVersionConfiguration()
+      assert(
+        VersioningHelper.determineVersionToBump(
+          config,
+          "0.1.1-SNAPSHOT"
         ) === VersionComponent.PATCH
       )
     }
@@ -149,6 +161,15 @@ class VersioningHelperSpec extends AnyFunSpec {
         componentToBump = VersionComponent.PATCH
       )
       assert(VersioningHelper.incrementVersion(config, "1.2.0") === "1.2.1")
+    }
+
+    it("should bump patch version if latest is a snapshot") {
+      val config = SemanticBuildVersionConfiguration(
+        componentToBump = VersionComponent.PATCH
+      )
+      assert(
+        VersioningHelper.incrementVersion(config, "1.2.0-SNAPSHOT") === "1.2.1"
+      )
     }
 
     it("should bump patch version with newPreRelease") {
