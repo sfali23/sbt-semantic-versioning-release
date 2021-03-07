@@ -228,7 +228,8 @@ object SemanticVersioningReleasePlugin extends AutoPlugin {
       runTest,
       setReleaseVersion,
       tagRelease,
-      publishArtifacts
+      publishArtifacts,
+      pushChanges
     )
   )
 }
