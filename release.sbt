@@ -8,5 +8,6 @@ releaseProcess := Seq[ReleaseStep](
   releaseStepCommandAndRemaining("^ scripted"),
   setReleaseVersion,
   tagRelease,
-  publishArtifacts
+  publishArtifacts,
+  pushChanges
 )
