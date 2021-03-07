@@ -1,4 +1,5 @@
 import sbtrelease.ReleasePlugin.autoImport.releaseVersionFile
+import ReleaseTransformations._
 import sbtsemverrelease.AutoBump
 import sbt.complete.DefaultParsers._
 
@@ -10,7 +11,16 @@ lazy val root = (project in file("."))
     name := "simple",
     version in ThisBuild := "0.1.0-SNAPSHOT",
     autoBump := AutoBump(majorPattern = Some("_major_".r)),
-    Global / onChangedBuildSource := ReloadOnSourceChanges
+    Global / onChangedBuildSource := ReloadOnSourceChanges,
+    releaseProcess := Seq[ReleaseStep](
+      checkSnapshotDependencies,
+      inquireVersions,
+      runClean,
+      runTest,
+      setReleaseVersion,
+      tagRelease,
+      publishArtifacts
+    )
   )
 
 val checkContentsOfVersionSbt =
