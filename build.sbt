@@ -4,7 +4,7 @@ lazy val `sbt-semantic-versioning-release` = project
   .in(file("."))
   .enablePlugins(SbtPlugin, ScalafmtPlugin)
   .settings(
-    organization := "com.github.sfali23.sbt",
+    organization := "io.github.sfali23",
     name := "sbt-semver-release",
     version in ThisBuild := "0.1.0-SNAPSHOT",
     scalaVersion in ThisBuild := "2.12.12",
