@@ -6,13 +6,12 @@ lazy val `sbt-semantic-versioning-release` = project
   .settings(
     organization := "io.github.sfali23",
     name := "sbt-semver-release",
-    version in ThisBuild := "0.1.0-SNAPSHOT",
-    scalaVersion in ThisBuild := "2.12.12",
-    javacOptions ++= Seq("-source", "1.8", "-target", "1.8"),
+    ThisBuild / version := "0.1.0-SNAPSHOT",
+    ThisBuild / scalaVersion := "2.12.20",
+    javacOptions ++= Seq("-source", "17", "-target", "17"),
     // Don't update crossSbtVersions!
     // https://github.com/sbt/sbt/issues/5049
-    crossSbtVersions := Vector("0.13.18", "1.1.6"),
-    sbtVersion in ThisBuild := "1.4.4",
+    // crossSbtVersions := Vector("0.13.18", "1.1.6"),
     publishMavenStyle := true,
     licenses := Seq(
       "APL2" -> url("http://www.apache.org/licenses/LICENSE-2.0.txt")
@@ -39,11 +38,11 @@ lazy val `sbt-semantic-versioning-release` = project
     },
     addSbtPlugin("com.github.gseitz" % "sbt-release" % "1.0.13"),
     libraryDependencies ++= Seq(
-      "org.eclipse.jgit" % "org.eclipse.jgit"       % "5.10.0.202012080955-r",
-      "io.circe"        %% "circe-core"             % "0.13.0"                % Test,
-      "io.circe"        %% "circe-generic"          % "0.13.0"                % Test,
-      "io.circe"        %% "circe-parser"           % "0.13.0"                % Test,
-      "org.eclipse.jgit" % "org.eclipse.jgit.junit" % "5.10.0.202012080955-r" % Test,
-      "org.scalatest"   %% "scalatest"              % "3.3.0-SNAP3"           % Test
+      "org.eclipse.jgit" % "org.eclipse.jgit"       % "7.0.0.202409031743-r",
+      "io.circe"        %% "circe-core"             % "0.14.10"              % Test,
+      "io.circe"        %% "circe-generic"          % "0.14.10"              % Test,
+      "io.circe"        %% "circe-parser"           % "0.14.10"              % Test,
+      "org.eclipse.jgit" % "org.eclipse.jgit.junit" % "7.0.0.202409031743-r" % Test,
+      "org.scalatest"   %% "scalatest"              % "3.3.0-SNAP4"          % Test
     )
   )

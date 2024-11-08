@@ -136,7 +136,7 @@ object SemanticVersioningReleasePlugin extends AutoPlugin {
 
   private def getStartingVersion =
     Def.setting {
-      val versionInBuild = (version in ThisBuild).value
+      val versionInBuild = (ThisBuild / version).value
       val parts = versionInBuild.split("-").toList
       parts match {
         case Nil => DefaultStartingVersion
@@ -171,7 +171,7 @@ object SemanticVersioningReleasePlugin extends AutoPlugin {
         val file = File.createTempFile("version_", ".sbt")
         val ver =
           if (releaseUseGlobalVersion.value)
-            (version in ThisBuild).value
+            (ThisBuild / version).value
           else version.value
 
         file.deleteOnExit()

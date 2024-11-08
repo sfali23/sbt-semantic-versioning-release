@@ -1,4 +1,4 @@
-import xerial.sbt.Sonatype._
+import xerial.sbt.Sonatype.*
 
 sonatypeRepository := "https://s01.oss.sonatype.org/service/local"
 sonatypeCredentialHost := "s01.oss.sonatype.org"
