@@ -1,4 +1,4 @@
-import ReleaseTransformations._
+import ReleaseTransformations.*
 
 releaseProcess := Seq[ReleaseStep](
   checkSnapshotDependencies,
