@@ -1,13 +1,13 @@
 package sbtsemverrelease
 
-import com.alphasystem.sbt.semver.release._
+import com.alphasystem.sbt.semver.release.*
 import com.alphasystem.sbt.semver.release.common.JGitAdapter
-import com.alphasystem.sbt.semver.release.internal._
-import sbt.Keys._
-import sbt._
+import com.alphasystem.sbt.semver.release.internal.*
+import sbt.Keys.*
+import sbt.*
 import sbtrelease.ReleasePlugin
-import sbtrelease.ReleasePlugin.autoImport._
-import sbtrelease.ReleaseStateTransformations._
+import sbtrelease.ReleasePlugin.autoImport.*
+import sbtrelease.ReleaseStateTransformations.*
 
 import java.io.File
 import scala.util.matching.Regex
@@ -97,7 +97,7 @@ object SemanticVersioningReleasePlugin extends AutoPlugin {
     }
   }
 
-  import autoImport._
+  import autoImport.*
 
   override def trigger = allRequirements
 
@@ -183,7 +183,7 @@ object SemanticVersioningReleasePlugin extends AutoPlugin {
       }
     }
 
-  override def projectSettings: Seq[Def.Setting[_]] = Seq[Setting[_]](
+  override def projectSettings: Seq[Def.Setting[?]] = Seq[Setting[?]](
     releaseVersionFile := initializeReleaseVersionFile.value,
     startingVersion := getStartingVersion.value,
     tagPrefix := DefaultTagPrefix,

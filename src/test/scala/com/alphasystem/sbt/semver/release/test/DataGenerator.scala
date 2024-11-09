@@ -1,12 +1,12 @@
 package com.alphasystem.sbt.semver.release.test
 
 import com.alphasystem.sbt.semver.release.VersionComponent
-import io.circe.generic.auto._
-import io.circe.parser._
-import io.circe.syntax._
+import io.circe.generic.auto.*
+import io.circe.parser.*
+import io.circe.syntax.*
 import io.circe.{ Decoder, Json }
-import org.scalatest.prop.TableDrivenPropertyChecks._
-import org.scalatest.prop._
+import org.scalatest.prop.TableDrivenPropertyChecks.*
+import org.scalatest.prop.*
 
 import java.nio.charset.StandardCharsets
 import java.nio.file.{ Files, Path, Paths, StandardOpenOption }
@@ -58,7 +58,7 @@ object DataGenerator {
       case Left(ex) => throw ex
       case Right(values) =>
         val rows = values.map(value => toDataTuple(value))
-        Table(headerFor3(headers), rows: _*)
+        Table(headerFor3(headers), rows *)
     }
   }
 
@@ -78,7 +78,7 @@ object DataGenerator {
       case Left(ex) => throw ex
       case Right(values) =>
         val rows = values.map(value => toDataTuple(value))
-        Table(headerFor4(headers), rows: _*)
+        Table(headerFor4(headers), rows *)
     }
   }
 
@@ -98,7 +98,7 @@ object DataGenerator {
       case Left(ex) => throw ex
       case Right(values) =>
         val rows = values.map(value => toDataTuple(value))
-        Table(headerFor5(headers), rows: _*)
+        Table(headerFor5(headers), rows *)
     }
   }
 
@@ -118,7 +118,7 @@ object DataGenerator {
       case Left(ex) => throw ex
       case Right(values) =>
         val rows = values.map(value => toDataTuple(value))
-        Table(headerFor6(headers), rows: _*)
+        Table(headerFor6(headers), rows *)
     }
   }
 
@@ -138,7 +138,7 @@ object DataGenerator {
       case Left(ex) => throw ex
       case Right(values) =>
         val rows = values.map(value => toDataTuple(value))
-        Table(headerFor7(headers), rows: _*)
+        Table(headerFor7(headers), rows *)
     }
   }
 
@@ -158,7 +158,7 @@ object DataGenerator {
       case Left(ex) => throw ex
       case Right(values) =>
         val rows = values.map(value => toDataTuple(value))
-        Table(headerFor8(headers), rows: _*)
+        Table(headerFor8(headers), rows *)
     }
   }
 

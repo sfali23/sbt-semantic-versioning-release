@@ -1,20 +1,21 @@
 package com.alphasystem.sbt.semver.release.internal
 
 import com.alphasystem.sbt.semver.release.common.JGitAdapter
-import com.alphasystem.sbt.semver.release.{ internal, _ }
+import com.alphasystem.sbt.semver.release.{ internal, * }
 import org.eclipse.jgit.lib.Constants
 import org.eclipse.jgit.revwalk.RevCommit
 
 import java.io.File
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
+import scala.util.Properties
 import scala.util.matching.Regex
 
 class SemanticBuildVersion(
   workingDir: File,
   config: SemanticBuildVersionConfiguration) {
 
-  import SemanticBuildVersion._
+  import SemanticBuildVersion.*
 
   private val adapter = JGitAdapter(workingDir)
   private val tags = adapter.getTags
@@ -89,14 +90,23 @@ class SemanticBuildVersion(
     } else {
       val headTag = getLatestTagOnReference(Constants.HEAD)
       if (headTag.isEmpty || adapter.hasUncommittedChanges) {
-        _currentConfig = _currentConfig.copy(componentToBump =
-          VersioningHelper.determineVersionToBump(
-            _currentConfig,
-            latestVersion.get
+        val startingVersion =
+          Properties.propOrNone(StartingVersionSystemPropertyName)
+        if (maybeLatestVersion.isEmpty && startingVersion.isEmpty) {
+          throw new RuntimeException(
+            """Unable to find latest tag on HEAD (see issue #12), please provide
+              |`sbt.release.startingVersion` system property to proceed."""
+              .stripMargin
+              .replaceAll(System.lineSeparator(), "")
           )
+        }
+        val ver = maybeLatestVersion
+          .orElse(Properties.propOrNone(StartingVersionSystemPropertyName))
+          .get
+        _currentConfig = _currentConfig.copy(componentToBump =
+          VersioningHelper.determineVersionToBump(_currentConfig, ver)
         )
-        result =
-          VersioningHelper.incrementVersion(_currentConfig, latestVersion.get)
+        result = VersioningHelper.incrementVersion(_currentConfig, ver)
       } else {
         if (
           !_currentConfig.componentToBump.isNone ||
@@ -203,7 +213,6 @@ class SemanticBuildVersion(
       .sorted
       .reverse
       .headOption
-
   }
 
   // TODO: missing pre-release

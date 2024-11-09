@@ -1,7 +1,7 @@
 package sbtsemverrelease
 
-import com.alphasystem.sbt.semver.release._
-import sbtsemverrelease.AutoBump._
+import com.alphasystem.sbt.semver.release.*
+import sbtsemverrelease.AutoBump.*
 
 import scala.util.matching.Regex
 

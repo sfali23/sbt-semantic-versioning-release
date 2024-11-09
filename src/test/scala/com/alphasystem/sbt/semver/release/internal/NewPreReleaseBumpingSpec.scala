@@ -1,8 +1,8 @@
 package com.alphasystem.sbt.semver.release.internal
 
-import com.alphasystem.sbt.semver.release._
-import com.alphasystem.sbt.semver.release.test._
-import io.circe.generic.auto._
+import com.alphasystem.sbt.semver.release.*
+import com.alphasystem.sbt.semver.release.test.*
+import io.circe.generic.auto.*
 import org.scalatest.Assertion
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.matchers.should.Matchers
@@ -14,7 +14,7 @@ class NewPreReleaseBumpingSpec
     with TableDrivenPropertyChecks
     with Matchers {
 
-  import NewPreReleaseBumpingSpec._
+  import NewPreReleaseBumpingSpec.*
 
   private val defaultConfiguration =
     SemanticBuildVersionConfiguration(

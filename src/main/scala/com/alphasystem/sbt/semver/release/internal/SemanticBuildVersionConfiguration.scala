@@ -1,12 +1,13 @@
 package com.alphasystem.sbt.semver.release.internal
 
-import com.alphasystem.sbt.semver.release._
+import com.alphasystem.sbt.semver.release.*
 import sbtsemverrelease.{ AutoBump, PreReleaseConfig, VersionsMatching }
 
 import scala.util.matching.Regex
 
 case class SemanticBuildVersionConfiguration(
   startingVersion: String = DefaultStartingVersion,
+  overrideStartingVersion: Option[String] = None,
   tagPrefix: String = DefaultTagPrefix,
   tagPattern: Regex = DefaultTagPattern,
   snapshotSuffix: String = DefaultSnapshotSuffix,

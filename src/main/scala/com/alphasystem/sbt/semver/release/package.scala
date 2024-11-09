@@ -29,6 +29,9 @@ package object release {
 
   private val SystemPropertyNamePrefix = "sbt.release."
 
+  val StartingVersionSystemPropertyName =
+    s"${SystemPropertyNamePrefix}startingVersion"
+
   val ForceBumpSystemPropertyName = s"${SystemPropertyNamePrefix}forceBump"
 
   val NewPreReleaseSystemPropertyName =

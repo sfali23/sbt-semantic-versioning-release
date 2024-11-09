@@ -1,7 +1,7 @@
 package com.alphasystem.sbt.semver.release
 
 import io.circe.{ Decoder, Encoder, Json }
-import org.scalatest.prop.TableDrivenPropertyChecks._
+import org.scalatest.prop.TableDrivenPropertyChecks.*
 import org.scalatest.prop.TableFor1
 import sbtsemverrelease.VersionsMatching
 
