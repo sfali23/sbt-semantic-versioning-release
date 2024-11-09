@@ -6,7 +6,7 @@ import org.eclipse.jgit.revwalk.RevWalk
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder
 
 import java.io.File
-import scala.collection.JavaConverters._
+import scala.collection.JavaConverters.*
 
 class JGitAdapter(workingDir: File) {
   private val _repository: Repository = JGitAdapter.initRepository(workingDir)

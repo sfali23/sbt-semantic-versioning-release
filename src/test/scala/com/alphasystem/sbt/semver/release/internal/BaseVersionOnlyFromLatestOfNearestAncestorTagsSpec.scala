@@ -1,7 +1,7 @@
 package com.alphasystem.sbt.semver.release.internal
 
 import com.alphasystem.sbt.semver.release.{ internal, _ }
-import com.alphasystem.sbt.semver.release.test._
+import com.alphasystem.sbt.semver.release.test.*
 import org.scalatest.Assertion
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.matchers.should.Matchers

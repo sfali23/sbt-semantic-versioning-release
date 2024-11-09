@@ -1,6 +1,6 @@
 package com.alphasystem.sbt.semver.release.internal
 
-import com.alphasystem.sbt.semver.release._
+import com.alphasystem.sbt.semver.release.*
 
 class SetupVersionComponentUsingAutobumpConfiguration private (
   config: SemanticBuildVersionConfiguration) {
@@ -59,7 +59,7 @@ class SetupVersionComponentUsingAutobumpConfiguration private (
         e1._1.compareTo(e2._1) > 0
       }
 
-    import util.control.Breaks._
+    import util.control.Breaks.*
 
     for (message <- autobumpMessages) {
       breakable {

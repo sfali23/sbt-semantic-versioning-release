@@ -1,6 +1,6 @@
 package com.alphasystem.sbt.semver.release.internal
 
-import com.alphasystem.sbt.semver.release._
+import com.alphasystem.sbt.semver.release.*
 import org.scalatest.funspec.AnyFunSpec
 
 class VersioningHelperSpec extends AnyFunSpec {

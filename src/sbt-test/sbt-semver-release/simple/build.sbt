@@ -1,7 +1,7 @@
 import sbtrelease.ReleasePlugin.autoImport.releaseVersionFile
-import ReleaseTransformations._
+import ReleaseTransformations.*
 import sbtsemverrelease.AutoBump
-import sbt.complete.DefaultParsers._
+import sbt.complete.DefaultParsers.*
 
 publishTo := Some(Resolver.file("file", new File(".")))
 
