@@ -8,9 +8,8 @@ publishTo := Some(Resolver.file("file", new File(".")))
 lazy val root = (project in file("."))
   .settings(
     organization := "com.example",
-    name := "simple",
-    ThisBuild / version := "0.1.0-SNAPSHOT",
-    autoBump := AutoBump(majorPattern = Some("_major_".r)),
+    name := "patch-then-minor",
+    startingVersion := "0.2.0",
     Global / onChangedBuildSource := ReloadOnSourceChanges,
     releaseProcess := Seq[ReleaseStep](
       checkSnapshotDependencies,

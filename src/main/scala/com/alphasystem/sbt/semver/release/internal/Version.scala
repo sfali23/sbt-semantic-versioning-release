@@ -14,12 +14,61 @@ case class Version(
   patch: Int,
   hotfix: Option[Int] = None,
   preRelease: Option[PreReleaseVersion] = None,
-  snapshot: Option[Boolean] = None)
+  snapshot: Option[Boolean] = None,
+  preReleaseConfig: PreReleaseConfig = PreReleaseConfig()) {
+
+  def bumpMajor: Version = {
+    if (preRelease.nonEmpty) {
+      throw new IllegalArgumentException("Current version is a a pre-release.")
+    }
+    copy(major = major + 1, minor = 0, patch = 0, hotfix = None, preRelease = None)
+  }
+
+  def bumpMinor: Version = {
+    if (preRelease.nonEmpty) {
+      throw new IllegalArgumentException("Current version is a a pre-release.")
+    }
+    copy(minor = minor + 1, patch = 0)
+  }
+
+  def bumpPatch: Version = {
+    if (preRelease.nonEmpty) {
+      throw new IllegalArgumentException("Current version is a a pre-release.")
+    }
+    copy(patch = patch + 1)
+  }
+
+  def bumpHotfix: Version = {
+    if (preRelease.nonEmpty) {
+      throw new IllegalArgumentException("Current version is a a pre-release.")
+    }
+    copy(hotfix = hotfix.map(_ + 1).orElse(Some(1)))
+  }
+
+  def bumpPreRelease: Version = {
+    if (preRelease.isEmpty) {
+      throw new IllegalArgumentException("Current version is not a pre-release.")
+    }
+    copy(preRelease = preRelease.map(pr => pr.copy(version = pr.version + 1)))
+  }
+
+  def newPreRelease(componentToBump: VersionComponent): Version = {
+    if (preRelease.isDefined) {
+      throw new IllegalArgumentException("Current version is already pre-release")
+    }
+    val maybePreReleaseVersion = preReleaseConfig.toInitialPreReleaseVersion
+    componentToBump match {
+      case VersionComponent.MAJOR => bumpMajor.copy(preRelease = maybePreReleaseVersion)
+      case VersionComponent.MINOR => bumpMinor.copy(preRelease = maybePreReleaseVersion)
+      case _                      => bumpPatch.copy(preRelease = maybePreReleaseVersion)
+    }
+  }
+}
 
 object Version {
 
   private val VersionRegex =
-    """^v(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|
+    """^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|
       |\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?(?:\.(0|[1-9]\d*))?$"""
       .stripMargin
       .replaceAll(System.lineSeparator(), "")
@@ -31,14 +80,16 @@ object Version {
     patch: Int,
     hotfix: Option[Int] = None,
     preRelease: Option[PreReleaseVersion] = None,
-    snapshot: Option[Boolean] = None
+    snapshot: Option[Boolean] = None,
+    preReleaseConfig: PreReleaseConfig = PreReleaseConfig()
   ): Version = new Version(
     major = major,
     minor = minor,
     patch = patch,
     hotfix = hotfix,
     preRelease = preRelease,
-    snapshot = snapshot
+    snapshot = snapshot,
+    preReleaseConfig = preReleaseConfig
   )
 
   def apply(version: String, preReleaseConfig: PreReleaseConfig): Version = {
@@ -65,7 +116,8 @@ object Version {
       patch = matcher.group(3).toInt,
       hotfix = Option(matcher.group(6)).map(_.toInt),
       preRelease = maybePreReleaseVersion,
-      snapshot = maybePreReleaseOrSnapshot.filter(_.contains("SNAPSHOT")).map(_.toBoolean)
+      snapshot = maybePreReleaseOrSnapshot.filter(_.contains("SNAPSHOT")).map(_.toBoolean),
+      preReleaseConfig = preReleaseConfig
     )
   }
 

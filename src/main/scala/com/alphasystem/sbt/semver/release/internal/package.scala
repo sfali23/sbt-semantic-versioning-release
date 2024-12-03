@@ -10,6 +10,9 @@ import scala.util.Try
 package object internal {
 
   implicit class PreReleaseConfigOps(src: PreReleaseConfig) {
+
+    def toInitialPreReleaseVersion: Option[PreReleaseVersion] = toPreReleaseVersion(src.startingVersion)
+
     def toPreReleaseVersion(version: String): Option[PreReleaseVersion] = {
       val matchIterator = src.preReleasePartPatternRegEx.findAllIn(version)
       if (matchIterator.nonEmpty) {

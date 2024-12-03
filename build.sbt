@@ -39,6 +39,8 @@ lazy val `sbt-semantic-versioning-release` = project
     addSbtPlugin("com.github.gseitz" % "sbt-release" % "1.0.13"),
     libraryDependencies ++= Seq(
       "org.eclipse.jgit" % "org.eclipse.jgit"       % "7.0.0.202409031743-r",
+      "org.slf4j"        % "slf4j-api"              % "2.0.16",
+      "ch.qos.logback"   % "logback-classic"        % "1.5.12",
       "io.circe"        %% "circe-core"             % "0.14.10"              % Test,
       "io.circe"        %% "circe-generic"          % "0.14.10"              % Test,
       "io.circe"        %% "circe-parser"           % "0.14.10"              % Test,
