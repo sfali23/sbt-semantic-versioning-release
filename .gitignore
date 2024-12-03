@@ -5,6 +5,7 @@
 # IDEA
 .idea/**
 .bsp/**
+tmp/**
 
 null/**
 
