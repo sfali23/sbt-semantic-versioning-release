@@ -1,33 +1,34 @@
 package com.alphasystem.sbt.semver.release.common
 
 import org.eclipse.jgit.api.Git
-import org.eclipse.jgit.lib.{ Constants, Repository }
-import org.eclipse.jgit.revwalk.{ RevTag, RevWalk }
+import org.eclipse.jgit.lib.{Constants, Repository}
+import org.eclipse.jgit.revwalk.{RevTag, RevWalk}
 import org.eclipse.jgit.transport.URIish
+import org.slf4j.LoggerFactory
 
-import java.io.{ File, PrintWriter }
+import java.io.{File, PrintWriter}
 import scala.util.Random
 
 class TestRepository(val repository: Repository) {
+
+  private val logger = LoggerFactory.getLogger(classOf[TestRepository])
 
   val git = new Git(repository)
 
   private val parentFile = repository.getDirectory.getParentFile.getAbsolutePath
 
-  def commitAndTag(tag: String, annotated: Boolean = false): TestRepository = {
-    git
-      .commit()
-      .setAuthor("Batman", "batman@waynemanor.com")
-      .setMessage("blah")
-      .call()
-
-    git.tag().setAnnotated(annotated).setName(tag).call()
-
-    this
-  }
+  def commitAndTag(tag: String, annotated: Boolean = false): TestRepository =
+    commit().tag(tag, annotated)
 
   def tag(tag: String, annotated: Boolean = false): TestRepository = {
-    git.tag().setAnnotated(annotated).setName(tag).call()
+    var tagCommand = git
+      .tag()
+      .setAnnotated(annotated)
+      .setName(tag)
+
+    tagCommand = if (annotated) tagCommand.setMessage(s"Releasing $tag") else tagCommand
+
+    tagCommand.call()
     this
   }
 
@@ -58,6 +59,22 @@ class TestRepository(val repository: Repository) {
     this
   }
 
+  def checkoutTag(branchName: String, tagName: String): TestRepository = {
+    val ref = git
+      .checkout()
+      .setCreateBranch(true)
+      .setName(branchName)
+      .setStartPoint(tagName)
+      .call()
+
+    logger.trace(
+      "Checkout tag: {}, current branch: {}",
+      ref.getName.asInstanceOf[Any],
+      getBranchName.asInstanceOf[Any]
+    )
+    this
+  }
+
   def checkoutBranch(branch: String): TestRepository = {
     git.checkout().setName(branch).call()
     this
@@ -71,8 +88,21 @@ class TestRepository(val repository: Repository) {
     this
   }
 
+  def createAndCheckout(name: String): TestRepository =
+    branch(name).checkoutBranch(name)
+
+  def getBranchName: String = repository.getBranch
+
+  def getFullBranchName: String = repository.getFullBranch
+
   def merge(target: String): TestRepository = {
-    git.merge().include(repository.resolve(target)).call()
+    val result = git.merge().include(repository.findRef(target)).call()
+    logger.trace(
+      "Result of merge from {} to {} was {}",
+      getBranchName,
+      target,
+      result.getMergeStatus.name()
+    )
     this
   }
 
@@ -104,9 +134,8 @@ class TestRepository(val repository: Repository) {
 
 object TestRepository {
 
-  def apply(repository: Repository): TestRepository = new TestRepository(
-    repository
-  )
+  def apply(repository: Repository): TestRepository =
+    new TestRepository(repository)
 
   def apply(workingDir: File): TestRepository = {
     if (!workingDir.exists()) {
