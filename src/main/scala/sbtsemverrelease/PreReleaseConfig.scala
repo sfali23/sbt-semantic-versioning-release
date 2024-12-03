@@ -6,20 +6,23 @@ import scala.util.matching.Regex
 
 case class PreReleaseConfig(
   startingVersion: String = "RC.1",
-  preReleasePartPattern: String = ".*+$") {
+  preReleasePartPattern: String = "^(RC)(.)([1-9]\\d*)$") {
 
   validate()
 
-  def pattern: Regex = ("\\d++\\.\\d++\\.\\d++-" + preReleasePartPattern).r
+  lazy val preReleasePartPatternRegEx: Regex = preReleasePartPattern.r
+
+  lazy val pattern: Regex = ("\\d++\\.\\d++\\.\\d++-" + preReleasePartPattern).r
 
   /** Splits the given `preReleasePart` separating into numeric and non-numeric parts.
     *
-    * For example:
-    *   If the input is '''alpha.0''' then result would be '''["alpha", ".", "0"]'''
-    *   If the input is '''alpha0''' then result would be '''["alpha", "0"]'''
-    *   If the input is '''pre.1-alpha.1''' then result would be '''["pre", ".", "1", "-", "alpha", ".", "1"]'''
-    * @param preReleasePart pre-release part of the current version
-    * @return List of different parts of pre-release part
+    * For example: If the input is '''alpha.0''' then result would be '''["alpha", ".", "0"]''' If the input is
+    * '''alpha0''' then result would be '''["alpha", "0"]''' If the input is '''pre.1-alpha.1''' then result would be
+    * '''["pre", ".", "1", "-", "alpha", ".", "1"]'''
+    * @param preReleasePart
+    *   pre-release part of the current version
+    * @return
+    *   List of different parts of pre-release part
     */
   def splitComponents(preReleasePart: String): List[String] =
     preReleasePart

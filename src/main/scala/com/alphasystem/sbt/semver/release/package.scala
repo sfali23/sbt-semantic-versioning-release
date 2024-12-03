@@ -1,4 +1,6 @@
-package com.alphasystem.sbt.semver
+package com.alphasystem
+package sbt
+package semver
 
 import sbtsemverrelease.PreReleaseConfig
 
