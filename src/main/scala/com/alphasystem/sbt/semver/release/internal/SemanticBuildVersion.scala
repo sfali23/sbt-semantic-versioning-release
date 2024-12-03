@@ -1,7 +1,7 @@
 package com.alphasystem.sbt.semver.release.internal
 
 import com.alphasystem.sbt.semver.release.common.JGitAdapter
-import com.alphasystem.sbt.semver.release.{ internal, * }
+import com.alphasystem.sbt.semver.release.{internal, *}
 import org.eclipse.jgit.lib.Constants
 import org.eclipse.jgit.revwalk.RevCommit
 
@@ -43,9 +43,7 @@ class SemanticBuildVersion(
       )
     }
 
-    if (
-      _currentConfig.promoteToRelease && !_currentConfig.componentToBump.isNone
-    ) {
+    if (_currentConfig.promoteToRelease && !_currentConfig.componentToBump.isNone) {
       throw new IllegalArgumentException(
         "Bumping any component while also promoting a pre-release is not supported"
       )
@@ -103,9 +101,8 @@ class SemanticBuildVersion(
         val ver = maybeLatestVersion
           .orElse(Properties.propOrNone(StartingVersionSystemPropertyName))
           .get
-        _currentConfig = _currentConfig.copy(componentToBump =
-          VersioningHelper.determineVersionToBump(_currentConfig, ver)
-        )
+        _currentConfig =
+          _currentConfig.copy(componentToBump = VersioningHelper.determineVersionToBump(_currentConfig, ver))
         result = VersioningHelper.incrementVersion(_currentConfig, ver)
       } else {
         if (
@@ -148,7 +145,7 @@ class SemanticBuildVersion(
     result
   }
 
-  private def initState(): Unit = {
+  private def initState(): Unit =
     if (filteredTags.isEmpty) {
       filteredTags = filterTags(tags.keySet)
 
@@ -195,7 +192,6 @@ class SemanticBuildVersion(
         .find(_.isDefined)
         .flatten
     }
-  }
 
   private def getLatestTagOnReference(revstr: String): Option[String] = {
     val repository = adapter.repository
@@ -216,7 +212,7 @@ class SemanticBuildVersion(
   }
 
   // TODO: missing pre-release
-  private def filterTags(tags: Set[String]): Set[String] = {
+  private def filterTags(tags: Set[String]): Set[String] =
     tags
       .filter(tag => _currentConfig.tagPattern.nonEmpty(tag))
       .filter(tag => SemanticBuildVersion.VersionPattern.nonEmpty(tag))
@@ -230,7 +226,6 @@ class SemanticBuildVersion(
         PreReleaseRegex.isEmpty(tag) ||
         _currentConfig.preReleaseConfig.pattern.nonEmpty(tag)
       }
-  }
 
 }
 
@@ -245,7 +240,6 @@ object SemanticBuildVersion {
 
   def apply(
     workingDir: File,
-    config: SemanticBuildVersionConfiguration =
-      internal.SemanticBuildVersionConfiguration()
+    config: SemanticBuildVersionConfiguration = internal.SemanticBuildVersionConfiguration()
   ) = new SemanticBuildVersion(workingDir, config)
 }
