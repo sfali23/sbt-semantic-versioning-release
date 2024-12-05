@@ -1,245 +1,160 @@
-package com.alphasystem.sbt.semver.release.internal
+package com.alphasystem
+package sbt
+package semver
+package release
+package internal
 
-import com.alphasystem.sbt.semver.release.common.JGitAdapter
-import com.alphasystem.sbt.semver.release.{internal, *}
-import org.eclipse.jgit.lib.Constants
-import org.eclipse.jgit.revwalk.RevCommit
+import org.slf4j.LoggerFactory
+import release.common.JGitAdapter
 
 import java.io.File
-import scala.collection.mutable
-import scala.collection.mutable.ListBuffer
-import scala.util.Properties
-import scala.util.matching.Regex
+import scala.util.Try
 
-class SemanticBuildVersion(
-  workingDir: File,
-  config: SemanticBuildVersionConfiguration) {
+class SemanticBuildVersion(workingDir: File, baseConfig: SemanticBuildVersionConfiguration) {
 
-  import SemanticBuildVersion.*
+  import VersionComponent.*
 
+  private val logger = LoggerFactory.getLogger(classOf[SemanticBuildVersion])
   private val adapter = JGitAdapter(workingDir)
-  private val tags = adapter.getTags
-  private var filteredTags: Set[String] = Set.empty
-  private var versionByTag: Map[String, String] = Map.empty
-  private var autobumpMessages: List[String] = List.empty
-  private var maybeLatestVersion: Option[String] = None
-  private var _currentConfig = config
+  private val preReleaseConfig = baseConfig.preReleaseConfig
+  private val snapshotSuffix = baseConfig.snapshotSuffix
+  private val tagPrefix = baseConfig.tagPrefix
+  private val startingVersion = Version(baseConfig.startingVersion, snapshotSuffix, preReleaseConfig)
 
-  initState()
+  def determineVersion: Version = {
+    val currentBranch = adapter.getCurrentBranch
+    val hotfixRequired = baseConfig.hotfixBranchPattern.nonEmpty(currentBranch)
+    val snapshotRequired =
+      (!baseConfig.isReleaseBranch(currentBranch) || adapter.hasUncommittedChanges) && !hotfixRequired
 
-  def latestVersion: Option[String] = maybeLatestVersion
-
-  def currentConfig: SemanticBuildVersionConfiguration = _currentConfig
-
-  def determineVersion: String = {
-    _currentConfig = SetupVersionComponentUsingAutobumpConfiguration(
-      _currentConfig,
-      autobumpMessages
-    )
-
-    if (_currentConfig.newPreRelease && _currentConfig.promoteToRelease) {
-      throw new IllegalArgumentException(
-        "Creating a new pre-release while also promoting a pre-release is not supported"
-      )
-    }
-
-    if (_currentConfig.promoteToRelease && !_currentConfig.componentToBump.isNone) {
-      throw new IllegalArgumentException(
-        "Bumping any component while also promoting a pre-release is not supported"
-      )
-    }
-
-    if (
-      _currentConfig.newPreRelease &&
-      _currentConfig.componentToBump.isPreRelease
-    ) {
-      throw new IllegalArgumentException(
-        "Bumping pre-release component while also creating a new pre-release is not supported"
-      )
-    }
-
-    if (!_currentConfig.snapshot && adapter.hasUncommittedChanges) {
-      throw new IllegalArgumentException(
-        "Cannot create a release version when there are uncommitted changes"
-      )
-    }
-
-    /*if (newPreRelease && preReleaseConfig.isEmpty) {
-      throw new IllegalArgumentException(
-        "Cannot create a new pre-release version if a preRelease configuration is not specified"
-      )
-    }
-    if (componentToBump.isPreRelease && preReleaseConfig.isEmpty) {
-      throw new IllegalArgumentException(
-        "Cannot bump pre-release identifier if a preRelease configuration is not specified"
-      )
-    }*/
-
-    var result = ""
-    if (versionByTag.isEmpty) {
-      // This means that we didn't find any tags (taking into account filtering as well) and so we have to use
-      // the starting version.
-
-      // We cannot always increment the starting version here. We have to make sure that doing so does not end
-      // up skipping a version series or a point-release. The method we are calling here will ensure that we
-      // bump only if it is necessary
-      result = VersioningHelper
-        .determineIncrementedVersionFromStartingVersion(_currentConfig)
-    } else {
-      val headTag = getLatestTagOnReference(Constants.HEAD)
-      if (headTag.isEmpty || adapter.hasUncommittedChanges) {
-        val startingVersion =
-          Properties.propOrNone(StartingVersionSystemPropertyName)
-        if (maybeLatestVersion.isEmpty && startingVersion.isEmpty) {
-          throw new RuntimeException(
-            """Unable to find latest tag on HEAD (see issue #12), please provide
-              |`sbt.release.startingVersion` system property to proceed."""
-              .stripMargin
-              .replaceAll(System.lineSeparator(), "")
-          )
-        }
-        val ver = maybeLatestVersion
-          .orElse(Properties.propOrNone(StartingVersionSystemPropertyName))
-          .get
-        _currentConfig =
-          _currentConfig.copy(componentToBump = VersioningHelper.determineVersionToBump(_currentConfig, ver))
-        result = VersioningHelper.incrementVersion(_currentConfig, ver)
-      } else {
-        if (
-          !_currentConfig.componentToBump.isNone ||
-          _currentConfig.newPreRelease ||
-          _currentConfig.promoteToRelease
-        ) {
-          throw new IllegalArgumentException(
-            """Cannot bump the version, create a new pre-release version, or promote a pre-release version because HEAD
-              | is currently pointing to a tag that identifies an existing version. To be able to create a new version,
-              |  you must make changes""".stripMargin.replaceNewLines
-          )
-        }
-        _currentConfig = _currentConfig.copy(snapshot = false)
-        result = TagPrefixPattern.replaceAllIn(headTag.get, "")
-      }
-    }
-
-    if (_currentConfig.snapshot) {
-      result = s"$result-${_currentConfig.snapshotSuffix}"
-    } else if (versionByTag.contains(result)) {
-      throw new IllegalArgumentException(
-        s"""Determined version $result already exists on another commit in the repository at '${adapter.directory}'. 
-           |Check your configuration to ensure that you haven't forgotten to filter out certain tags or versions. You
-           | may also be bumping the wrong component; if so, bump the component that will give you the intended version,
-           | or manually create a tag with the intended version on the commit to be released."""
-          .stripMargin
-          .replaceNewLines
-      )
-    } else if (filterTags(Set(s"${_currentConfig.tagPrefix}$result")).isEmpty) {
-      throw new IllegalArgumentException(
-        s"""Determined tag '${_currentConfig.tagPrefix}$result' is filtered out by your configuration; this is not 
-           |supported. Check your filtering and tag-prefix configuration. You may also be bumping the wrong component; 
-           |if so, bump the component that will give you the intended version, or manually create a tag with the 
-           |intended version on the commit to be released."""
-          .stripMargin
-          .replaceNewLines
-      )
-    }
-    result
-  }
-
-  private def initState(): Unit =
-    if (filteredTags.isEmpty) {
-      filteredTags = filterTags(tags.keySet)
-
-      versionByTag = filteredTags
-        .map(tag => tag -> TagPrefixPattern.replaceFirstIn(tag, ""))
-        .toMap
-
-      val headCommit = adapter.getHeadCommit
-      if (Option(headCommit).isEmpty) {
-        return // If there is no HEAD, we are done
-      }
-
-      val nearestAncestorTags: ListBuffer[String] = ListBuffer()
-      val references = mutable.Stack[RevCommit]()
-      val investigatedReferences = mutable.Set[RevCommit]()
-      val autobumpMessages = ListBuffer[String]()
-
-      val revWalk = adapter.getRevWalk
-
-      // This is a depth-first traversal; references is the frontier set (stack)
-      references.push(revWalk.parseCommit(headCommit))
-
-      while (references.nonEmpty) {
-        val reference = references.pop()
-        investigatedReferences += reference
-        val tag = getLatestTagOnReference(reference.name())
-        if (tag.isDefined && tags.contains(tag.get)) {
-          nearestAncestorTags += tag.get
-        } else {
-          val commit = revWalk.parseCommit(reference.getId)
-          if (_currentConfig.isAutobumpEnabled) {
-            autobumpMessages += commit.getFullMessage
-          }
-          references.pushAll(commit.getParents.collect {
-            case c if !investigatedReferences.contains(c) => c
-          })
-        }
-      }
-      this.autobumpMessages = autobumpMessages.toList
-
-      maybeLatestVersion = nearestAncestorTags
-        .toSet
-        .map(versionByTag.get)
-        .find(_.isDefined)
-        .flatten
-    }
-
-  private def getLatestTagOnReference(revstr: String): Option[String] = {
-    val repository = adapter.repository
-    val commit = repository.resolve(revstr)
-
-    tags
-      .collect {
-        case (name, ref) if filteredTags.contains(name) =>
-          name -> repository.resolve(s"${ref.getName}^{commit}")
-      }
-      .collect {
-        case (name, id) if id.equals(commit) => name
-      }
-      .toList
+    val tagsForCurrentBranch = adapter
+      .getTagsForCurrentBranch
+      .map(tag => tag.replaceAll(tagPrefix, ""))
+      .map(version => Version(version, snapshotSuffix, preReleaseConfig))
       .sorted
-      .reverse
-      .headOption
+
+    val maybeLatestVersion = tagsForCurrentBranch.headOption
+    val currentVersion = maybeLatestVersion.getOrElse(startingVersion)
+    val newVersion = determineVersion(currentVersion, hotfixRequired, snapshotRequired, maybeLatestVersion)
+    if (currentVersion == newVersion && maybeLatestVersion.isDefined) {
+      throw new IllegalArgumentException(
+        s"Couldn't determine next version, tag (${newVersion.toStringValue(tagPrefix)}) is already exists."
+      )
+    }
+    newVersion
   }
 
-  // TODO: missing pre-release
-  private def filterTags(tags: Set[String]): Set[String] =
-    tags
-      .filter(tag => _currentConfig.tagPattern.nonEmpty(tag))
-      .filter(tag => SemanticBuildVersion.VersionPattern.nonEmpty(tag))
-      .filter(tag =>
-        !_currentConfig.versionsMatching.isEnabled || _currentConfig
-          .versionsMatching
-          .toPattern
-          .nonEmpty(tag)
-      )
-      .filter { tag =>
-        PreReleaseRegex.isEmpty(tag) ||
-        _currentConfig.preReleaseConfig.pattern.nonEmpty(tag)
-      }
+  private[internal] def determineVersion(
+    currentVersion: Version,
+    hotfixRequired: Boolean,
+    snapshotRequired: Boolean,
+    maybeLatestVersion: Option[Version]
+  ) =
+    if (maybeLatestVersion.isEmpty) {
+      // first ever tag on this repository
+      startingVersion
+    } else if (baseConfig.forceBump) {
+      val versionComponents =
+        SetupVersionComponentsForBump()
+          .addComponentIfRequired(baseConfig.componentToBump, () => true)
+          .addComponentIfRequired(PROMOTE_TO_RELEASE, () => baseConfig.promoteToRelease)
+          .addComponentIfRequired(NEW_PRE_RELEASE, () => baseConfig.newPreRelease)
 
+      bumpVersion(
+        forcePush = false,
+        currentVersion = currentVersion,
+        hotfixRequired = hotfixRequired,
+        snapshotRequired = snapshotRequired,
+        versionComponents = versionComponents
+      )
+    } else {
+      val (hasCommits, commitMessages) =
+        maybeLatestVersion
+          .map { version =>
+            // if last tag exists then get commits between last tag and current head, otherwise get all commits
+            val commits = adapter.getCommitBetween(version.toStringValue(tagPrefix))
+            (commits.nonEmpty, commits)
+          }
+          .getOrElse((false, adapter.getCommits))
+
+      val versionComponents =
+        commitMessages.foldLeft(SetupVersionComponentsForBump()) { case (m, commitMessage) =>
+          m.parseMessage(commitMessage, baseConfig.autoBump)
+        }
+
+      // if we have auto bump enabled, there is(are) previous tag(s), and if there are commits added between last tag
+      // and current head, then if components to bump are empty at the end of process, then bump configured bump level
+      val forcePush = baseConfig.isAutobumpEnabled && maybeLatestVersion.isDefined && hasCommits
+      bumpVersion(forcePush, currentVersion, hotfixRequired, snapshotRequired, versionComponents)
+    }
+
+  private def bumpVersion(
+    forcePush: Boolean,
+    currentVersion: Version,
+    hotfixRequired: Boolean,
+    snapshotRequired: Boolean,
+    versionComponents: SetupVersionComponentsForBump
+  ): Version = {
+    if (hotfixRequired || currentVersion.isHotfix) {
+      versionComponents
+        .addHotFix()
+        .removeMajor()
+        .removeMinor()
+        .removePatch()
+        .removePreRelease()
+        .removePromoteToRelease()
+      if (currentVersion.isHotfix) versionComponents.removeNewPreRelease()
+    }
+
+    if (currentVersion.isPreRelease) {
+      versionComponents
+        .addPreRelease()
+        .removeHotFix()
+        .removeNewPreRelease()
+        .removeMajor()
+        .removeMinor()
+        .removePatch()
+    }
+
+    if (versionComponents.isPromoteToRelease) {
+      if (currentVersion.isPreRelease) {
+        // when current version is pre-release and promote to release is set, ignore any other flags
+        logger.warn("Promoting to release flag is set and current version is pre-release, ignoring any other flag.")
+        versionComponents.reset().addPromoteToRelease()
+      } else {
+        logger.warn("Promoting to release flag is set but current version is not a pre-release version, ignoring it.")
+        versionComponents.removePromoteToRelease()
+      }
+    }
+
+    if (versionComponents.isMajor) {
+      versionComponents.removeMinor().removePatch()
+    }
+
+    if (versionComponents.isMinor) {
+      versionComponents.removePatch()
+    }
+
+    if (snapshotRequired) {
+      versionComponents.addSnapshot().removeNewPreRelease().removePromoteToRelease().removePreRelease()
+    }
+
+    currentVersion.bumpVersion(
+      getSnapshotInfo,
+      versionComponents
+        .addComponentIfRequired(baseConfig.defaultBumpLevel, () => forcePush && versionComponents.isEmpty)
+        .getVersionComponents*
+    )
+  }
+
+  private def getSnapshotInfo = Some(Snapshot(baseConfig.snapshotSuffix, Try(adapter.getShortHash).toOption))
 }
 
 object SemanticBuildVersion {
 
-  val PreReleaseRegex: Regex = "\\d++\\.\\d++\\.\\d++-[\\p{Alnum}.-]++".r
-
-  val VersionPattern: Regex = ".*\\d++\\.\\d++\\.\\d++.*".r
-
-  val TagPrefixPattern: Regex =
-    "^(?!\\d++\\.\\d++\\.\\d)(?:.(?!\\d++\\.\\d++\\.\\d))*.".r
-
   def apply(
     workingDir: File,
-    config: SemanticBuildVersionConfiguration = internal.SemanticBuildVersionConfiguration()
-  ) = new SemanticBuildVersion(workingDir, config)
+    baseConfig: SemanticBuildVersionConfiguration = SemanticBuildVersionConfiguration()
+  ): SemanticBuildVersion =
+    new SemanticBuildVersion(workingDir, baseConfig)
 }
