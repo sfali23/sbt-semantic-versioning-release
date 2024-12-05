@@ -23,6 +23,10 @@ class JGitAdapter(workingDir: File) {
 
   def getHeadCommit: ObjectId = repository.resolve(Constants.HEAD)
 
+  def getShortHash: String = repository.newObjectReader().abbreviate(getHeadCommit).name()
+
+  def getCurrentBranch: String = repository.getBranch
+
   def getRevWalk: RevWalk = new RevWalk(repository)
 
   def getTags: Map[String, Ref] = _repository
@@ -35,7 +39,7 @@ class JGitAdapter(workingDir: File) {
     }
     .toMap
 
-  def getAllTags: Seq[String] = getTags.values.map(_.getName.replaceAll(Constants.R_TAGS, "")).toList.reverse
+  def getAllTags: Seq[String] = getTags.values.map(_.getName.replaceAll(Constants.R_TAGS, "")).toList
 
   def getTagsForCurrentBranch: Seq[String] = {
     val tags =
@@ -72,10 +76,19 @@ class JGitAdapter(workingDir: File) {
      } else Seq.empty).headOption
   }
 
+  def getCommits: List[String] =
+    git
+      .log()
+      .add(repository.resolve(repository.getBranch))
+      .call()
+      .asScala
+      .map(_.getFullMessage)
+      .toList
+
   def getCommitBetween(
     start: String,
     end: String = Constants.HEAD
-  ): Seq[String] = {
+  ): List[String] = {
     val startId = repository.resolve(start)
     val endId = repository.resolve(end)
     val walk = getRevWalk
@@ -84,7 +97,7 @@ class JGitAdapter(workingDir: File) {
         val commits = git.log().addRange(startCommit, endCommit).call()
         commits.asScala.map(_.getFullMessage).toList
 
-      case _ => Seq.empty
+      case _ => List.empty
     }
   }
 
