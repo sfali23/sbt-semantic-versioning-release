@@ -12,12 +12,14 @@ package object release {
   val DefaultTagPrefix: String = "v"
   val DefaultTagPattern: Regex = "\\d++\\.\\d++\\.\\d++".r
   val DefaultSnapshotSuffix: String = "SNAPSHOT"
-  val DefaultPreReleaseStartingVersion: String = "RC.1"
   val DefaultForceBump: Boolean = false
   val DefaultPromoteToRelease: Boolean = false
   val DefaultSnapshot: Boolean = true
   val DefaultNewPreRelease: Boolean = false
+  val DefaultBumpLevel: VersionComponent = VersionComponent.PATCH
   val DefaultComponentToBump: VersionComponent = VersionComponent.NONE
+  val DefaultHotfixBranchPattern: Regex = s"^$DefaultTagPrefix(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\+$$".r
+  val DefaultReleaseBranches: Seq[String] = Seq("main", "master")
 
   def defaultPreReleaseBump(
     config: PreReleaseConfig,
