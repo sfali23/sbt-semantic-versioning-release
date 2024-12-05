@@ -7,6 +7,7 @@ import org.eclipse.jgit.transport.URIish
 import org.slf4j.LoggerFactory
 
 import java.io.{File, PrintWriter}
+import java.nio.file.Paths
 import scala.util.Random
 
 class TestRepository(val repository: Repository) {
@@ -16,6 +17,7 @@ class TestRepository(val repository: Repository) {
   val git = new Git(repository)
 
   private val parentFile = repository.getDirectory.getParentFile.getAbsolutePath
+  val workingDirectory: File = Paths.get(parentFile).toFile
 
   def commitAndTag(tag: String, annotated: Boolean = false): TestRepository =
     commit().tag(tag, annotated)
