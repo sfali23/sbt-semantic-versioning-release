@@ -31,7 +31,7 @@ class SemanticBuildVersion(workingDir: File, baseConfig: SemanticBuildVersionCon
     tagsForCurrentBranch.headOption
   }
 
-  def determineVersion: Version = {
+  def determineVersion: String = {
     val currentBranch = adapter.getCurrentBranch
     val hotfixRequired = baseConfig.hotfixBranchPattern.nonEmpty(currentBranch)
     val snapshotRequired =
@@ -47,10 +47,8 @@ class SemanticBuildVersion(workingDir: File, baseConfig: SemanticBuildVersionCon
         s"Couldn't determine next version, tag (${newVersion.toStringValue(tagPrefix)}) is already exists."
       )
     }
-    newVersion
+    newVersion.toStringValue(baseConfig.tagPrefix)
   }
-
-  def toStringValue: String = determineVersion.toStringValue(baseConfig.tagPrefix)
 
   private[internal] def determineVersion(
     currentVersion: Version,

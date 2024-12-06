@@ -25,7 +25,7 @@ sealed trait Scenario1 extends TestScenario {
     repository
       .makeChanges()
       .commit(commitMessage)
-      .createTag(SemanticBuildVersion(repository.workingDirectory, config).determineVersion.toStringValue())
+      .createTag(SemanticBuildVersion(repository.workingDirectory, config).determineVersion)
     adapter.getCurrentHeadTag
   }
 }
@@ -41,7 +41,7 @@ sealed trait Scenario2 extends TestScenario {
       .commit(commitMessage)
       .checkoutBranch("main")
       .merge("test")
-      .createTag(SemanticBuildVersion(repository.workingDirectory, config).determineVersion.toStringValue())
+      .createTag(SemanticBuildVersion(repository.workingDirectory, config).determineVersion)
     adapter.getCurrentHeadTag
   }
 }
@@ -52,7 +52,7 @@ sealed trait Scenario3 extends TestScenario {
   override val expectedResult: String = "Couldn't determine next version, tag (v0.2.0) is already exists."
   override def runScenario(repository: TestRepository, adapter: JGitAdapter): String =
     Try(
-      repository.createTag(SemanticBuildVersion(repository.workingDirectory, config).determineVersion.toStringValue())
+      repository.createTag(SemanticBuildVersion(repository.workingDirectory, config).determineVersion)
     ) match {
       case Failure(ex) => ex.getMessage
       case Success(_)  => adapter.getCurrentHeadTag
@@ -70,7 +70,7 @@ sealed trait Scenario4 extends TestScenario {
       .commit(commitMessage)
       .checkoutBranch("v0.1.0+")
       .merge("hot_fix")
-      .createTag(SemanticBuildVersion(repository.workingDirectory, config).determineVersion.toStringValue())
+      .createTag(SemanticBuildVersion(repository.workingDirectory, config).determineVersion)
     adapter.getCurrentHeadTag
   }
 }
@@ -87,7 +87,7 @@ sealed trait Scenario5 extends TestScenario {
       .commit(commitMessage)
       .checkoutBranch("main")
       .merge("update_tag")
-      .createTag(SemanticBuildVersion(repository.workingDirectory, config).determineVersion.toStringValue())
+      .createTag(SemanticBuildVersion(repository.workingDirectory, config).determineVersion)
     adapter.getCurrentHeadTag
   }
 }
@@ -103,7 +103,7 @@ sealed trait Scenario6 extends TestScenario {
       .commit(commitMessage)
       .checkoutBranch("v0.1.0+")
       .merge("update_hotfix_tag")
-      .createTag(SemanticBuildVersion(repository.workingDirectory, config).determineVersion.toStringValue())
+      .createTag(SemanticBuildVersion(repository.workingDirectory, config).determineVersion)
     adapter.getCurrentHeadTag
   }
 }
@@ -119,7 +119,7 @@ sealed trait Scenario7 extends TestScenario {
       .commit(commitMessage)
       .checkoutBranch("main")
       .merge("bump_major")
-      .createTag(SemanticBuildVersion(repository.workingDirectory, config).determineVersion.toStringValue())
+      .createTag(SemanticBuildVersion(repository.workingDirectory, config).determineVersion)
     adapter.getCurrentHeadTag
   }
 }
@@ -135,7 +135,7 @@ sealed trait Scenario8 extends TestScenario {
       .commit(commitMessage)
       .checkoutBranch("main")
       .merge("new_pre_release")
-      .createTag(SemanticBuildVersion(repository.workingDirectory, config).determineVersion.toStringValue())
+      .createTag(SemanticBuildVersion(repository.workingDirectory, config).determineVersion)
     adapter.getCurrentHeadTag
   }
 }
@@ -151,7 +151,7 @@ sealed trait Scenario9 extends TestScenario {
       .commit(commitMessage)
       .checkoutBranch("main")
       .merge("new_pre_release_2")
-      .createTag(SemanticBuildVersion(repository.workingDirectory, config).determineVersion.toStringValue())
+      .createTag(SemanticBuildVersion(repository.workingDirectory, config).determineVersion)
     adapter.getCurrentHeadTag
   }
 }
@@ -167,7 +167,7 @@ sealed trait Scenario10 extends TestScenario {
       .commit(commitMessage)
       .checkoutBranch("main")
       .merge("promote_to_release")
-      .createTag(SemanticBuildVersion(repository.workingDirectory, config).determineVersion.toStringValue())
+      .createTag(SemanticBuildVersion(repository.workingDirectory, config).determineVersion)
     adapter.getCurrentHeadTag
   }
 }
@@ -183,7 +183,7 @@ sealed trait Scenario11 extends TestScenario {
       .commit(commitMessage)
       .checkoutBranch("main")
       .merge("ignore_promote_to_release")
-      .createTag(SemanticBuildVersion(repository.workingDirectory, config).determineVersion.toStringValue())
+      .createTag(SemanticBuildVersion(repository.workingDirectory, config).determineVersion)
     adapter.getCurrentHeadTag
   }
 }
@@ -197,7 +197,7 @@ sealed trait Scenario12 extends TestScenario {
       .createAndCheckout("sub_branch")
       .makeChanges()
       .commit(commitMessage)
-      .createTag(SemanticBuildVersion(repository.workingDirectory, config).determineVersion.toStringValue())
+      .createTag(SemanticBuildVersion(repository.workingDirectory, config).determineVersion)
     val result = adapter.getCurrentHeadTag
     val index = result.indexOf("+")
     result.substring(0, index)

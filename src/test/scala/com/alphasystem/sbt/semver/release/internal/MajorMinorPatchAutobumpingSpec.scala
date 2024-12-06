@@ -27,7 +27,7 @@ class MajorMinorPatchAutobumpingSpec extends AnyFunSuite with TableDrivenPropert
         SemanticBuildVersion(
           workingDir,
           defaultConfiguration
-        ).determineVersion.toStringValue() shouldBe "v0.1.0"
+        ).determineVersion shouldBe "v0.1.0"
     }
   }
 
@@ -76,7 +76,7 @@ class MajorMinorPatchAutobumpingSpec extends AnyFunSuite with TableDrivenPropert
             SemanticBuildVersion(
               workingDir,
               config
-            ).determineVersion.toStringValue(_tagPrefix) shouldBe expectedVersion
+            ).determineVersion shouldBe expectedVersion
           }
         } // end of TestSpec
       } // end of test
