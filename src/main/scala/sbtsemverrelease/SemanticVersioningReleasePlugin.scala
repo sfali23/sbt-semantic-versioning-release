@@ -30,38 +30,42 @@ object SemanticVersioningReleasePlugin extends AutoPlugin {
       "This option defines prefix to use when tagging a release. Default value is \"v\"."
     )
 
-    val tagPattern = settingKey[Regex](
-      "This option defines the pattern to identify tag. Default value is \"\\d++\\.\\d++\\.\\d++\"."
-    )
-
     val snapshotSuffix = settingKey[String](
       "This option defines the suffix for snapshot. Default value is \"SNAPSHOT\"."
     )
 
     val forceBump = settingKey[Boolean](
-      s"""This option defines the flag to enable forceBump. Default value is "false". This option can be set
-         | via system property "sbt.release.forceBump"."""
+      """This option defines the flag to enable forceBump. Default value is "false". This option can be set
+        | via system property "sbt.release.forceBump"."""
         .stripMargin
         .replaceNewLines
     )
 
     val newPreRelease = settingKey[Boolean](
-      s"""This option defines the flag to enable new-pre-release. Default value is "false". This option can be set
-         | via system property "sbt.release.newPreRelease" as well as via "\\[new-pre-release]" regular expression."""
+      """This option defines the flag to enable new-pre-release. Default value is "false". This option can be set
+        | via system property "sbt.release.newPreRelease" as well as via "\\[new-pre-release]" regular expression."""
         .stripMargin
         .replaceNewLines
     )
 
     val promoteToRelease = settingKey[Boolean](
-      s"""This option defines the flag to enable promote-to-release. Default value is "false". This option can be set
-         | via system property "sbt.release.promoteToRelease" as well as via "\\[promote]" regular expression."""
+      """This option defines the flag to enable promote-to-release. Default value is "false". This option can be set
+        | via system property "sbt.release.promoteToRelease" as well as via "\\[promote]" regular expression."""
         .stripMargin
         .replaceNewLines
     )
 
     val snapshot = settingKey[Boolean](
-      s"""This option defines the flag to make current release a snapshot release. Default value is "true". This option
-         | can be set via system property "sbt.release.snapshot"."""
+      """This option defines the flag to make current release a snapshot release. Default value is "true". This option
+        | can be set via system property "sbt.release.snapshot"."""
+        .stripMargin
+        .replaceNewLines
+    )
+
+    val defaultBumpLevel = settingKey[VersionComponent](
+      """This option defines the default level to bump, if bumping of version is required and no bump pattern can be
+        |deduced from commit messages. The default value is 'PATCH. This option can be set via system property
+        |"sbt.release.defaultBumpLevel"."""
         .stripMargin
         .replaceNewLines
     )
@@ -69,8 +73,8 @@ object SemanticVersioningReleasePlugin extends AutoPlugin {
     val componentToBump = settingKey[Option[String]](
       s"""This option defines the component to bump. Default value is "NONE", which corresponds to bumping 
          |the lowest precedence component. Acceptable values are "PRE_RELEASE", "PATCH", "MINOR", "MAJOR", going from 
-         |lowest precedence to highest precedence. This option can be set via system property 
-         |"sbt.release.componentToBump"."""
+         |lowest precedence to highest precedence. This option is only applicable for "forceBump" strategy.
+         |This option can be set via system property "sbt.release.componentToBump"."""
         .stripMargin
         .replaceNewLines
     )
@@ -79,9 +83,21 @@ object SemanticVersioningReleasePlugin extends AutoPlugin {
       "This option allows you to specify how the build version should be automatically bumped based on the contents of commit messages."
     )
 
-    val preRelease = settingKey[PreReleaseConfig](
-      "This option defines configuration for pre-release"
-    )
+    val preRelease = settingKey[PreReleaseConfig]("This option defines configuration for pre-release")
+
+    val hotfixBranchPattern =
+      settingKey[Regex]("""This option defines branch name pattern for hot fix branches. Default pattern is
+                          |"^v(0|[1-9]\d*)\\.(0|[1-9]\d*)\\.(0|[1-9]\d*)\+$" This option can be set via system property
+                          | "sbt.release.hotFixBranchPattern".""".stripMargin)
+
+    val extraReleaseBranches =
+      settingKey[Seq[String]](
+        """This option defines the list of name of branches that can be used to release from. By default only "main" and
+          | "master" branches can be used for publishing, if plugin is executed from a branch then it would created a
+          | snapshot version. This rule doesn't apply for hot fix branches. Possible use case is to a "development" branch."""
+          .stripMargin
+          .replaceNewLines
+      )
 
     object ReleaseKeys {
       val versionToBe = AttributeKey[String]("Next version")
@@ -105,14 +121,14 @@ object SemanticVersioningReleasePlugin extends AutoPlugin {
         snapshot = snapshot.value,
         newPreRelease = newPreRelease.value,
         autoBump = autoBump.value,
-        defaultBumpLevel = DefaultBumpLevel, // TODO: populate this
+        defaultBumpLevel = defaultBumpLevel.value,
         componentToBump = componentToBump
           .value
           .map(VersionComponent.valueOf)
           .getOrElse(DefaultComponentToBump),
         preReleaseConfig = preRelease.value,
         hotfixBranchPattern = DefaultHotfixBranchPattern, // TODO: populate this
-        extraReleaseBranches = Seq.empty // TODO: populate this
+        extraReleaseBranches = extraReleaseBranches.value
       )
     }
 
@@ -153,6 +169,20 @@ object SemanticVersioningReleasePlugin extends AutoPlugin {
       )
     }
 
+  private def initializeDefaultBumpLevel =
+    Def.setting {
+      val name = Properties.propOrElse(DefaultBumpLevelSystemPropertyName, VersionComponent.PATCH.name())
+      Try(VersionComponent.valueOf(name)).getOrElse(VersionComponent.PATCH)
+    }
+
+  private def initializeDefaultHotFixBranchPattern =
+    Def.setting {
+      Properties.propOrNone(HotfixBranchPatternSystemPropertyName) match {
+        case Some(value) => s"$value".r
+        case None        => initializeHotfixBranchPattern(tagPrefix.value)
+      }
+    }
+
   private def initializeReleaseVersionFile =
     Def.setting {
       val defaultFile = new File(baseDirectory.value, "version.sbt")
@@ -177,7 +207,6 @@ object SemanticVersioningReleasePlugin extends AutoPlugin {
     releaseVersionFile := initializeReleaseVersionFile.value,
     startingVersion := getStartingVersion.value,
     tagPrefix := DefaultTagPrefix,
-    tagPattern := DefaultTagPattern,
     snapshotSuffix := DefaultSnapshotSuffix,
     forceBump := initializeSettingFromSystemProperty(
       ForceBumpSystemPropertyName,
@@ -192,6 +221,7 @@ object SemanticVersioningReleasePlugin extends AutoPlugin {
       NewPreReleaseSystemPropertyName,
       DefaultNewPreRelease
     ),
+    defaultBumpLevel := initializeDefaultBumpLevel.value,
     componentToBump := Some(
       Properties
         .propOrNone(ComponentToBumpSystemPropertyName)
@@ -199,6 +229,8 @@ object SemanticVersioningReleasePlugin extends AutoPlugin {
     ),
     autoBump := AutoBump(),
     preRelease := PreReleaseConfig(),
+    hotfixBranchPattern := initializeDefaultHotFixBranchPattern.value,
+    extraReleaseBranches := Seq.empty[String],
     determineVersion := {
       val config = toConfiguration.value
       SemanticBuildVersion(

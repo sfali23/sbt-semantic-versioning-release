@@ -32,28 +32,24 @@ class MajorMinorPatchAutobumpingSpec extends AnyFunSuite with TableDrivenPropert
   }
 
   forAll(
-    DataGenerator.tableFor7(
+    DataGenerator.tableFor5(
       getClass.getSimpleName,
       classOf[DataSet].getSimpleName,
       (value: DataSet) => DataSet.unapply(value).get
     )
   ) {
     (
-      tagPattern: Option[Regex],
       tagPrefix: Option[String],
-      matching: Option[VersionsMatching],
       tagNames: List[String],
       autobumpTag: String,
       annotated: Boolean,
       expectedVersion: String
     ) =>
-      val tagPatternStr = tagPattern.map(_.regex).getOrElse("Default")
       val tagPrefixStr = tagPrefix.getOrElse("Default")
-      val matchingStr = matching.map(_.toLabel).getOrElse("[]")
       val tagNamesStr = tagNames.mkString("[", ", ", "]")
       test(
-        s"""test various autobumping variants (tagPattern: $tagPatternStr, tagPrefix: $tagPrefixStr, 
-           |matching: $matchingStr, tagNames $tagNamesStr, autobumpTag: $autobumpTag, annotated: $annotated)"""
+        s"""test various autobumping variants (tagPrefix: $tagPrefixStr, tagNames $tagNamesStr, autobumpTag: $autobumpTag,
+           | annotated: $annotated)"""
           .stripMargin
           .replaceNewLines
       ) {
@@ -153,9 +149,7 @@ class MajorMinorPatchAutobumpingSpec extends AnyFunSuite with TableDrivenPropert
 object MajorMinorPatchAutobumpingSpec {
 
   private case class DataSet(
-    tagPattern: Option[Regex] = None,
     tagPrefix: Option[String] = None,
-    matching: Option[VersionsMatching] = None,
     tagNames: List[String] = Nil,
     autobumpTag: String = "",
     annotated: Boolean = false,
