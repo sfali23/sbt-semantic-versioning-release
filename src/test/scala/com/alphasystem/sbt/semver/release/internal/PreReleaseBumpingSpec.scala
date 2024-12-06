@@ -7,10 +7,7 @@ import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.prop.TableDrivenPropertyChecks
 
-class PreReleaseBumpingSpec
-    extends AnyFunSuite
-    with TableDrivenPropertyChecks
-    with Matchers {
+class PreReleaseBumpingSpec extends AnyFunSuite with TableDrivenPropertyChecks with Matchers {
 
   private val defaultConfiguration =
     SemanticBuildVersionConfiguration(
@@ -195,10 +192,7 @@ class PreReleaseBumpingSpec
             intercept[IllegalArgumentException](
               SemanticBuildVersion(
                 workingDir,
-                defaultConfiguration.copy(
-                  tagPattern = "beta".r,
-                  tagPrefix = "beta"
-                )
+                defaultConfiguration.copy(tagPrefix = "beta")
               ).determineVersion
             )
           caught.getMessage shouldBe
@@ -220,11 +214,7 @@ class PreReleaseBumpingSpec
             intercept[IllegalArgumentException](
               SemanticBuildVersion(
                 workingDir,
-                defaultConfiguration.copy(
-                  tagPattern = "beta".r,
-                  tagPrefix = "beta",
-                  snapshot = false
-                )
+                defaultConfiguration.copy(tagPrefix = "beta", snapshot = false)
               ).determineVersion
             )
           caught.getMessage shouldBe
@@ -326,10 +316,7 @@ class PreReleaseBumpingSpec
             intercept[IllegalArgumentException](
               SemanticBuildVersion(
                 workingDir,
-                defaultConfiguration.copy(
-                  tagPattern = "beta".r,
-                  tagPrefix = "beta"
-                )
+                defaultConfiguration.copy(tagPrefix = "beta")
               ).determineVersion
             )
           caught.getMessage shouldBe
@@ -360,11 +347,7 @@ class PreReleaseBumpingSpec
             intercept[IllegalArgumentException](
               SemanticBuildVersion(
                 workingDir,
-                defaultConfiguration.copy(
-                  tagPattern = "beta".r,
-                  tagPrefix = "beta",
-                  snapshot = false
-                )
+                defaultConfiguration.copy(tagPrefix = "beta", snapshot = false)
               ).determineVersion
             )
           caught.getMessage shouldBe
@@ -391,15 +374,11 @@ class PreReleaseBumpingSpec
             .commitAndTag("0.2.1-beta.1", annotated)
             .makeChanges()
 
-        override protected def assertion: Assertion = {
+        override protected def assertion: Assertion =
           SemanticBuildVersion(
             workingDir,
-            defaultConfiguration.copy(
-              tagPattern = "beta".r,
-              tagPrefix = "beta"
-            )
+            defaultConfiguration.copy(tagPrefix = "beta")
           ).determineVersion shouldBe "0.2.1-beta.2-SNAPSHOT"
-        }
       }
     }
     //
@@ -421,16 +400,11 @@ class PreReleaseBumpingSpec
             .makeChanges()
             .commit()
 
-        override protected def assertion: Assertion = {
+        override protected def assertion: Assertion =
           SemanticBuildVersion(
             workingDir,
-            defaultConfiguration.copy(
-              tagPattern = "beta".r,
-              tagPrefix = "beta",
-              snapshot = false
-            )
+            defaultConfiguration.copy(tagPrefix = "beta", snapshot = false)
           ).determineVersion shouldBe "0.2.1-beta.2"
-        }
       }
     }
     //
@@ -451,16 +425,11 @@ class PreReleaseBumpingSpec
             .commitAndTag("0.2.1-beta.1", annotated)
             .makeChanges()
 
-        override protected def assertion: Assertion = {
+        override protected def assertion: Assertion =
           SemanticBuildVersion(
             workingDir,
-            defaultConfiguration.copy(
-              tagPattern = "beta".r,
-              tagPrefix = "beta",
-              componentToBump = VersionComponent.NONE
-            )
+            defaultConfiguration.copy(tagPrefix = "beta", componentToBump = VersionComponent.NONE)
           ).determineVersion shouldBe "0.2.1-beta.2-SNAPSHOT"
-        }
       }
     }
     //
@@ -482,17 +451,15 @@ class PreReleaseBumpingSpec
             .makeChanges()
             .commit()
 
-        override protected def assertion: Assertion = {
+        override protected def assertion: Assertion =
           SemanticBuildVersion(
             workingDir,
             defaultConfiguration.copy(
-              tagPattern = "beta".r,
               tagPrefix = "beta",
               snapshot = false,
               componentToBump = VersionComponent.NONE
             )
           ).determineVersion shouldBe "0.2.1-beta.2"
-        }
       }
     }
     //
@@ -510,17 +477,15 @@ class PreReleaseBumpingSpec
             .commitAndTag("0.2.1-beta.1", annotated)
             .makeChanges()
 
-        override protected def assertion: Assertion = {
+        override protected def assertion: Assertion =
           SemanticBuildVersion(
             workingDir,
             defaultConfiguration.copy(
-              tagPattern = "beta".r,
               tagPrefix = "beta",
               componentToBump = VersionComponent.NONE,
               promoteToRelease = true
             )
           ).determineVersion shouldBe "0.2.1-SNAPSHOT"
-        }
       }
     }
     //
@@ -539,18 +504,16 @@ class PreReleaseBumpingSpec
             .makeChanges()
             .commit()
 
-        override protected def assertion: Assertion = {
+        override protected def assertion: Assertion =
           SemanticBuildVersion(
             workingDir,
             defaultConfiguration.copy(
-              tagPattern = "beta".r,
               tagPrefix = "beta",
               componentToBump = VersionComponent.NONE,
               promoteToRelease = true,
               snapshot = false
             )
           ).determineVersion shouldBe "0.2.1"
-        }
       }
     }
   }
@@ -564,11 +527,7 @@ class PreReleaseBumpingSpec
           intercept[IllegalArgumentException](
             SemanticBuildVersion(
               workingDir,
-              defaultConfiguration.copy(
-                tagPattern = "beta".r,
-                tagPrefix = "beta",
-                snapshot = false
-              )
+              defaultConfiguration.copy(tagPrefix = "beta", snapshot = false)
             ).determineVersion
           )
         caught.getMessage shouldBe
@@ -589,10 +548,7 @@ class PreReleaseBumpingSpec
           intercept[IllegalArgumentException](
             SemanticBuildVersion(
               workingDir,
-              defaultConfiguration.copy(
-                tagPattern = "beta".r,
-                tagPrefix = "beta"
-              )
+              defaultConfiguration.copy(tagPrefix = "beta")
             ).determineVersion
           )
         caught.getMessage shouldBe

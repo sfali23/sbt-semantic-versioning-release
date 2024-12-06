@@ -11,15 +11,11 @@ import sbtsemverrelease.VersionsMatching
 
 import scala.util.matching.Regex
 
-class MajorMinorPatchAutobumpingSpec
-    extends AnyFunSuite
-    with TableDrivenPropertyChecks
-    with Matchers {
+class MajorMinorPatchAutobumpingSpec extends AnyFunSuite with TableDrivenPropertyChecks with Matchers {
 
   import MajorMinorPatchAutobumpingSpec.*
 
-  private val defaultConfiguration =
-    SemanticBuildVersionConfiguration(snapshot = false)
+  private val defaultConfiguration = SemanticBuildVersionConfiguration(snapshot = false)
 
   test(
     "autobumping without any prior commits does not cause build to fail but returns starting version"
@@ -31,7 +27,7 @@ class MajorMinorPatchAutobumpingSpec
         SemanticBuildVersion(
           workingDir,
           defaultConfiguration
-        ).determineVersion shouldBe "0.1.0"
+        ).determineVersion.toStringValue() shouldBe "v0.1.0"
     }
   }
 
@@ -75,17 +71,16 @@ class MajorMinorPatchAutobumpingSpec
           }
 
           override protected def assertion: Assertion = {
+            val _tagPrefix = tagPrefix.getOrElse(defaultConfiguration.tagPrefix)
             val config = defaultConfiguration.copy(
-              tagPattern =
-                tagPattern.getOrElse(defaultConfiguration.tagPattern),
-              tagPrefix = tagPrefix.getOrElse(defaultConfiguration.tagPrefix),
-              versionsMatching =
-                matching.getOrElse(defaultConfiguration.versionsMatching)
+              // tagPattern = tagPattern.getOrElse(defaultConfiguration.tagPattern),
+              tagPrefix = _tagPrefix
+              // versionsMatching = matching.getOrElse(defaultConfiguration.versionsMatching)
             )
             SemanticBuildVersion(
               workingDir,
               config
-            ).determineVersion shouldBe expectedVersion
+            ).determineVersion.toStringValue(_tagPrefix) shouldBe expectedVersion
           }
         } // end of TestSpec
       } // end of test

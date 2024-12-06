@@ -2,6 +2,7 @@ package sbtsemverrelease
 
 import scala.util.matching.Regex
 
+@deprecated("To be removed")
 case class VersionsMatching(major: Int = -1, minor: Int = -1, patch: Int = -1) {
   def isEnabled: Boolean = major >= 0 || minor >= 0 || patch >= 0
 

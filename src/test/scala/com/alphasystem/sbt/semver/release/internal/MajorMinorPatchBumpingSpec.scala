@@ -7,14 +7,9 @@ import org.scalatest.Assertion
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.prop.TableDrivenPropertyChecks
-import sbtsemverrelease.{ PreReleaseConfig, VersionsMatching }
+import sbtsemverrelease.PreReleaseConfig
 
-import scala.util.matching.Regex
-
-class MajorMinorPatchBumpingSpec
-    extends AnyFunSuite
-    with TableDrivenPropertyChecks
-    with Matchers {
+class MajorMinorPatchBumpingSpec extends AnyFunSuite with TableDrivenPropertyChecks with Matchers {
 
   import MajorMinorPatchBumpingSpec.*
 
@@ -116,10 +111,7 @@ class MajorMinorPatchBumpingSpec
 
         override protected def assertion: Assertion = {
           val config = defaultConfiguration
-            .copy(
-              tagPattern = "^bar-".r,
-              tagPrefix = "bar-"
-            )
+            .copy(tagPrefix = "bar-")
           SemanticBuildVersion(
             workingDir,
             config
@@ -139,11 +131,7 @@ class MajorMinorPatchBumpingSpec
 
         override protected def assertion: Assertion = {
           val config = defaultConfiguration
-            .copy(
-              tagPattern = "^bar-".r,
-              tagPrefix = "bar-",
-              snapshot = false
-            )
+            .copy(tagPrefix = "bar-", snapshot = false)
           SemanticBuildVersion(
             workingDir,
             config
@@ -241,11 +229,7 @@ class MajorMinorPatchBumpingSpec
         override protected def assertion: Assertion = {
           val configuration =
             defaultConfiguration
-              .copy(
-                componentToBump = VersionComponent.MAJOR,
-                snapshot = false,
-                versionsMatching = VersionsMatching(major = 0)
-              )
+              .copy(componentToBump = VersionComponent.MAJOR, snapshot = false)
           val caught =
             intercept[IllegalArgumentException](
               SemanticBuildVersion(
@@ -280,9 +264,7 @@ class MajorMinorPatchBumpingSpec
             defaultConfiguration
               .copy(
                 snapshot = false,
-                tagPattern = "^bar-".r,
                 tagPrefix = "bar-",
-                versionsMatching = VersionsMatching(major = 0),
                 componentToBump = VersionComponent.MAJOR
               )
           val caught =
@@ -311,12 +293,7 @@ class MajorMinorPatchBumpingSpec
             .makeChanges()
 
         override protected def assertion: Assertion =
-          SemanticBuildVersion(
-            workingDir,
-            defaultConfiguration.copy(versionsMatching =
-              VersionsMatching(major = 5)
-            )
-          ).determineVersion shouldBe "5.4.3-SNAPSHOT"
+          SemanticBuildVersion(workingDir, defaultConfiguration).determineVersion shouldBe "5.4.3-SNAPSHOT"
       }
     }
     //
@@ -333,9 +310,7 @@ class MajorMinorPatchBumpingSpec
         override protected def assertion: Assertion =
           SemanticBuildVersion(
             workingDir,
-            defaultConfiguration.copy(versionsMatching =
-              VersionsMatching(major = 5)
-            )
+            defaultConfiguration
           ).determineVersion shouldBe "5.4.3-SNAPSHOT"
       }
     }
@@ -354,9 +329,7 @@ class MajorMinorPatchBumpingSpec
           SemanticBuildVersion(
             workingDir,
             defaultConfiguration.copy(
-              preReleaseConfig = PreReleaseConfig(startingVersion = "pre.1"),
-              versionsMatching =
-                VersionsMatching(major = 5, minor = 4, patch = 3)
+              preReleaseConfig = PreReleaseConfig(startingVersion = "pre.1")
             )
           ).determineVersion shouldBe "5.4.3-pre.2-SNAPSHOT"
       }
@@ -414,64 +387,59 @@ class MajorMinorPatchBumpingSpec
       test(
         s"bumping ${bump.name().toLowerCase} version for ${`type`} (annotated: $annotated)"
       ) {
-        {
-          new TestSpec {
-            override protected def populateRepository(): Unit =
-              testRepository
-                .commitAndTag("v0.0.2", annotated)
-                .makeChanges()
-                .commit()
+        new TestSpec {
+          override protected def populateRepository(): Unit =
+            testRepository
+              .commitAndTag("v0.0.2", annotated)
+              .makeChanges()
+              .commit()
 
-            override protected def assertion: Assertion =
-              SemanticBuildVersion(
-                workingDir,
-                defaultConfiguration.copy(
-                  snapshot = `type` == "snapshot",
-                  componentToBump = bump
-                )
-              ).determineVersion shouldBe expectedVersion
-          }
+          override protected def assertion: Assertion =
+            SemanticBuildVersion(
+              workingDir,
+              defaultConfiguration.copy(
+                snapshot = `type` == "snapshot",
+                componentToBump = bump
+              )
+            ).determineVersion shouldBe expectedVersion
         }
       }
       //
       test(
         s"bumping ${bump.name().toLowerCase} version with tag pattern for ${`type`} (annotated: $annotated)"
       ) {
-        {
-          val snapshot = `type` == "snapshot"
-          new TestSpec {
-            override protected def populateRepository(): Unit = {
-              testRepository
-                .commitAndTag("foo-0.1.1", annotated)
-                .commitAndTag("foo-0.1.2", annotated)
-                .commitAndTag("bar-0.0.1", annotated)
-                .commitAndTag("bar-0.0.2", annotated)
-                .makeChanges()
-              if (snapshot) {
-                testRepository.makeChanges()
-              } else {
-                testRepository.commit()
-              }
+        val snapshot = `type` == "snapshot"
+        new TestSpec {
+          override protected def populateRepository(): Unit = {
+            testRepository
+              .commitAndTag("foo-0.1.1", annotated)
+              .commitAndTag("foo-0.1.2", annotated)
+              .commitAndTag("bar-0.0.1", annotated)
+              .commitAndTag("bar-0.0.2", annotated)
+              .makeChanges()
+            if (snapshot) {
+              testRepository.makeChanges()
+            } else {
+              testRepository.commit()
             }
-
-            override protected def assertion: Assertion =
-              SemanticBuildVersion(
-                workingDir,
-                defaultConfiguration.copy(
-                  snapshot = snapshot,
-                  componentToBump = bump,
-                  tagPattern = "^bar-".r,
-                  tagPrefix = "bar-"
-                )
-              ).determineVersion shouldBe expectedVersion
           }
+
+          override protected def assertion: Assertion =
+            SemanticBuildVersion(
+              workingDir,
+              defaultConfiguration.copy(
+                snapshot = snapshot,
+                componentToBump = bump,
+                tagPrefix = "bar-"
+              )
+            ).determineVersion shouldBe expectedVersion
         }
       } //
   }
 
   forAll(
     DataGenerator
-      .tableFor6(
+      .tableFor5(
         getClass.getSimpleName,
         classOf[DataSet3].getSimpleName,
         (value: DataSet3) => DataSet3.unapply(value).get
@@ -480,7 +448,6 @@ class MajorMinorPatchBumpingSpec
     (
       bump: VersionComponent,
       `type`: String,
-      matching: VersionsMatching,
       tagNames: List[String],
       annotated: Boolean,
       expectedVersion: String
@@ -488,37 +455,31 @@ class MajorMinorPatchBumpingSpec
       test(
         s"bumping ${bump.name().toLowerCase} version with versions matching for ${`type`} (annotated: $annotated)"
       ) {
-        {
-          val snapshot = `type` == "snapshot"
-          new TestSpec {
-            override protected def populateRepository(): Unit = {
-              tagNames.foreach { tag =>
-                testRepository.commitAndTag(tag, annotated)
-              }
-              if (snapshot) {
-                testRepository.makeChanges()
-              } else {
-                testRepository.commit()
-              }
+        val snapshot = `type` == "snapshot"
+        new TestSpec {
+          override protected def populateRepository(): Unit = {
+            tagNames.foreach { tag =>
+              testRepository.commitAndTag(tag, annotated)
             }
-
-            override protected def assertion: Assertion =
-              SemanticBuildVersion(
-                workingDir,
-                defaultConfiguration.copy(
-                  snapshot = snapshot,
-                  componentToBump = bump,
-                  versionsMatching = matching
-                )
-              ).determineVersion shouldBe expectedVersion
+            if (snapshot) {
+              testRepository.makeChanges()
+            } else {
+              testRepository.commit()
+            }
           }
+
+          override protected def assertion: Assertion =
+            SemanticBuildVersion(
+              workingDir,
+              defaultConfiguration.copy(snapshot = snapshot, componentToBump = bump)
+            ).determineVersion shouldBe expectedVersion
         }
       }
   }
 
   forAll(
     DataGenerator
-      .tableFor8(
+      .tableFor6(
         getClass.getSimpleName,
         classOf[DataSet4].getSimpleName,
         (value: DataSet4) => DataSet4.unapply(value).get
@@ -527,8 +488,6 @@ class MajorMinorPatchBumpingSpec
     (
       bump: VersionComponent,
       `type`: String,
-      matching: VersionsMatching,
-      tagPattern: Regex,
       tagPrefix: String,
       tagNames: List[String],
       annotated: Boolean,
@@ -551,8 +510,6 @@ class MajorMinorPatchBumpingSpec
           override protected def assertion: Assertion = {
             val config = defaultConfiguration.copy(
               snapshot = snapshot,
-              versionsMatching = matching,
-              tagPattern = tagPattern,
               tagPrefix = tagPrefix,
               componentToBump = bump
             )
@@ -582,7 +539,6 @@ object MajorMinorPatchBumpingSpec {
   private case class DataSet3(
     bump: VersionComponent = VersionComponent.NONE,
     `type`: String = "",
-    matching: VersionsMatching = VersionsMatching(),
     tagNames: List[String] = Nil,
     annotated: Boolean = false,
     expectedVersion: String = "")
@@ -590,8 +546,6 @@ object MajorMinorPatchBumpingSpec {
   private case class DataSet4(
     bump: VersionComponent = VersionComponent.NONE,
     `type`: String = "",
-    matching: VersionsMatching = VersionsMatching(),
-    tagPattern: Regex = "".r,
     tagPrefix: String = "",
     tagNames: List[String] = Nil,
     annotated: Boolean = false,

@@ -21,16 +21,6 @@ package object release {
   val DefaultHotfixBranchPattern: Regex = s"^$DefaultTagPrefix(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\+$$".r
   val DefaultReleaseBranches: Seq[String] = Seq("main", "master")
 
-  def defaultPreReleaseBump(
-    config: PreReleaseConfig,
-    latestVersion: String
-  ): String = {
-    val preReleaseComponents = config.splitComponents(latestVersion)
-    val prefix = preReleaseComponents.dropRight(1).mkString("")
-    val nextVersion = preReleaseComponents.last.toInt + 1
-    s"$prefix$nextVersion"
-  }
-
   private val SystemPropertyNamePrefix = "sbt.release."
 
   val StartingVersionSystemPropertyName =

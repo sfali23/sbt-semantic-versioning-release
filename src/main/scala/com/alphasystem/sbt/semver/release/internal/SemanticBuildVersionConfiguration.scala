@@ -7,20 +7,16 @@ import scala.util.matching.Regex
 
 case class SemanticBuildVersionConfiguration(
   startingVersion: String = DefaultStartingVersion,
-  overrideStartingVersion: Option[String] = None, // TODO: remove this, no longer required, needed investigation
   tagPrefix: String = DefaultTagPrefix,
-  tagPattern: Regex = DefaultTagPattern, // TODO: remove this, no longer required
   snapshotSuffix: String = DefaultSnapshotSuffix,
   forceBump: Boolean = DefaultForceBump,
   promoteToRelease: Boolean = DefaultPromoteToRelease,
   snapshot: Boolean = DefaultSnapshot,
   newPreRelease: Boolean = DefaultNewPreRelease,
   autoBump: AutoBump = AutoBump(),
-  versionsMatching: VersionsMatching = VersionsMatching(), // TODO: remove this, no longer required
   defaultBumpLevel: VersionComponent = DefaultBumpLevel,
   componentToBump: VersionComponent = DefaultComponentToBump,
   preReleaseConfig: PreReleaseConfig = PreReleaseConfig(),
-  preReleaseBump: (PreReleaseConfig, String) => String = defaultPreReleaseBump, // TODO: remove this, no longer required
   hotfixBranchPattern: Regex = DefaultHotfixBranchPattern,
   extraReleaseBranches: Seq[String] = Seq.empty) {
 

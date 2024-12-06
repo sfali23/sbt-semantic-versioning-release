@@ -6,10 +6,7 @@ import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.prop.TableDrivenPropertyChecks
 
-class PreReleaseAutobumpingSpec
-    extends AnyFunSuite
-    with TableDrivenPropertyChecks
-    with Matchers {
+class PreReleaseAutobumpingSpec extends AnyFunSuite with TableDrivenPropertyChecks with Matchers {
 
   forAll(AnnotatedTestData) { (annotated: Boolean) =>
     test(s"promoting pre-release version (annotated: $annotated)") {
@@ -29,7 +26,6 @@ class PreReleaseAutobumpingSpec
           SemanticBuildVersion(
             workingDir,
             SemanticBuildVersionConfiguration(
-              tagPattern = "beta".r,
               tagPrefix = "beta.",
               snapshot = false,
               promoteToRelease = true

@@ -9,10 +9,7 @@ import org.scalatest.matchers.should.Matchers
 import org.scalatest.prop.TableDrivenPropertyChecks
 import sbtsemverrelease.PreReleaseConfig
 
-class NewPreReleaseBumpingSpec
-    extends AnyFunSuite
-    with TableDrivenPropertyChecks
-    with Matchers {
+class NewPreReleaseBumpingSpec extends AnyFunSuite with TableDrivenPropertyChecks with Matchers {
 
   import NewPreReleaseBumpingSpec.*
 
@@ -58,9 +55,7 @@ class NewPreReleaseBumpingSpec
       ) {
         new TestSpec {
           override protected def populateRepository(): Unit = {
-            tagNames.foreach(tag =>
-              testRepository.makeChanges().commitAndTag(tag, annotated)
-            )
+            tagNames.foreach(tag => testRepository.makeChanges().commitAndTag(tag, annotated))
             testRepository
               .makeChanges()
               .commit()
@@ -96,20 +91,15 @@ class NewPreReleaseBumpingSpec
         s"""new pre-release version with snapshot '$snapshot' without matching tags (annotated: $annotated)""".stripMargin
       ) {
         new TestSpec {
-          override protected def populateRepository(): Unit = {
+          override protected def populateRepository(): Unit =
             testRepository
               .makeChanges()
               .commitAndTag("foo-0.1.0", annotated)
-          }
 
           override protected def assertion: Assertion =
             SemanticBuildVersion(
               workingDir,
-              defaultConfiguration.copy(
-                snapshot = snapshot,
-                tagPattern = "^bar-".r,
-                tagPrefix = "bar-"
-              )
+              defaultConfiguration.copy(snapshot = snapshot, tagPrefix = "bar-")
             ).determineVersion shouldBe expectedVersion
         }
       }

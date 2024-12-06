@@ -11,7 +11,7 @@ import sbtrelease.ReleaseStateTransformations.*
 
 import java.io.File
 import scala.util.matching.Regex
-import scala.util.{ Properties, Try }
+import scala.util.{Properties, Try}
 
 object SemanticVersioningReleasePlugin extends AutoPlugin {
 
@@ -75,17 +75,8 @@ object SemanticVersioningReleasePlugin extends AutoPlugin {
         .replaceNewLines
     )
 
-    val preReleaseBump =
-      settingKey[(PreReleaseConfig, String) => String](
-        "This option defines the function that "
-      )
-
     val autoBump = settingKey[AutoBump](
       "This option allows you to specify how the build version should be automatically bumped based on the contents of commit messages."
-    )
-
-    val versionsMatching = settingKey[VersionsMatching](
-      "The option defines filtering of tags based on particular version."
     )
 
     val preRelease = settingKey[PreReleaseConfig](
@@ -108,20 +99,20 @@ object SemanticVersioningReleasePlugin extends AutoPlugin {
       SemanticBuildVersionConfiguration(
         startingVersion = startingVersion.value,
         tagPrefix = tagPrefix.value,
-        tagPattern = tagPattern.value,
         snapshotSuffix = snapshotSuffix.value,
         forceBump = forceBump.value,
         promoteToRelease = promoteToRelease.value,
         snapshot = snapshot.value,
         newPreRelease = newPreRelease.value,
         autoBump = autoBump.value,
-        versionsMatching = versionsMatching.value,
+        defaultBumpLevel = DefaultBumpLevel, // TODO: populate this
         componentToBump = componentToBump
           .value
           .map(VersionComponent.valueOf)
           .getOrElse(DefaultComponentToBump),
         preReleaseConfig = preRelease.value,
-        preReleaseBump = preReleaseBump.value
+        hotfixBranchPattern = DefaultHotfixBranchPattern, // TODO: populate this
+        extraReleaseBranches = Seq.empty // TODO: populate this
       )
     }
 
@@ -148,7 +139,7 @@ object SemanticVersioningReleasePlugin extends AutoPlugin {
       }
     }
 
-  private def initializeSnapshot = {
+  private def initializeSnapshot =
     // JGitAdapter doesn't work well in tests where git is not initialized
     Def.setting {
       val computedValue =
@@ -161,7 +152,6 @@ object SemanticVersioningReleasePlugin extends AutoPlugin {
         computedValue
       )
     }
-  }
 
   private def initializeReleaseVersionFile =
     Def.setting {
@@ -207,17 +197,15 @@ object SemanticVersioningReleasePlugin extends AutoPlugin {
         .propOrNone(ComponentToBumpSystemPropertyName)
         .getOrElse(DefaultComponentToBump.name())
     ),
-    preReleaseBump := { (config: PreReleaseConfig, latestVersion: String) =>
-      defaultPreReleaseBump(config, latestVersion)
-    },
     autoBump := AutoBump(),
-    versionsMatching := VersionsMatching(),
     preRelease := PreReleaseConfig(),
-    determineVersion :=
+    determineVersion := {
+      val config = toConfiguration.value
       SemanticBuildVersion(
         baseDirectory.value,
-        toConfiguration.value
-      ).determineVersion,
+        config
+      ).determineVersion.toStringValue(config.tagPrefix)
+    },
     releaseVersion := { _ =>
       determineVersion.value: @sbtUnchecked
     },

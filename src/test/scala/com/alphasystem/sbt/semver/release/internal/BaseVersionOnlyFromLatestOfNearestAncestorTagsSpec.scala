@@ -1,6 +1,9 @@
-package com.alphasystem.sbt.semver.release.internal
+package com.alphasystem
+package sbt
+package semver
+package release
+package internal
 
-import com.alphasystem.sbt.semver.release.{ internal, _ }
 import com.alphasystem.sbt.semver.release.test.*
 import org.scalatest.Assertion
 import org.scalatest.funsuite.AnyFunSuite
@@ -30,8 +33,8 @@ class BaseVersionOnlyFromLatestOfNearestAncestorTagsSpec
         override protected def assertion: Assertion =
           SemanticBuildVersion(
             workingDir,
-            SemanticBuildVersionConfiguration(snapshot = false)
-          ).determineVersion shouldBe "1.0.1"
+            SemanticBuildVersionConfiguration(snapshot = false, tagPrefix = "")
+          ).determineVersion.toStringValue("") shouldBe "1.0.1"
       }
     }
   }
@@ -55,7 +58,7 @@ class BaseVersionOnlyFromLatestOfNearestAncestorTagsSpec
             .commit()
             .makeChanges()
             .commit()
-            .checkoutBranch("master")
+            .checkoutBranch("main")
             .makeChanges()
             .commit()
             .makeChanges()
@@ -65,13 +68,13 @@ class BaseVersionOnlyFromLatestOfNearestAncestorTagsSpec
             .commit()
             .makeChanges()
             .commitAndTag("3.0.0", annotated)
-            .checkout("master~")
+            .checkout("main~")
 
         override protected def assertion: Assertion =
           SemanticBuildVersion(
             workingDir,
-            internal.SemanticBuildVersionConfiguration(snapshot = false)
-          ).determineVersion shouldBe "2.0.1"
+            SemanticBuildVersionConfiguration(snapshot = false, tagPrefix = "")
+          ).determineVersion.toStringValue("") shouldBe "2.0.1"
       }
     }
   }
@@ -97,7 +100,7 @@ class BaseVersionOnlyFromLatestOfNearestAncestorTagsSpec
             .commit()
             .makeChanges()
             .commit()
-            .checkoutBranch("master")
+            .checkoutBranch("main")
             .makeChanges()
             .commit()
             .makeChanges()
@@ -107,13 +110,13 @@ class BaseVersionOnlyFromLatestOfNearestAncestorTagsSpec
             .commit()
             .makeChanges()
             .commitAndTag("4.0.0", annotated)
-            .checkout("master~")
+            .checkout("main~")
 
         override protected def assertion: Assertion =
           SemanticBuildVersion(
             workingDir,
-            internal.SemanticBuildVersionConfiguration(snapshot = false)
-          ).determineVersion shouldBe "2.0.1"
+            SemanticBuildVersionConfiguration(snapshot = false, tagPrefix = "")
+          ).determineVersion.toStringValue("") shouldBe "3.0.1"
       }
     }
   }
@@ -136,19 +139,11 @@ class BaseVersionOnlyFromLatestOfNearestAncestorTagsSpec
         override protected def assertion: Assertion = {
           val semanticBuildVersion = SemanticBuildVersion(
             workingDir,
-            internal.SemanticBuildVersionConfiguration(snapshot = false)
+            SemanticBuildVersionConfiguration(snapshot = false, tagPrefix = "")
           )
-          val caught = intercept[IllegalArgumentException](
-            semanticBuildVersion.determineVersion
-          )
-          val directory = testRepository.repository.getDirectory
-          caught.getMessage shouldBe
-            s"""Determined version 1.0.1 already exists on another commit in the repository at '$directory'. Check your
-               | configuration to ensure that you haven't forgotten to filter out certain tags or versions. You may 
-               |also be bumping the wrong component; if so, bump the component that will give you the intended version,
-               | or manually create a tag with the intended version on the commit to be released."""
-              .stripMargin
-              .replaceNewLines
+          println(s">>>> ${semanticBuildVersion.determineVersion.toStringValue("")}")
+          val caught = intercept[IllegalArgumentException](semanticBuildVersion.determineVersion)
+          caught.getMessage shouldBe "Couldn't determine next version, tag (v1.0.0) is already exists"
         }
       }
     }

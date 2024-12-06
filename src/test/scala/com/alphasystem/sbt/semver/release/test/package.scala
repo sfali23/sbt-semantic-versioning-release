@@ -1,6 +1,6 @@
 package com.alphasystem.sbt.semver.release
 
-import io.circe.{ Decoder, Encoder, Json }
+import io.circe.{Decoder, Encoder, Json}
 import org.scalatest.prop.TableDrivenPropertyChecks.*
 import org.scalatest.prop.TableFor1
 import sbtsemverrelease.VersionsMatching
@@ -14,8 +14,7 @@ package object test {
 
   val AnnotatedTestData: TableFor1[Boolean] = Table("annotated", false, true)
 
-  implicit val encodeRegEx: Encoder[Regex] = (a: Regex) =>
-    Json.fromString(a.regex)
+  implicit val encodeRegEx: Encoder[Regex] = (a: Regex) => Json.fromString(a.regex)
 
   implicit val decodeRegex: Decoder[Regex] =
     Decoder.decodeString.map(value => new Regex(value))
@@ -25,16 +24,6 @@ package object test {
 
   implicit val decodeVersionComponent: Decoder[VersionComponent] =
     Decoder.decodeString.map(value => VersionComponent.valueOf(value))
-
-  private[test] def toVersionMatching(src: String): VersionsMatching = {
-    val major =
-      majorVersionMatchingRegex.findFirstIn(src).map(_.toInt).getOrElse(-1)
-    val minor =
-      minorVersionMatchingRegex.findFirstIn(src).map(_.toInt).getOrElse(-1)
-    val patch =
-      patchVersionMatchingRegex.findFirstIn(src).map(_.toInt).getOrElse(-1)
-    VersionsMatching(major, minor, patch)
-  }
 
   private[test] def toTagNames(src: String): List[String] =
     if (src == "[]") Nil

@@ -4,12 +4,12 @@ import com.alphasystem.sbt.semver.release.VersionComponent
 import io.circe.generic.auto.*
 import io.circe.parser.*
 import io.circe.syntax.*
-import io.circe.{ Decoder, Json }
+import io.circe.{Decoder, Json}
 import org.scalatest.prop.TableDrivenPropertyChecks.*
 import org.scalatest.prop.*
 
 import java.nio.charset.StandardCharsets
-import java.nio.file.{ Files, Path, Paths, StandardOpenOption }
+import java.nio.file.{Files, Path, Paths, StandardOpenOption}
 import scala.io.Source
 
 object DataGenerator {
@@ -51,14 +51,15 @@ object DataGenerator {
     basePath: String,
     resourceName: String,
     toDataTuple: T => (A, B, C)
-  )(implicit decoder: Decoder[T]
+  )(implicit
+    decoder: Decoder[T]
   ): TableFor3[A, B, C] = {
     val (headers, json) = toJson(basePath, resourceName)
     decode[List[T]](json) match {
       case Left(ex) => throw ex
       case Right(values) =>
         val rows = values.map(value => toDataTuple(value))
-        Table(headerFor3(headers), rows *)
+        Table(headerFor3(headers), rows*)
     }
   }
 
@@ -71,14 +72,15 @@ object DataGenerator {
     basePath: String,
     resourceName: String,
     toDataTuple: T => (A, B, C, D)
-  )(implicit decoder: Decoder[T]
+  )(implicit
+    decoder: Decoder[T]
   ): TableFor4[A, B, C, D] = {
     val (headers, json) = toJson(basePath, resourceName)
     decode[List[T]](json) match {
       case Left(ex) => throw ex
       case Right(values) =>
         val rows = values.map(value => toDataTuple(value))
-        Table(headerFor4(headers), rows *)
+        Table(headerFor4(headers), rows*)
     }
   }
 
@@ -91,14 +93,15 @@ object DataGenerator {
     basePath: String,
     resourceName: String,
     toDataTuple: T => (A, B, C, D, E)
-  )(implicit decoder: Decoder[T]
+  )(implicit
+    decoder: Decoder[T]
   ): TableFor5[A, B, C, D, E] = {
     val (headers, json) = toJson(basePath, resourceName)
     decode[List[T]](json) match {
       case Left(ex) => throw ex
       case Right(values) =>
         val rows = values.map(value => toDataTuple(value))
-        Table(headerFor5(headers), rows *)
+        Table(headerFor5(headers), rows*)
     }
   }
 
@@ -111,14 +114,15 @@ object DataGenerator {
     basePath: String,
     resourceName: String,
     toDataTuple: T => (A, B, C, D, E, F)
-  )(implicit decoder: Decoder[T]
+  )(implicit
+    decoder: Decoder[T]
   ): TableFor6[A, B, C, D, E, F] = {
     val (headers, json) = toJson(basePath, resourceName)
     decode[List[T]](json) match {
       case Left(ex) => throw ex
       case Right(values) =>
         val rows = values.map(value => toDataTuple(value))
-        Table(headerFor6(headers), rows *)
+        Table(headerFor6(headers), rows*)
     }
   }
 
@@ -131,14 +135,15 @@ object DataGenerator {
     basePath: String,
     resourceName: String,
     toDataTuple: T => (A, B, C, D, E, F, G)
-  )(implicit decoder: Decoder[T]
+  )(implicit
+    decoder: Decoder[T]
   ): TableFor7[A, B, C, D, E, F, G] = {
     val (headers, json) = toJson(basePath, resourceName)
     decode[List[T]](json) match {
       case Left(ex) => throw ex
       case Right(values) =>
         val rows = values.map(value => toDataTuple(value))
-        Table(headerFor7(headers), rows *)
+        Table(headerFor7(headers), rows*)
     }
   }
 
@@ -151,14 +156,15 @@ object DataGenerator {
     basePath: String,
     resourceName: String,
     toDataTuple: T => (A, B, C, D, E, F, G, H)
-  )(implicit decoder: Decoder[T]
+  )(implicit
+    decoder: Decoder[T]
   ): TableFor8[A, B, C, D, E, F, G, H] = {
     val (headers, json) = toJson(basePath, resourceName)
     decode[List[T]](json) match {
       case Left(ex) => throw ex
       case Right(values) =>
         val rows = values.map(value => toDataTuple(value))
-        Table(headerFor8(headers), rows *)
+        Table(headerFor8(headers), rows*)
     }
   }
 
@@ -178,8 +184,7 @@ object DataGenerator {
         case (header, item) if header == "tagNames" =>
           s""""$header": ${toTagNames(item).asJson.noSpaces}"""
 
-        case (header, item) if header == "matching" =>
-          s""""$header": ${toVersionMatching(item).asJson.noSpaces}"""
+        case (header, _) if header == "matching" => ""
 
         case (header, item) if item == "true" || item == "false" =>
           s""""$header": $item"""
