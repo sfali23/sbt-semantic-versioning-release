@@ -2,8 +2,6 @@ package com.alphasystem
 package sbt
 package semver
 
-import sbtsemverrelease.PreReleaseConfig
-
 import scala.util.matching.Regex
 
 package object release {
@@ -19,6 +17,7 @@ package object release {
   val DefaultComponentToBump: VersionComponent = VersionComponent.NONE
   val DefaultHotfixBranchPattern: Regex = initializeHotfixBranchPattern()
   val DefaultReleaseBranches: Seq[String] = Seq("main", "master")
+  val DefaultPreReleasePattern: String = "^(RC)(.)([1-9]\\d*)$"
 
   private val SystemPropertyNamePrefix = "sbt.release."
 

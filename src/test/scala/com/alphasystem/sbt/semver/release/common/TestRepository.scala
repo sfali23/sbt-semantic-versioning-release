@@ -19,6 +19,8 @@ class TestRepository(val repository: Repository) {
   private val parentFile = repository.getDirectory.getParentFile.getAbsolutePath
   val workingDirectory: File = Paths.get(parentFile).toFile
 
+  def close(): Unit = repository.close()
+
   def commitAndTag(tag: String, annotated: Boolean = false): TestRepository =
     commit().tag(tag, annotated)
 

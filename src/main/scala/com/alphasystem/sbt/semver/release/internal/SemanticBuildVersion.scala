@@ -50,6 +50,8 @@ class SemanticBuildVersion(workingDir: File, baseConfig: SemanticBuildVersionCon
     newVersion
   }
 
+  def toStringValue: String = determineVersion.toStringValue(baseConfig.tagPrefix)
+
   private[internal] def determineVersion(
     currentVersion: Version,
     hotfixRequired: Boolean,

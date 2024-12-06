@@ -14,23 +14,19 @@ class PreReleaseAutobumpingSpec extends AnyFunSuite with TableDrivenPropertyChec
         override protected def populateRepository(): Unit =
           testRepository
             .makeChanges()
-            .commitAndTag("0.2.0", annotated)
+            .commitAndTag("beta.0.2.0", annotated)
             .makeChanges()
-            .commitAndTag("0.2.1-alpha.1", annotated)
+            .commitAndTag("beta.0.2.1-RC.1", annotated)
             .makeChanges()
-            .commitAndTag("0.2.1-beta.1", annotated)
+            .commitAndTag("beta.0.2.1-RC.2", annotated)
             .makeChanges()
-            .commit("This is a message [promote]")
+            .commit("This is a message to [promote] release")
 
         override protected def assertion: Assertion =
           SemanticBuildVersion(
             workingDir,
-            SemanticBuildVersionConfiguration(
-              tagPrefix = "beta.",
-              snapshot = false,
-              promoteToRelease = true
-            )
-          ).determineVersion shouldBe "0.2.1"
+            SemanticBuildVersionConfiguration(tagPrefix = "beta.", snapshot = false)
+          ).determineVersion.toStringValue("beta.") shouldBe "beta.0.2.1"
       }
     }
   }
