@@ -1,7 +1,10 @@
-package com.alphasystem.sbt.semver.release.internal
+package com.alphasystem
+package sbt
+package semver
+package release
+package internal
 
-import com.alphasystem.sbt.semver.release.*
-import com.alphasystem.sbt.semver.release.test.*
+import release.test.*
 import org.scalatest.Assertion
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.matchers.should.Matchers
@@ -11,6 +14,7 @@ class PreReleaseBumpingSpec extends AnyFunSuite with TableDrivenPropertyChecks w
 
   private val defaultConfiguration =
     SemanticBuildVersionConfiguration(
+      forceBump = true,
       componentToBump = VersionComponent.PRE_RELEASE,
       tagPrefix = "alpha."
     )
@@ -19,6 +23,12 @@ class PreReleaseBumpingSpec extends AnyFunSuite with TableDrivenPropertyChecks w
     "bumped pre-release snapshot version without prior pre release version causes build to fail"
   ) {
     new TestSpec {
+      override protected def populateRepository(): Unit =
+        testRepository
+          .makeChanges()
+          .commit("initial commit")
+          .createTag(SemanticBuildVersion(workingDir, defaultConfiguration.copy(snapshot = true)))
+
       override protected def assertion: Assertion = {
         val caught =
           intercept[IllegalArgumentException](
@@ -28,8 +38,7 @@ class PreReleaseBumpingSpec extends AnyFunSuite with TableDrivenPropertyChecks w
             ).determineVersion
           )
         caught.getMessage shouldBe
-          """Cannot bump pre-release because the latest version is not a pre-release version. 
-            |To create a new pre-release version, use newPreRelease instead"""
+          """Cannot bump pre-release because the latest version is not a pre-release version. To create a new pre-release version, use newPreRelease instead"""
             .stripMargin
             .replaceNewLines
       }
@@ -40,12 +49,18 @@ class PreReleaseBumpingSpec extends AnyFunSuite with TableDrivenPropertyChecks w
     "bumped pre-release version without prior pre release version causes build to fail"
   ) {
     new TestSpec {
+      override protected def populateRepository(): Unit =
+        testRepository
+          .makeChanges()
+          .commit("initial commit")
+          .createTag(SemanticBuildVersion(workingDir, defaultConfiguration))
+
       override protected def assertion: Assertion = {
         val caught =
           intercept[IllegalArgumentException](
             SemanticBuildVersion(
               workingDir,
-              defaultConfiguration.copy(snapshot = false)
+              defaultConfiguration
             ).determineVersion
           )
         caught.getMessage shouldBe
@@ -96,14 +111,15 @@ class PreReleaseBumpingSpec extends AnyFunSuite with TableDrivenPropertyChecks w
             .makeChanges()
             .commitAndTag("0.2.0", annotated)
             .makeChanges()
-            .commitAndTag("0.2.1-alpha.1", annotated)
+            .commitAndTag("0.2.1-RC.1", annotated)
             .makeChanges()
 
         override protected def assertion: Assertion =
           SemanticBuildVersion(
             workingDir,
             defaultConfiguration
-          ).determineVersion shouldBe "0.2.1-alpha.2-SNAPSHOT"
+          ).determineVersion shouldBe s"alpha.0.2.1-RC.2-SNAPSHOT+${gitAdapter.getShortHash}"
+
       }
     }
     //
@@ -117,7 +133,7 @@ class PreReleaseBumpingSpec extends AnyFunSuite with TableDrivenPropertyChecks w
             .makeChanges()
             .commitAndTag("0.2.0", annotated)
             .makeChanges()
-            .commitAndTag("0.2.1-alpha.1", annotated)
+            .commitAndTag("0.2.1-RC.1", annotated)
             .makeChanges()
             .commit()
 
@@ -125,7 +141,7 @@ class PreReleaseBumpingSpec extends AnyFunSuite with TableDrivenPropertyChecks w
           SemanticBuildVersion(
             workingDir,
             defaultConfiguration.copy(snapshot = false)
-          ).determineVersion shouldBe "0.2.1-alpha.2"
+          ).determineVersion shouldBe "alpha.0.2.1-RC.2"
       }
     }
     //
@@ -139,7 +155,7 @@ class PreReleaseBumpingSpec extends AnyFunSuite with TableDrivenPropertyChecks w
             .makeChanges()
             .commitAndTag("0.2.0", annotated)
             .makeChanges()
-            .commitAndTag("0.2.1-alpha.1", annotated)
+            .commitAndTag("0.2.1-RC.1", annotated)
             .makeChanges()
             .commit()
 
@@ -147,7 +163,7 @@ class PreReleaseBumpingSpec extends AnyFunSuite with TableDrivenPropertyChecks w
           SemanticBuildVersion(
             workingDir,
             defaultConfiguration.copy(componentToBump = VersionComponent.NONE)
-          ).determineVersion shouldBe "0.2.1-alpha.2-SNAPSHOT"
+          ).determineVersion shouldBe "alpha.0.2.1-RC.2"
       }
     }
     //
