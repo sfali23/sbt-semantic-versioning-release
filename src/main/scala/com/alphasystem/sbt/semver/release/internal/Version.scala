@@ -55,7 +55,10 @@ case class Version(
 
   private def bumpPreRelease: Version = {
     if (preRelease.isEmpty) {
-      throw new IllegalArgumentException("Current version is not a pre-release.")
+      throw new IllegalArgumentException(
+        """Cannot bump pre-release because the latest version is not a pre-release version. To create a new pre-release
+          | version, use newPreRelease instead""".stripMargin.replaceNewLines
+      )
     }
     copy(preRelease = preRelease.map(pr => pr.copy(version = pr.version + 1)))
   }
