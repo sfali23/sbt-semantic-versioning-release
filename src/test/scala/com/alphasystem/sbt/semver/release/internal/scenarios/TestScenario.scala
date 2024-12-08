@@ -5,6 +5,7 @@ package release
 package internal
 package scenarios
 
+import release.test.*
 import release.common.{JGitAdapter, TestRepository}
 
 import scala.util.{Failure, Success, Try}
