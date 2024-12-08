@@ -15,7 +15,7 @@ class SemanticBuildVersion(workingDir: File, baseConfig: SemanticBuildVersionCon
   import VersionComponent.*
 
   private val logger = LoggerFactory.getLogger(classOf[SemanticBuildVersion])
-  private val adapter = JGitAdapter(workingDir)
+  private val adapter: JGitAdapter = JGitAdapter(workingDir)
   private val preReleaseConfig = baseConfig.preReleaseConfig
   private val snapshotSuffix = baseConfig.snapshotSuffix
   private val tagPrefix = baseConfig.tagPrefix
@@ -31,13 +31,12 @@ class SemanticBuildVersion(workingDir: File, baseConfig: SemanticBuildVersionCon
     tagsForCurrentBranch.headOption
   }
 
-  def determineVersion: Version = {
+  def determineVersion: String = {
     val currentBranch = adapter.getCurrentBranch
     val hotfixRequired = baseConfig.hotfixBranchPattern.nonEmpty(currentBranch)
     val snapshotRequired =
-      (!baseConfig.isReleaseBranch(
-        currentBranch
-      ) || adapter.hasUncommittedChanges) && !hotfixRequired && baseConfig.snapshot
+      (!baseConfig.isReleaseBranch(currentBranch) ||
+        adapter.hasUncommittedChanges) && !hotfixRequired && baseConfig.snapshot
 
     val maybeLatestVersion = latestVersion
     val currentVersion = maybeLatestVersion.getOrElse(startingVersion)
@@ -47,10 +46,8 @@ class SemanticBuildVersion(workingDir: File, baseConfig: SemanticBuildVersionCon
         s"Couldn't determine next version, tag (${newVersion.toStringValue(tagPrefix)}) is already exists."
       )
     }
-    newVersion
+    newVersion.toStringValue(baseConfig.tagPrefix)
   }
-
-  def toStringValue: String = determineVersion.toStringValue(baseConfig.tagPrefix)
 
   private[internal] def determineVersion(
     currentVersion: Version,
@@ -91,7 +88,7 @@ class SemanticBuildVersion(workingDir: File, baseConfig: SemanticBuildVersionCon
         }
 
       // if we have auto bump enabled, there is(are) previous tag(s), and if there are commits added between last tag
-      // and current head, then if components to bump are empty at the end of process, then bump configured bump level
+      // and current head, then if components to bump are empty at the end of process, then bump default configured bump level
       val forcePush = baseConfig.isAutobumpEnabled && maybeLatestVersion.isDefined && hasCommits
       bumpVersion(forcePush, currentVersion, hotfixRequired, snapshotRequired, versionComponents)
     }
@@ -144,15 +141,23 @@ class SemanticBuildVersion(workingDir: File, baseConfig: SemanticBuildVersionCon
     }
 
     if (snapshotRequired) {
-      versionComponents.addSnapshot().removeNewPreRelease().removePromoteToRelease().removePreRelease()
+      // This is special case, we figured this is snapshot version but we don't know which component to bump, bump defaultBumpLevel
+      if (versionComponents.isEmpty)
+        versionComponents
+          .addComponentIfRequired(baseConfig.defaultBumpLevel, () => forcePush)
+
+      versionComponents.addSnapshot() /*.removeNewPreRelease().removePromoteToRelease().removePreRelease()*/
     }
 
-    currentVersion.bumpVersion(
-      getSnapshotInfo,
-      versionComponents
-        .addComponentIfRequired(baseConfig.defaultBumpLevel, () => forcePush && versionComponents.isEmpty)
-        .getVersionComponents*
-    )
+    val componentsToBump =
+      if (versionComponents.isEmpty && forcePush) {
+        // We don't have any defined bump level use defaultBumpLevel
+        versionComponents
+          .addComponentIfRequired(baseConfig.defaultBumpLevel, () => forcePush)
+          .getVersionComponents
+      } else versionComponents.getVersionComponents
+
+    currentVersion.bumpVersion(getSnapshotInfo, componentsToBump*)
   }
 
   private def getSnapshotInfo = Some(Snapshot(baseConfig.snapshotSuffix, Try(adapter.getShortHash).toOption))

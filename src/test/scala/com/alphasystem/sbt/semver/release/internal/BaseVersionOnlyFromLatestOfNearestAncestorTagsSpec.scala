@@ -34,7 +34,7 @@ class BaseVersionOnlyFromLatestOfNearestAncestorTagsSpec
           SemanticBuildVersion(
             workingDir,
             SemanticBuildVersionConfiguration(snapshot = false, tagPrefix = "")
-          ).determineVersion.toStringValue("") shouldBe "1.0.1"
+          ).determineVersion shouldBe "1.0.1"
       }
     }
   }
@@ -74,7 +74,7 @@ class BaseVersionOnlyFromLatestOfNearestAncestorTagsSpec
           SemanticBuildVersion(
             workingDir,
             SemanticBuildVersionConfiguration(snapshot = false, tagPrefix = "")
-          ).determineVersion.toStringValue("") shouldBe "2.0.1"
+          ).determineVersion shouldBe "2.0.1"
       }
     }
   }
@@ -116,7 +116,7 @@ class BaseVersionOnlyFromLatestOfNearestAncestorTagsSpec
           SemanticBuildVersion(
             workingDir,
             SemanticBuildVersionConfiguration(snapshot = false, tagPrefix = "")
-          ).determineVersion.toStringValue("") shouldBe "3.0.1"
+          ).determineVersion shouldBe "3.0.1"
       }
     }
   }
@@ -141,7 +141,6 @@ class BaseVersionOnlyFromLatestOfNearestAncestorTagsSpec
             workingDir,
             SemanticBuildVersionConfiguration(snapshot = false, tagPrefix = "")
           )
-          println(s">>>> ${semanticBuildVersion.determineVersion.toStringValue("")}")
           val caught = intercept[IllegalArgumentException](semanticBuildVersion.determineVersion)
           caught.getMessage shouldBe "Couldn't determine next version, tag (v1.0.0) is already exists"
         }

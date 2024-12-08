@@ -26,7 +26,7 @@ class PreReleaseAutobumpingSpec extends AnyFunSuite with TableDrivenPropertyChec
           SemanticBuildVersion(
             workingDir,
             SemanticBuildVersionConfiguration(tagPrefix = "beta.", snapshot = false)
-          ).determineVersion.toStringValue("beta.") shouldBe "beta.0.2.1"
+          ) shouldBe "beta.0.2.1"
       }
     }
   }

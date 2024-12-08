@@ -121,7 +121,7 @@ class SemanticBuildVersionSpec extends AnyFunSpec with TableDrivenPropertyChecks
             SemanticBuildVersion(
               workingDir,
               internal.SemanticBuildVersionConfiguration()
-            ).determineVersion.toStringValue() shouldBe "v0.0.2"
+            ).determineVersion shouldBe "v0.0.2"
         }
       }
     }

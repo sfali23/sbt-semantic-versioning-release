@@ -1,13 +1,14 @@
-package com.alphasystem.sbt.semver.release
+package com.alphasystem
+package sbt
+package semver
+package release
 
-import com.alphasystem.sbt.semver.release.common.JGitAdapter
-import com.alphasystem.sbt.semver.release.internal.{SemanticBuildVersionConfiguration, Version}
-import com.typesafe.config.{Config, ConfigFactory}
+import com.alphasystem.sbt.semver.release.common.{JGitAdapter, TestRepository}
+import com.alphasystem.sbt.semver.release.internal.{SemanticBuildVersion, SemanticBuildVersionConfiguration, Version}
 import io.circe.{Decoder, Encoder, Json}
 import org.scalatest.prop.TableDrivenPropertyChecks.*
 import org.scalatest.prop.TableFor1
-import sbtsemverrelease.AutoBump.*
-import sbtsemverrelease.{AutoBump, PreReleaseConfig}
+import sbtsemverrelease.{PreReleaseConfig, VersionsMatching}
 
 import scala.util.matching.Regex
 package object test {
@@ -33,6 +34,22 @@ package object test {
     if (src == "[]") Nil
     else src.dropRight(1).drop(1).split(",").map(_.trim).toList
 
+  implicit class TestRepositoryOps(src: TestRepository) {
+    def createTag(semanticBuildVersion: SemanticBuildVersion, annotated: Boolean = false): TestRepository =
+      src.tag(semanticBuildVersion.determineVersion, annotated)
+
+    def createTag(version: String): TestRepository = src.tag(version, annotated = true)
+  }
+
+  implicit class JGitAdapterOps(src: JGitAdapter) {
+    def getCurrentHeadTag: String =
+      src
+        .getTagsForCurrentBranch
+        .map(_.replaceAll(DefaultTagPrefix, ""))
+        .map(version => Version(version, DefaultSnapshotSuffix, PreReleaseConfig()))
+        .min
+        .toStringValue()
+  }
   implicit class JGitAdapterOps(src: JGitAdapter) {
     def getCurrentHeadTag(
       tagPrefix: String = DefaultTagPrefix,

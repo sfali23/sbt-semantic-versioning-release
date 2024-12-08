@@ -236,7 +236,7 @@ object SemanticVersioningReleasePlugin extends AutoPlugin {
       SemanticBuildVersion(
         baseDirectory.value,
         config
-      ).determineVersion.toStringValue(config.tagPrefix)
+      ).determineVersion
     },
     releaseVersion := { _ =>
       determineVersion.value: @sbtUnchecked
