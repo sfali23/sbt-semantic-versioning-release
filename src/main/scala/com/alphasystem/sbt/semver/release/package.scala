@@ -48,4 +48,13 @@ package object release {
     def nonEmpty(source: String): Boolean = src.findFirstIn(source).nonEmpty
   }
 
+  implicit class ComponentToBumpOps(src: ComponentToBump) {
+    def toVersionComponent: VersionComponent =
+      src match {
+        case ComponentToBump.MAJOR => VersionComponent.MAJOR
+        case ComponentToBump.MINOR => VersionComponent.MINOR
+        case ComponentToBump.PATCH => VersionComponent.PATCH
+      }
+  }
+
 }

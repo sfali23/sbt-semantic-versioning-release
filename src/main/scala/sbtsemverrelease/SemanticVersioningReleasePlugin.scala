@@ -62,7 +62,7 @@ object SemanticVersioningReleasePlugin extends AutoPlugin {
         .replaceNewLines
     )
 
-    val defaultBumpLevel = settingKey[VersionComponent](
+    val defaultBumpLevel = settingKey[ComponentToBump](
       """This option defines the default level to bump, if bumping of version is required and no bump pattern can be
         |deduced from commit messages. The default value is 'PATCH. This option can be set via system property
         |"sbt.release.defaultBumpLevel"."""
@@ -70,9 +70,9 @@ object SemanticVersioningReleasePlugin extends AutoPlugin {
         .replaceNewLines
     )
 
-    val componentToBump = settingKey[Option[String]](
+    val componentToBump = settingKey[Option[ComponentToBump]](
       s"""This option defines the component to bump. Default value is "NONE", which corresponds to bumping 
-         |the lowest precedence component. Acceptable values are "PRE_RELEASE", "PATCH", "MINOR", "MAJOR", going from 
+         |the lowest precedence component. Acceptable values are "MAJOR", "MINOR", "PATCH", going from
          |lowest precedence to highest precedence. This option is only applicable for "forceBump" strategy.
          |This option can be set via system property "sbt.release.componentToBump"."""
         .stripMargin
@@ -121,10 +121,10 @@ object SemanticVersioningReleasePlugin extends AutoPlugin {
         snapshot = snapshot.value,
         newPreRelease = newPreRelease.value,
         autoBump = autoBump.value,
-        defaultBumpLevel = defaultBumpLevel.value,
+        defaultBumpLevel = defaultBumpLevel.value.toVersionComponent,
         componentToBump = componentToBump
           .value
-          .map(VersionComponent.valueOf)
+          .map(_.toVersionComponent)
           .getOrElse(DefaultComponentToBump),
         preReleaseConfig = preRelease.value,
         hotfixBranchPattern = DefaultHotfixBranchPattern, // TODO: populate this
@@ -171,8 +171,15 @@ object SemanticVersioningReleasePlugin extends AutoPlugin {
 
   private def initializeDefaultBumpLevel =
     Def.setting {
-      val name = Properties.propOrElse(DefaultBumpLevelSystemPropertyName, VersionComponent.PATCH.name())
-      Try(VersionComponent.valueOf(name)).getOrElse(VersionComponent.PATCH)
+      val name = Properties.propOrElse(DefaultBumpLevelSystemPropertyName, ComponentToBump.PATCH.name())
+      Try(ComponentToBump.valueOf(name)).getOrElse(ComponentToBump.PATCH)
+    }
+
+  private def initializeComponentToBump =
+    Def.setting {
+      Properties
+        .propOrNone(ComponentToBumpSystemPropertyName)
+        .flatMap(name => Try(ComponentToBump.valueOf(name)).toOption)
     }
 
   private def initializeDefaultHotFixBranchPattern =
@@ -222,11 +229,7 @@ object SemanticVersioningReleasePlugin extends AutoPlugin {
       DefaultNewPreRelease
     ),
     defaultBumpLevel := initializeDefaultBumpLevel.value,
-    componentToBump := Some(
-      Properties
-        .propOrNone(ComponentToBumpSystemPropertyName)
-        .getOrElse(DefaultComponentToBump.name())
-    ),
+    componentToBump := initializeComponentToBump.value,
     autoBump := AutoBump(),
     preRelease := PreReleaseConfig(),
     hotfixBranchPattern := initializeDefaultHotFixBranchPattern.value,
