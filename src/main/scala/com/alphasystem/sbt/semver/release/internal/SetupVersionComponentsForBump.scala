@@ -44,9 +44,12 @@ class SetupVersionComponentsForBump {
 
   def addSnapshot(): SetupVersionComponentsForBump = addComponent(SNAPSHOT)
 
-  def isMajor: Boolean = isGivenComponent(MAJOR)
-  def isMinor: Boolean = isGivenComponent(MINOR)
-  def isPromoteToRelease: Boolean = isGivenComponent(PROMOTE_TO_RELEASE)
+  def hasMajor: Boolean = hasGivenComponent(MAJOR)
+  def hasMinor: Boolean = hasGivenComponent(MINOR)
+  def hasPromoteToRelease: Boolean = hasGivenComponent(PROMOTE_TO_RELEASE)
+  def hasMandatoryComponents: Boolean = hasMajor || hasMinor || hasGivenComponent(PATCH)
+  def hasEssentialComponents: Boolean = hasMajor || hasMinor || hasGivenComponent(PATCH) || hasPromoteToRelease ||
+    hasGivenComponent(PRE_RELEASE) || hasGivenComponent(HOT_FIX)
 
   def isEmpty: Boolean = result == NONE.getIndex
 
@@ -65,7 +68,7 @@ class SetupVersionComponentsForBump {
       VersionComponent.fromIndex(result & PRE_RELEASE.getIndex),
       VersionComponent.fromIndex(result & PROMOTE_TO_RELEASE.getIndex),
       VersionComponent.fromIndex(result & SNAPSHOT.getIndex)
-    ).toSeq
+    ).toSeq.filterNot(_ == VersionComponent.NONE)
 
   def addComponentIfRequired(
     versionComponent: VersionComponent,
@@ -82,8 +85,12 @@ class SetupVersionComponentsForBump {
     this
   }
 
-  private def isGivenComponent(versionComponent: VersionComponent) =
+  private def hasGivenComponent(versionComponent: VersionComponent) =
     (result & versionComponent.getIndex) == versionComponent.getIndex
+
+  override def toString: String =
+    s"""SetupVersionComponentsForBump(MAJOR = ${hasGivenComponent(VersionComponent.MAJOR)},
+       |PROMOTE_TO_RELEASE = ${hasGivenComponent(VersionComponent.PROMOTE_TO_RELEASE)})""".stripMargin.replaceNewLines
 }
 
 object SetupVersionComponentsForBump {

@@ -11,7 +11,7 @@ package object release {
   val DefaultSnapshotSuffix: String = "SNAPSHOT"
   val DefaultForceBump: Boolean = false
   val DefaultPromoteToRelease: Boolean = false
-  val DefaultSnapshot: Boolean = true
+  val DefaultSnapshot: Boolean = false
   val DefaultNewPreRelease: Boolean = false
   val DefaultBumpLevel: VersionComponent = VersionComponent.PATCH
   val DefaultComponentToBump: VersionComponent = VersionComponent.NONE

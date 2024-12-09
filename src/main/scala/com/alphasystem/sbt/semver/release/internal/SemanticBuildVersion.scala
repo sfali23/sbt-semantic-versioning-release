@@ -34,9 +34,24 @@ class SemanticBuildVersion(workingDir: File, baseConfig: SemanticBuildVersionCon
   def determineVersion: String = {
     val currentBranch = adapter.getCurrentBranch
     val hotfixRequired = baseConfig.hotfixBranchPattern.nonEmpty(currentBranch)
-    val snapshotRequired =
-      (!baseConfig.isReleaseBranch(currentBranch) ||
-        adapter.hasUncommittedChanges) && !hotfixRequired && baseConfig.snapshot
+    val snapshotRequired = {
+      val notAReleaseBranch = !baseConfig.isReleaseBranch(currentBranch)
+      val hasUncommitedChanges = adapter.hasUncommittedChanges
+      val snapshotFlag = baseConfig.snapshot
+      if (notAReleaseBranch) {
+        logger.warn(
+          "Current configuration doesn't allow to create new tag from current branch ({}), creating snapshot version",
+          currentBranch
+        )
+      }
+      if (hasUncommitedChanges) {
+        logger.warn("Current branch ({}) has uncommitted changes, creating snapshot version", currentBranch)
+      }
+      if (snapshotFlag) {
+        logger.warn("Snapshot flag is set to true, creating snapshot version")
+      }
+      (notAReleaseBranch || hasUncommitedChanges || snapshotFlag) && !hotfixRequired
+    }
 
     val maybeLatestVersion = latestVersion
     val currentVersion = maybeLatestVersion.getOrElse(startingVersion)
@@ -61,7 +76,10 @@ class SemanticBuildVersion(workingDir: File, baseConfig: SemanticBuildVersionCon
     } else if (baseConfig.forceBump) {
       val versionComponents =
         SetupVersionComponentsForBump()
-          .addComponentIfRequired(baseConfig.componentToBump, () => true)
+          .addComponentIfRequired(
+            baseConfig.componentToBump,
+            addDefaultComponent(baseConfig.componentToBump)
+          )
           .addComponentIfRequired(PROMOTE_TO_RELEASE, () => baseConfig.promoteToRelease)
           .addComponentIfRequired(NEW_PRE_RELEASE, () => baseConfig.newPreRelease)
 
@@ -121,7 +139,7 @@ class SemanticBuildVersion(workingDir: File, baseConfig: SemanticBuildVersionCon
         .removePatch()
     }
 
-    if (versionComponents.isPromoteToRelease) {
+    if (versionComponents.hasPromoteToRelease) {
       if (currentVersion.isPreRelease) {
         // when current version is pre-release and promote to release is set, ignore any other flags
         logger.warn("Promoting to release flag is set and current version is pre-release, ignoring any other flag.")
@@ -132,35 +150,43 @@ class SemanticBuildVersion(workingDir: File, baseConfig: SemanticBuildVersionCon
       }
     }
 
-    if (versionComponents.isMajor) {
+    if (versionComponents.hasMajor) {
       versionComponents.removeMinor().removePatch()
     }
 
-    if (versionComponents.isMinor) {
+    if (versionComponents.hasMinor) {
       versionComponents.removePatch()
     }
 
     if (snapshotRequired) {
-      // This is special case, we figured this is snapshot version but we don't know which component to bump, bump defaultBumpLevel
-      if (versionComponents.isEmpty)
+      // This is special case, we figured this is snapshot version, but we don't know which component to bump, bump defaultBumpLevel
+      if (!versionComponents.hasMandatoryComponents)
         versionComponents
-          .addComponentIfRequired(baseConfig.defaultBumpLevel, () => forcePush)
+          .addComponentIfRequired(baseConfig.defaultBumpLevel, addDefaultComponent(baseConfig.defaultBumpLevel))
 
-      versionComponents.addSnapshot() /*.removeNewPreRelease().removePromoteToRelease().removePreRelease()*/
+      versionComponents.addSnapshot()
     }
 
-    val componentsToBump =
-      if (versionComponents.isEmpty && forcePush) {
+    if (!versionComponents.hasEssentialComponents) {
+      if (forcePush) {
         // We don't have any defined bump level use defaultBumpLevel
-        versionComponents
-          .addComponentIfRequired(baseConfig.defaultBumpLevel, () => forcePush)
-          .getVersionComponents
-      } else versionComponents.getVersionComponents
+        versionComponents.addComponentIfRequired(baseConfig.defaultBumpLevel, () => forcePush)
+      } else if (baseConfig.forceBump) {
+        throw new IllegalArgumentException(
+          s"Couldn't determine next version, tag (${currentVersion.toStringValue(tagPrefix)}) is already exists."
+        )
+      }
+    }
 
-    currentVersion.bumpVersion(getSnapshotInfo, componentsToBump*)
+    currentVersion.bumpVersion(getSnapshotInfo, versionComponents.getVersionComponents*)
   }
 
   private def getSnapshotInfo = Some(Snapshot(baseConfig.snapshotSuffix, Try(adapter.getShortHash).toOption))
+
+  private def addDefaultComponent(versionComponent: VersionComponent) = () =>
+    Seq(VersionComponent.MAJOR, VersionComponent.MINOR, VersionComponent.PATCH)
+      .contains(versionComponent)
+
 }
 
 object SemanticBuildVersion {
@@ -168,6 +194,5 @@ object SemanticBuildVersion {
   def apply(
     workingDir: File,
     baseConfig: SemanticBuildVersionConfiguration = SemanticBuildVersionConfiguration()
-  ): SemanticBuildVersion =
-    new SemanticBuildVersion(workingDir, baseConfig)
+  ): SemanticBuildVersion = new SemanticBuildVersion(workingDir, baseConfig)
 }
