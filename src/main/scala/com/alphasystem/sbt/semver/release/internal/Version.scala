@@ -7,6 +7,7 @@ package internal
 import sbtsemverrelease.PreReleaseConfig
 
 import scala.annotation.tailrec
+import scala.util.{Failure, Success, Try}
 
 case class Version(
   major: Int,
@@ -128,8 +129,10 @@ object Version {
     val matcher = VersionRegex.findAllIn(version)
     // Group 0 will be the entire version string, Groups 1 - 3 will major, minor, and patch version, so there must be
     // at least four groups. There will total of 6 groups
-    if (matcher.groupCount < 4) {
-      throw new IllegalArgumentException(s"Invalid version: $version")
+    Try(matcher.groupCount) match {
+      case Failure(_)                  => throw new IllegalArgumentException(s"Invalid version: $version")
+      case Success(value) if value < 4 => throw new IllegalArgumentException(s"Invalid version: $version")
+      case _                           => // do nothing
     }
     // pre-release and snapshot
     val maybePreReleaseOrSnapshot = Option(matcher.group(4))

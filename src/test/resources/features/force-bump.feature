@@ -263,3 +263,38 @@ Feature: Branch with Force bump repository
       | annotated |
       | true      |
       | false     |
+
+  Scenario Outline: Override tagPrefix will generate tags with given prefix
+    Given Current branch is 'main'
+    And Read build config from resource 'configs/force-bump' at paths (major,tagPrefix)
+    And Following annotated: <annotated> tags (alpha.0.1.0) has been created
+    And Branch 'test' is created and checked out
+    When Make changes and commit with message: 'version update'
+    And Branch 'main' is checked out
+    And Merge branch 'test' into current branch
+    And A tag with annotated: (<annotated>) flag is created
+    Then Generated version should be 'alpha.1.0.0'
+    And Close resources
+
+    Examples:
+      | annotated |
+      | true      |
+      | false     |
+
+  Scenario Outline: Ignore unmatched tags with prefix other than configured prefix
+    Given Current branch is 'main'
+    And Read build config from resource 'configs/force-bump' at paths (major,tagPrefix)
+    And Following annotated: <annotated> tags (v.0.1.0,alpha.0.1.0,v1.0.0) has been created
+    And Branch 'test' is created and checked out
+    When Make changes and commit with message: 'version update'
+    And Branch 'main' is checked out
+    And Merge branch 'test' into current branch
+    And A tag with annotated: (<annotated>) flag is created
+    Then Generated version should be 'alpha.1.0.0'
+    And Close resources
+
+    Examples:
+      | annotated |
+      | true      |
+      | false     |
+

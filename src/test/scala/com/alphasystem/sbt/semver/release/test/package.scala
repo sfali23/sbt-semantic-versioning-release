@@ -12,6 +12,7 @@ import sbtsemverrelease.AutoBump.*
 import sbtsemverrelease.{AutoBump, PreReleaseConfig}
 import com.typesafe.config.{Config, ConfigFactory}
 
+import scala.util.Try
 import scala.util.matching.Regex
 package object test {
 
@@ -52,7 +53,7 @@ package object test {
       src
         .getTagsForCurrentBranch
         .map(_.replaceAll(tagPrefix, ""))
-        .map(version => Version(version, snapshotSuffix, preReleaseConfig))
+        .flatMap(version => Try(Version(version, snapshotSuffix, preReleaseConfig)).toOption)
         .min
         .toStringValue(tagPrefix)
   }

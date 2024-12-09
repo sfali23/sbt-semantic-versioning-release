@@ -160,7 +160,9 @@ class SemanticBuildVersion(workingDir: File, baseConfig: SemanticBuildVersionCon
 
     if (snapshotRequired) {
       // This is special case, we figured this is snapshot version, but we don't know which component to bump, bump defaultBumpLevel
-      if (!versionComponents.hasMandatoryComponents)
+      if (
+        !versionComponents.hasMandatoryComponents && !versionComponents.hasPreRelease && !versionComponents.hasPromoteToRelease
+      )
         versionComponents
           .addComponentIfRequired(baseConfig.defaultBumpLevel, addDefaultComponent(baseConfig.defaultBumpLevel))
 

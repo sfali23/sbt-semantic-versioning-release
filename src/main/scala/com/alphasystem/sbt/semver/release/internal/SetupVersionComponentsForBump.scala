@@ -47,6 +47,7 @@ class SetupVersionComponentsForBump {
   def hasMajor: Boolean = hasGivenComponent(MAJOR)
   def hasMinor: Boolean = hasGivenComponent(MINOR)
   def hasPromoteToRelease: Boolean = hasGivenComponent(PROMOTE_TO_RELEASE)
+  def hasPreRelease: Boolean = hasGivenComponent(PRE_RELEASE)
   def hasMandatoryComponents: Boolean = hasMajor || hasMinor || hasGivenComponent(PATCH)
   def hasEssentialComponents: Boolean = hasMajor || hasMinor || hasGivenComponent(PATCH) || hasPromoteToRelease ||
     hasGivenComponent(PRE_RELEASE) || hasGivenComponent(HOT_FIX)
