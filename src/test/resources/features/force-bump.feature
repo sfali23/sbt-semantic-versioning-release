@@ -139,7 +139,7 @@ Feature: Branch with Force bump repository
 
   Scenario Outline: Bump pre release version
     Given Current branch is 'main'
-    And Read build config from resource 'configs/force-bump' at paths (minor,newPreRelease)
+    And Read build config from resource 'configs/force-bump' at paths (minor)
     And Following annotated: <annotated> tags (v0.1.0,v0.2.0,v1.0.0,v1.1.0-RC.1) has been created
     When Branch 'updated_tag' is created and checked out
     And Make changes and commit with message: 'updated'
