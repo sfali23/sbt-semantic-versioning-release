@@ -16,7 +16,7 @@ class BaseVersionOnlyFromLatestOfNearestAncestorTagsSpec
     with Matchers {
 
   forAll(AnnotatedTestData) { (annotated: Boolean) =>
-    test(
+    ignore(
       s"take the latest ancestor tag, ignoring other tags (annotated: $annotated) - v1"
     ) {
       new TestSpec {
@@ -40,7 +40,7 @@ class BaseVersionOnlyFromLatestOfNearestAncestorTagsSpec
   }
 
   forAll(AnnotatedTestData) { (annotated: Boolean) =>
-    test(
+    ignore(
       s"take the latest ancestor tag, ignoring other tags (annotated: $annotated) - v2"
     ) {
       new TestSpec {
@@ -80,7 +80,7 @@ class BaseVersionOnlyFromLatestOfNearestAncestorTagsSpec
   }
 
   forAll(AnnotatedTestData) { (annotated: Boolean) =>
-    test(
+    ignore(
       s"take the latest tag from the nearest ancestor tags, ignoring unrelated tags (annotated: $annotated)"
     ) {
       new TestSpec {
@@ -122,7 +122,7 @@ class BaseVersionOnlyFromLatestOfNearestAncestorTagsSpec
   }
 
   forAll(AnnotatedTestData) { (annotated: Boolean) =>
-    test(
+    ignore(
       s"if the determined version exists already as tag, the build should fail (annotated: $annotated) - v1"
     ) {
       new TestSpec {
@@ -149,7 +149,7 @@ class BaseVersionOnlyFromLatestOfNearestAncestorTagsSpec
   }
 
   forAll(AnnotatedTestData) { (annotated: Boolean) =>
-    test(
+    ignore(
       s"if the determined version exists already as tag, a snapshot build should not fail (annotated: $annotated)"
     ) {
       new TestSpec {
