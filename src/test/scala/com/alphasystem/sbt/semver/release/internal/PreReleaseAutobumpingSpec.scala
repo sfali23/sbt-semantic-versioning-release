@@ -6,6 +6,7 @@ import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.prop.TableDrivenPropertyChecks
 
+// Working
 class PreReleaseAutobumpingSpec extends AnyFunSuite with TableDrivenPropertyChecks with Matchers {
 
   forAll(AnnotatedTestData) { (annotated: Boolean) =>
@@ -26,7 +27,7 @@ class PreReleaseAutobumpingSpec extends AnyFunSuite with TableDrivenPropertyChec
           SemanticBuildVersion(
             workingDir,
             SemanticBuildVersionConfiguration(tagPrefix = "beta.", snapshot = false)
-          ) shouldBe "beta.0.2.1"
+          ).determineVersion shouldBe "beta.0.2.1"
       }
     }
   }

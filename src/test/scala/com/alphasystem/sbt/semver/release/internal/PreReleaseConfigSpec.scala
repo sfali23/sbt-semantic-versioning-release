@@ -1,8 +1,13 @@
-package com.alphasystem.sbt.semver.release.internal
+package com.alphasystem
+package sbt
+package semver
+package release
+package internal
 
 import org.scalatest.funsuite.AnyFunSuite
 import sbtsemverrelease.PreReleaseConfig
 
+// Working
 class PreReleaseConfigSpec extends AnyFunSuite {
 
   test("Providing valid data should result in providing pattern") {
@@ -19,9 +24,9 @@ class PreReleaseConfigSpec extends AnyFunSuite {
     "Having leading zeros in prerelease part should result in failed validation"
   ) {
     val caught =
-      intercept[IllegalArgumentException](PreReleaseConfig("1.0.0-alpha.01"))
+      intercept[IllegalArgumentException](Version("1.0.0-RC.01", DefaultSnapshotSuffix, PreReleaseConfig()))
     assert(
-      caught.getMessage === "Numeric identifiers must not include leading zeroes"
+      caught.getMessage === "Invalid version: 1.0.0-RC.01"
     )
   }
 }

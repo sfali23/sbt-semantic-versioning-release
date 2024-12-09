@@ -7,6 +7,7 @@ import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.prop.TableDrivenPropertyChecks
 
+// Working
 class SemanticBuildVersionSpec extends AnyFunSpec with TableDrivenPropertyChecks with Matchers {
 
   describe("test various latest version variants") {
@@ -126,26 +127,4 @@ class SemanticBuildVersionSpec extends AnyFunSpec with TableDrivenPropertyChecks
       }
     }
   }
-
-  /*describe("tagged version is recognized as non snapshot") {
-    forAll(AnnotatedTestData) { (annotated: Boolean) =>
-      it(s" (annotated: $annotated)") {
-        new TestSpec {
-          override protected def populateRepository(): Unit =
-            testRepository
-              .makeChanges()
-              .commitAndTag("v0.0.1", annotated)
-
-          override protected def assertion: Assertion = {
-            val sbv = SemanticBuildVersion(
-              workingDir,
-              internal.SemanticBuildVersionConfiguration()
-            )
-            sbv.determineVersion
-            sbv.currentConfig.snapshot shouldBe false
-          }
-        }
-      }
-    }
-  }*/
 }
