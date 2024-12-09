@@ -8,7 +8,9 @@ import com.alphasystem.sbt.semver.release.internal.{SemanticBuildVersion, Semant
 import io.circe.{Decoder, Encoder, Json}
 import org.scalatest.prop.TableDrivenPropertyChecks.*
 import org.scalatest.prop.TableFor1
-import sbtsemverrelease.{PreReleaseConfig, VersionsMatching}
+import sbtsemverrelease.AutoBump.*
+import sbtsemverrelease.{AutoBump, PreReleaseConfig}
+import com.typesafe.config.{Config, ConfigFactory}
 
 import scala.util.matching.Regex
 package object test {
@@ -41,15 +43,6 @@ package object test {
     def createTag(version: String): TestRepository = src.tag(version, annotated = true)
   }
 
-  implicit class JGitAdapterOps(src: JGitAdapter) {
-    def getCurrentHeadTag: String =
-      src
-        .getTagsForCurrentBranch
-        .map(_.replaceAll(DefaultTagPrefix, ""))
-        .map(version => Version(version, DefaultSnapshotSuffix, PreReleaseConfig()))
-        .min
-        .toStringValue()
-  }
   implicit class JGitAdapterOps(src: JGitAdapter) {
     def getCurrentHeadTag(
       tagPrefix: String = DefaultTagPrefix,
@@ -111,8 +104,15 @@ package object test {
       )
   }
 
-  def toSemanticBuildVersionConfiguration(resourceName: String): SemanticBuildVersionConfiguration = {
-    val config = ConfigFactory.load(resourceName).getConfig("config")
-    config.toSemanticBuildVersionConfiguration
+  def toSemanticBuildVersionConfiguration(
+    resourceName: String,
+    configPaths: Seq[String]
+  ): SemanticBuildVersionConfiguration = {
+    val fullConfig = ConfigFactory.load(resourceName)
+    val config =
+      configPaths.foldLeft(ConfigFactory.empty()) { case (config, path) =>
+        fullConfig.getConfig(path).withFallback(config)
+      }
+    config.withFallback(fullConfig.getConfig("default")).toSemanticBuildVersionConfiguration
   }
 }
