@@ -206,7 +206,7 @@ Feature: Branch with Force bump repository
     And Make changes and commit with message: 'updated'
     And Branch 'main' is checked out
     And Merge branch 'updated_tag' into current branch
-    Then Exception 'Couldn't determine next version, tag (v1.0.0) is already exists.' should be thrown when creating new tag
+    Then Exception 'Couldn't determine next version, tag (1.0.0) is already exists.' should be thrown when creating new tag
     And Close resources
 
     Examples:
