@@ -99,7 +99,6 @@ class StepDefinitions extends ScalaDsl with EN with Matchers {
         } else expectedVersion
       } else expectedVersion
 
-    println(result)
     currentTag shouldBe result
   }
 

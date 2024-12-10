@@ -1,6 +1,6 @@
 package com.alphasystem.sbt.semver.release.internal
 
-import com.alphasystem.sbt.semver.release.internal
+import com.alphasystem.sbt.semver.release.{VersionComponent, internal}
 import com.alphasystem.sbt.semver.release.test.*
 import org.scalatest.Assertion
 import org.scalatest.funspec.AnyFunSpec
@@ -72,7 +72,7 @@ class SemanticBuildVersionSpec extends AnyFunSpec with TableDrivenPropertyChecks
               SemanticBuildVersion(
                 workingDir,
                 SemanticBuildVersionConfiguration(tagPrefix = "")
-              ).latestVersion.map(_.toStringValue("")) shouldBe Option(expectedVersion)
+              ).latestVersion.map(_.toStringValue) shouldBe Option(expectedVersion)
           }
         }
     }
@@ -100,8 +100,8 @@ class SemanticBuildVersionSpec extends AnyFunSpec with TableDrivenPropertyChecks
           override protected def assertion: Assertion =
             SemanticBuildVersion(
               workingDir,
-              internal.SemanticBuildVersionConfiguration()
-            ).latestVersion.map(_.toStringValue()) shouldBe Some("v0.0.1")
+              SemanticBuildVersionConfiguration()
+            ).latestVersion.map(_.toStringValue) shouldBe Some("0.0.1")
         }
       }
     }
@@ -121,8 +121,8 @@ class SemanticBuildVersionSpec extends AnyFunSpec with TableDrivenPropertyChecks
           override protected def assertion: Assertion =
             SemanticBuildVersion(
               workingDir,
-              internal.SemanticBuildVersionConfiguration()
-            ).determineVersion shouldBe "v0.0.2"
+              SemanticBuildVersionConfiguration(forceBump = true, componentToBump = VersionComponent.PATCH)
+            ).determineVersion shouldBe "0.0.2"
         }
       }
     }

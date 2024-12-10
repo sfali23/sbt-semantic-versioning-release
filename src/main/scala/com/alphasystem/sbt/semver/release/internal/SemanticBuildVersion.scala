@@ -59,10 +59,10 @@ class SemanticBuildVersion(workingDir: File, baseConfig: SemanticBuildVersionCon
     val newVersion = determineVersion(currentVersion, hotfixRequired, snapshotRequired, maybeLatestVersion)
     if (currentVersion == newVersion && maybeLatestVersion.isDefined) {
       throw new IllegalArgumentException(
-        s"Couldn't determine next version, tag (${newVersion.toStringValue(tagPrefix)}) is already exists."
+        s"Couldn't determine next version, tag (${newVersion.toStringValue}) is already exists."
       )
     }
-    newVersion.toStringValue(baseConfig.tagPrefix)
+    newVersion.toStringValue
   }
 
   private[internal] def determineVersion(
@@ -96,7 +96,7 @@ class SemanticBuildVersion(workingDir: File, baseConfig: SemanticBuildVersionCon
         maybeLatestVersion
           .map { version =>
             // if last tag exists then get commits between last tag and current head, otherwise get all commits
-            val commits = adapter.getCommitBetween(version.toStringValue(tagPrefix))
+            val commits = adapter.getCommitBetween(s"${baseConfig.tagPrefix}${version.toStringValue}")
             (commits.nonEmpty, commits)
           }
           .getOrElse((false, adapter.getCommits))
@@ -176,7 +176,7 @@ class SemanticBuildVersion(workingDir: File, baseConfig: SemanticBuildVersionCon
         versionComponents.addComponentIfRequired(baseConfig.defaultBumpLevel, () => forcePush)
       } else if (baseConfig.forceBump) {
         throw new IllegalArgumentException(
-          s"Couldn't determine next version, tag (${currentVersion.toStringValue(tagPrefix)}) is already exists."
+          s"Couldn't determine next version, tag (${currentVersion.toStringValue}) is already exists."
         )
       }
     }

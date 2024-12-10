@@ -88,11 +88,11 @@ case class Version(
       }
     }
 
-  def toStringValue(tagPrefix: String = DefaultTagPrefix): String = {
+  def toStringValue: String = {
     val hotfixValue = hotfix.map(v => s".$v").getOrElse("")
     val preReleaseValue = preRelease.map(_.toStringValue).getOrElse("")
     val snapshotValue = snapshot.map(_.toStringValue).getOrElse("")
-    s"$tagPrefix$major.$minor.$patch$hotfixValue$preReleaseValue$snapshotValue"
+    s"$major.$minor.$patch$hotfixValue$preReleaseValue$snapshotValue"
   }
 }
 

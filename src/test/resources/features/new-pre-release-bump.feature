@@ -14,19 +14,19 @@ Feature: New pre-release bumping scenarios
     And Close resources
 
     Examples:
-      | bumpComponent | annotated | expectedVersion          | snapshotFlag         |
-      | patch         | true      | v0.1.1-RC.1              | non-snapshot         |
-      | patch         | false     | v0.1.1-RC.1              | non-snapshot         |
-      | patch         | true      | v0.1.1-RC.1-SNAPSHOT     | snapshot             |
-      | patch         | false     | v0.1.1-RC.1-SNAPSHOT     | snapshot             |
-      | minor         | true      | v0.2.0-RC.1              | non-snapshot         |
-      | minor         | false     | v0.2.0-RC.1              | non-snapshot         |
-      | minor         | true      | v0.2.0-RC.1-SNAPSHOT     | snapshot             |
-      | minor         | false     | v0.2.0-RC.1-SNAPSHOT     | snapshot             |
-      | major         | true      | v1.0.0-RC.1              | non-snapshot         |
-      | major         | false     | v1.0.0-RC.1              | non-snapshot         |
-      | major         | true      | v1.0.0-RC.1-SNAPSHOT     | snapshot             |
-      | major         | false     | v1.0.0-RC.1-SNAPSHOT     | snapshot             |
+      | bumpComponent | annotated | expectedVersion         | snapshotFlag         |
+      | patch         | true      | 0.1.1-RC.1              | non-snapshot         |
+      | patch         | false     | 0.1.1-RC.1              | non-snapshot         |
+      | patch         | true      | 0.1.1-RC.1-SNAPSHOT     | snapshot             |
+      | patch         | false     | 0.1.1-RC.1-SNAPSHOT     | snapshot             |
+      | minor         | true      | 0.2.0-RC.1              | non-snapshot         |
+      | minor         | false     | 0.2.0-RC.1              | non-snapshot         |
+      | minor         | true      | 0.2.0-RC.1-SNAPSHOT     | snapshot             |
+      | minor         | false     | 0.2.0-RC.1-SNAPSHOT     | snapshot             |
+      | major         | true      | 1.0.0-RC.1              | non-snapshot         |
+      | major         | false     | 1.0.0-RC.1              | non-snapshot         |
+      | major         | true      | 1.0.0-RC.1-SNAPSHOT     | snapshot             |
+      | major         | false     | 1.0.0-RC.1-SNAPSHOT     | snapshot             |
 
   @new-pre-release
   Scenario Outline: With previous pre-release version will bump pre-release version (Force bump)
@@ -42,19 +42,19 @@ Feature: New pre-release bumping scenarios
     And Close resources
 
     Examples:
-      | annotated | previousVersion          | expectedVersion      | snapshotFlag         |
-      | true      | v0.1.1-RC.1              | v0.1.1-RC.2          | non-snapshot         |
-      | false     | v0.1.1-RC.1              | v0.1.1-RC.2          | non-snapshot         |
-      | true      | v0.1.1-RC.1-SNAPSHOT     | v0.1.1-RC.2-SNAPSHOT |snapshot              |
-      | false     | v0.1.1-RC.1-SNAPSHOT     | v0.1.1-RC.2-SNAPSHOT | snapshot             |
-      | true      | v0.2.0-RC.1              | v0.2.0-RC.2          | non-snapshot         |
-      | false     | v0.2.0-RC.1              | v0.2.0-RC.2          | non-snapshot         |
-      | true      | v0.2.0-RC.1-SNAPSHOT     | v0.2.0-RC.2-SNAPSHOT | snapshot             |
-      | false     | v0.2.0-RC.1-SNAPSHOT     | v0.2.0-RC.2-SNAPSHOT | snapshot             |
-      | true      | v1.0.0-RC.1              | v1.0.0-RC.2          | non-snapshot         |
-      | false     | v1.0.0-RC.1              | v1.0.0-RC.2          | non-snapshot         |
-      | true      | v1.0.0-RC.1-SNAPSHOT     | v1.0.0-RC.2-SNAPSHOT | snapshot             |
-      | false     | v1.0.0-RC.1-SNAPSHOT     | v1.0.0-RC.2-SNAPSHOT | snapshot             |
+      | annotated | previousVersion          | expectedVersion     | snapshotFlag         |
+      | true      | v0.1.1-RC.1              | 0.1.1-RC.2          | non-snapshot         |
+      | false     | v0.1.1-RC.1              | 0.1.1-RC.2          | non-snapshot         |
+      | true      | v0.1.1-RC.1-SNAPSHOT     | 0.1.1-RC.2-SNAPSHOT |snapshot              |
+      | false     | v0.1.1-RC.1-SNAPSHOT     | 0.1.1-RC.2-SNAPSHOT | snapshot             |
+      | true      | v0.2.0-RC.1              | 0.2.0-RC.2          | non-snapshot         |
+      | false     | v0.2.0-RC.1              | 0.2.0-RC.2          | non-snapshot         |
+      | true      | v0.2.0-RC.1-SNAPSHOT     | 0.2.0-RC.2-SNAPSHOT | snapshot             |
+      | false     | v0.2.0-RC.1-SNAPSHOT     | 0.2.0-RC.2-SNAPSHOT | snapshot             |
+      | true      | v1.0.0-RC.1              | 1.0.0-RC.2          | non-snapshot         |
+      | false     | v1.0.0-RC.1              | 1.0.0-RC.2          | non-snapshot         |
+      | true      | v1.0.0-RC.1-SNAPSHOT     | 1.0.0-RC.2-SNAPSHOT | snapshot             |
+      | false     | v1.0.0-RC.1-SNAPSHOT     | 1.0.0-RC.2-SNAPSHOT | snapshot             |
 
   @new-pre-release
   Scenario Outline: With current version is pre-release, promote to release (Force bump)
@@ -70,19 +70,19 @@ Feature: New pre-release bumping scenarios
     And Close resources
 
     Examples:
-      | annotated | previousVersion          | expectedVersion      | snapshotFlag         |
-      | true      | v0.1.1-RC.1              | v0.1.1               | non-snapshot         |
-      | false     | v0.1.1-RC.1              | v0.1.1               | non-snapshot         |
-      | true      | v0.1.1-RC.1-SNAPSHOT     | v0.1.1-SNAPSHOT      |snapshot              |
-      | false     | v0.1.1-RC.1-SNAPSHOT     | v0.1.1-SNAPSHOT      | snapshot             |
-      | true      | v0.2.0-RC.1              | v0.2.0               | non-snapshot         |
-      | false     | v0.2.0-RC.1              | v0.2.0               | non-snapshot         |
-      | true      | v0.2.0-RC.1-SNAPSHOT     | v0.2.0-SNAPSHOT      | snapshot             |
-      | false     | v0.2.0-RC.1-SNAPSHOT     | v0.2.0-SNAPSHOT      | snapshot             |
-      | true      | v1.0.0-RC.1              | v1.0.0               | non-snapshot         |
-      | false     | v1.0.0-RC.1              | v1.0.0               | non-snapshot         |
-      | true      | v1.0.0-RC.1-SNAPSHOT     | v1.0.0-SNAPSHOT      | snapshot             |
-      | false     | v1.0.0-RC.1-SNAPSHOT     | v1.0.0-SNAPSHOT      | snapshot             |
+      | annotated | previousVersion          | expectedVersion     | snapshotFlag         |
+      | true      | v0.1.1-RC.1              | 0.1.1               | non-snapshot         |
+      | false     | v0.1.1-RC.1              | 0.1.1               | non-snapshot         |
+      | true      | v0.1.1-RC.1-SNAPSHOT     | 0.1.1-SNAPSHOT      |snapshot              |
+      | false     | v0.1.1-RC.1-SNAPSHOT     | 0.1.1-SNAPSHOT      | snapshot             |
+      | true      | v0.2.0-RC.1              | 0.2.0               | non-snapshot         |
+      | false     | v0.2.0-RC.1              | 0.2.0               | non-snapshot         |
+      | true      | v0.2.0-RC.1-SNAPSHOT     | 0.2.0-SNAPSHOT      | snapshot             |
+      | false     | v0.2.0-RC.1-SNAPSHOT     | 0.2.0-SNAPSHOT      | snapshot             |
+      | true      | v1.0.0-RC.1              | 1.0.0               | non-snapshot         |
+      | false     | v1.0.0-RC.1              | 1.0.0               | non-snapshot         |
+      | true      | v1.0.0-RC.1-SNAPSHOT     | 1.0.0-SNAPSHOT      | snapshot             |
+      | false     | v1.0.0-RC.1-SNAPSHOT     | 1.0.0-SNAPSHOT      | snapshot             |
 
   @new-pre-release
   Scenario Outline: New pre-release without any previous pre-release version will create new pre-release (Auto bump)
@@ -98,19 +98,19 @@ Feature: New pre-release bumping scenarios
     And Close resources
 
     Examples:
-      | bumpComponent | annotated | expectedVersion          | snapshotFlag         |
-      | patch         | true      | v0.1.1-RC.1              | non-snapshot         |
-      | patch         | false     | v0.1.1-RC.1              | non-snapshot         |
-      | patch         | true      | v0.1.1-RC.1-SNAPSHOT     | snapshot             |
-      | patch         | false     | v0.1.1-RC.1-SNAPSHOT     | snapshot             |
-      | minor         | true      | v0.2.0-RC.1              | non-snapshot         |
-      | minor         | false     | v0.2.0-RC.1              | non-snapshot         |
-      | minor         | true      | v0.2.0-RC.1-SNAPSHOT     | snapshot             |
-      | minor         | false     | v0.2.0-RC.1-SNAPSHOT     | snapshot             |
-      | major         | true      | v1.0.0-RC.1              | non-snapshot         |
-      | major         | false     | v1.0.0-RC.1              | non-snapshot         |
-      | major         | true      | v1.0.0-RC.1-SNAPSHOT     | snapshot             |
-      | major         | false     | v1.0.0-RC.1-SNAPSHOT     | snapshot             |
+      | bumpComponent | annotated | expectedVersion         | snapshotFlag         |
+      | patch         | true      | 0.1.1-RC.1              | non-snapshot         |
+      | patch         | false     | 0.1.1-RC.1              | non-snapshot         |
+      | patch         | true      | 0.1.1-RC.1-SNAPSHOT     | snapshot             |
+      | patch         | false     | 0.1.1-RC.1-SNAPSHOT     | snapshot             |
+      | minor         | true      | 0.2.0-RC.1              | non-snapshot         |
+      | minor         | false     | 0.2.0-RC.1              | non-snapshot         |
+      | minor         | true      | 0.2.0-RC.1-SNAPSHOT     | snapshot             |
+      | minor         | false     | 0.2.0-RC.1-SNAPSHOT     | snapshot             |
+      | major         | true      | 1.0.0-RC.1              | non-snapshot         |
+      | major         | false     | 1.0.0-RC.1              | non-snapshot         |
+      | major         | true      | 1.0.0-RC.1-SNAPSHOT     | snapshot             |
+      | major         | false     | 1.0.0-RC.1-SNAPSHOT     | snapshot             |
 
   @new-pre-release
   Scenario Outline: With previous pre-release version will bump pre-release version (Auto bump)
@@ -127,18 +127,18 @@ Feature: New pre-release bumping scenarios
 
     Examples:
       | annotated | previousVersion          | expectedVersion      | snapshotFlag         |
-      | true      | v0.1.1-RC.1              | v0.1.1-RC.2          | non-snapshot         |
-      | false     | v0.1.1-RC.1              | v0.1.1-RC.2          | non-snapshot         |
-      | true      | v0.1.1-RC.1-SNAPSHOT     | v0.1.1-RC.2-SNAPSHOT |snapshot              |
-      | false     | v0.1.1-RC.1-SNAPSHOT     | v0.1.1-RC.2-SNAPSHOT | snapshot             |
-      | true      | v0.2.0-RC.1              | v0.2.0-RC.2          | non-snapshot         |
-      | false     | v0.2.0-RC.1              | v0.2.0-RC.2          | non-snapshot         |
-      | true      | v0.2.0-RC.1-SNAPSHOT     | v0.2.0-RC.2-SNAPSHOT | snapshot             |
-      | false     | v0.2.0-RC.1-SNAPSHOT     | v0.2.0-RC.2-SNAPSHOT | snapshot             |
-      | true      | v1.0.0-RC.1              | v1.0.0-RC.2          | non-snapshot         |
-      | false     | v1.0.0-RC.1              | v1.0.0-RC.2          | non-snapshot         |
-      | true      | v1.0.0-RC.1-SNAPSHOT     | v1.0.0-RC.2-SNAPSHOT | snapshot             |
-      | false     | v1.0.0-RC.1-SNAPSHOT     | v1.0.0-RC.2-SNAPSHOT | snapshot             |
+      | true      | v0.1.1-RC.1              | 0.1.1-RC.2           | non-snapshot         |
+      | false     | v0.1.1-RC.1              | 0.1.1-RC.2           | non-snapshot         |
+      | true      | v0.1.1-RC.1-SNAPSHOT     | 0.1.1-RC.2-SNAPSHOT  |snapshot              |
+      | false     | v0.1.1-RC.1-SNAPSHOT     | 0.1.1-RC.2-SNAPSHOT  | snapshot             |
+      | true      | v0.2.0-RC.1              | 0.2.0-RC.2           | non-snapshot         |
+      | false     | v0.2.0-RC.1              |0.2.0-RC.2            | non-snapshot         |
+      | true      | v0.2.0-RC.1-SNAPSHOT     |0.2.0-RC.2-SNAPSHOT   | snapshot             |
+      | false     | v0.2.0-RC.1-SNAPSHOT     |0.2.0-RC.2-SNAPSHOT   | snapshot             |
+      | true      | v1.0.0-RC.1              |1.0.0-RC.2            | non-snapshot         |
+      | false     | v1.0.0-RC.1              |1.0.0-RC.2            | non-snapshot         |
+      | true      | v1.0.0-RC.1-SNAPSHOT     |1.0.0-RC.2-SNAPSHOT   | snapshot             |
+      | false     | v1.0.0-RC.1-SNAPSHOT     |1.0.0-RC.2-SNAPSHOT   | snapshot             |
 
   @new-pre-release
   Scenario Outline: With current version is pre-release, promote to release (Auto bump)
@@ -154,16 +154,16 @@ Feature: New pre-release bumping scenarios
     And Close resources
 
     Examples:
-      | annotated | previousVersion          | expectedVersion      | snapshotFlag         |
-      | true      | v0.1.1-RC.1              | v0.1.1               | non-snapshot         |
-      | false     | v0.1.1-RC.1              | v0.1.1               | non-snapshot         |
-      | true      | v0.1.1-RC.1-SNAPSHOT     | v0.1.1-SNAPSHOT      | snapshot             |
-      | false     | v0.1.1-RC.1-SNAPSHOT     | v0.1.1-SNAPSHOT      | snapshot             |
-      | true      | v0.2.0-RC.1              | v0.2.0               | non-snapshot         |
-      | false     | v0.2.0-RC.1              | v0.2.0               | non-snapshot         |
-      | true      | v0.2.0-RC.1-SNAPSHOT     | v0.2.0-SNAPSHOT      | snapshot             |
-      | false     | v0.2.0-RC.1-SNAPSHOT     | v0.2.0-SNAPSHOT      | snapshot             |
-      | true      | v1.0.0-RC.1              | v1.0.0               | non-snapshot         |
-      | false     | v1.0.0-RC.1              | v1.0.0               | non-snapshot         |
-      | true      | v1.0.0-RC.1-SNAPSHOT     | v1.0.0-SNAPSHOT      | snapshot             |
-      | false     | v1.0.0-RC.1-SNAPSHOT     | v1.0.0-SNAPSHOT      | snapshot             |
+      | annotated | previousVersion          | expectedVersion     | snapshotFlag         |
+      | true      | v0.1.1-RC.1              | 0.1.1               | non-snapshot         |
+      | false     | v0.1.1-RC.1              | 0.1.1               | non-snapshot         |
+      | true      | v0.1.1-RC.1-SNAPSHOT     | 0.1.1-SNAPSHOT      | snapshot             |
+      | false     | v0.1.1-RC.1-SNAPSHOT     | 0.1.1-SNAPSHOT      | snapshot             |
+      | true      | v0.2.0-RC.1              | 0.2.0               | non-snapshot         |
+      | false     | v0.2.0-RC.1              | 0.2.0               | non-snapshot         |
+      | true      | v0.2.0-RC.1-SNAPSHOT     | 0.2.0-SNAPSHOT      | snapshot             |
+      | false     | v0.2.0-RC.1-SNAPSHOT     | 0.2.0-SNAPSHOT      | snapshot             |
+      | true      | v1.0.0-RC.1              | 1.0.0               | non-snapshot         |
+      | false     | v1.0.0-RC.1              | 1.0.0               | non-snapshot         |
+      | true      | v1.0.0-RC.1-SNAPSHOT     | 1.0.0-SNAPSHOT      | snapshot             |
+      | false     | v1.0.0-RC.1-SNAPSHOT     | 1.0.0-SNAPSHOT      | snapshot             |

@@ -55,7 +55,7 @@ package object test {
         .map(_.replaceAll(tagPrefix, ""))
         .flatMap(version => Try(Version(version, snapshotSuffix, preReleaseConfig)).toOption)
         .min
-        .toStringValue(tagPrefix)
+        .toStringValue
   }
 
   implicit class ConfigOps(src: Config) {

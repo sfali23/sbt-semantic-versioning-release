@@ -74,8 +74,8 @@ class VersionSpec extends AnyWordSpec with Matchers {
         Version("1.89.22-RC.5", DefaultSnapshotSuffix, preReleaseConfig),
         Version("0.12.345", DefaultSnapshotSuffix, preReleaseConfig),
         Version("0.12.345-RC.1", DefaultSnapshotSuffix, preReleaseConfig)
-      ).sorted.map(_.toStringValue())
-      val expected = Seq("v1.89.22-RC.5", "v0.12.346.1", "v0.12.346", "v0.12.345", "v0.12.345-RC.2", "v0.12.345-RC.1")
+      ).sorted.map(_.toStringValue)
+      val expected = Seq("1.89.22-RC.5", "0.12.346.1", "0.12.346", "0.12.345", "0.12.345-RC.2", "0.12.345-RC.1")
       actual shouldBe expected
     }
 
@@ -88,8 +88,8 @@ class VersionSpec extends AnyWordSpec with Matchers {
         Version("1.1.0", DefaultSnapshotSuffix, preReleaseConfig),
         Version("1.1.0-RC.1", DefaultSnapshotSuffix, preReleaseConfig),
         Version("1.1.0-RC.2", DefaultSnapshotSuffix, preReleaseConfig)
-      ).sorted.map(_.toStringValue())
-      val expected = Seq("v1.1.0", "v1.1.0-RC.2", "v1.1.0-RC.1", "v1.0.0", "v0.2.1", "v0.2.0", "v0.1.0")
+      ).sorted.map(_.toStringValue)
+      val expected = Seq("1.1.0", "1.1.0-RC.2", "1.1.0-RC.1", "1.0.0", "0.2.1", "0.2.0", "0.1.0")
       actual shouldBe expected
     }
   }

@@ -15,13 +15,13 @@ Feature: Snapshot
     And Close resources
 
     Examples:
-      | bumpComponent | annotated | expectedVersion   |
-      | patch         | true      | v0.1.1-snapshot   |
-      | patch         | false     | v0.1.1-snapshot   |
-      | minor         | true      | v0.2.0-snapshot   |
-      | minor         | false     | v0.2.0-snapshot   |
-      | major         | true      | v1.0.0-snapshot   |
-      | major         | false     | v1.0.0-snapshot   |
+      | bumpComponent | annotated | expectedVersion  |
+      | patch         | true      | 0.1.1-snapshot   |
+      | patch         | false     | 0.1.1-snapshot   |
+      | minor         | true      | 0.2.0-snapshot   |
+      | minor         | false     | 0.2.0-snapshot   |
+      | major         | true      | 1.0.0-snapshot   |
+      | major         | false     | 1.0.0-snapshot   |
 
   @snapshot
   Scenario Outline: Create snapshot release with overridden suffix and using long hash commit (Force bump)
@@ -38,13 +38,13 @@ Feature: Snapshot
     And Close resources
 
     Examples:
-      | bumpComponent | annotated | expectedVersion   |
-      | patch         | true      | v0.1.1-snapshot   |
-      | patch         | false     | v0.1.1-snapshot   |
-      | minor         | true      | v0.2.0-snapshot   |
-      | minor         | false     | v0.2.0-snapshot   |
-      | major         | true      | v1.0.0-snapshot   |
-      | major         | false     | v1.0.0-snapshot   |
+      | bumpComponent | annotated | expectedVersion  |
+      | patch         | true      | 0.1.1-snapshot   |
+      | patch         | false     | 0.1.1-snapshot   |
+      | minor         | true      | 0.2.0-snapshot   |
+      | minor         | false     | 0.2.0-snapshot   |
+      | major         | true      | 1.0.0-snapshot   |
+      | major         | false     | 1.0.0-snapshot   |
 
   @snapshot
   Scenario Outline: Create snapshot release with overridden suffix and no hash commit (Force bump)
@@ -61,13 +61,13 @@ Feature: Snapshot
     And Close resources
 
     Examples:
-      | bumpComponent | annotated | expectedVersion   |
-      | patch         | true      | v0.1.1-snapshot   |
-      | patch         | false     | v0.1.1-snapshot   |
-      | minor         | true      | v0.2.0-snapshot   |
-      | minor         | false     | v0.2.0-snapshot   |
-      | major         | true      | v1.0.0-snapshot   |
-      | major         | false     | v1.0.0-snapshot   |
+      | bumpComponent | annotated | expectedVersion  |
+      | patch         | true      | 0.1.1-snapshot   |
+      | patch         | false     | 0.1.1-snapshot   |
+      | minor         | true      | 0.2.0-snapshot   |
+      | minor         | false     | 0.2.0-snapshot   |
+      | major         | true      | 1.0.0-snapshot   |
+      | major         | false     | 1.0.0-snapshot   |
 
   @snapshot
   Scenario Outline: Create snapshot release with overridden suffix (Auto bump)
@@ -84,13 +84,13 @@ Feature: Snapshot
     And Close resources
 
     Examples:
-      | bumpComponent | annotated | expectedVersion   |
-      | patch         | true      | v0.1.1-snapshot   |
-      | patch         | false     | v0.1.1-snapshot   |
-      | minor         | true      | v0.2.0-snapshot   |
-      | minor         | false     | v0.2.0-snapshot   |
-      | major         | true      | v1.0.0-snapshot   |
-      | major         | false     | v1.0.0-snapshot   |
+      | bumpComponent | annotated | expectedVersion  |
+      | patch         | true      | 0.1.1-snapshot   |
+      | patch         | false     | 0.1.1-snapshot   |
+      | minor         | true      | 0.2.0-snapshot   |
+      | minor         | false     | 0.2.0-snapshot   |
+      | major         | true      | 1.0.0-snapshot   |
+      | major         | false     | 1.0.0-snapshot   |
 
   @snapshot
   Scenario Outline: Create snapshot release with overridden suffix and using long hash commit (Auto bump)
@@ -108,12 +108,12 @@ Feature: Snapshot
 
     Examples:
       | bumpComponent | annotated | expectedVersion   |
-      | patch         | true      | v0.1.1-snapshot   |
-      | patch         | false     | v0.1.1-snapshot   |
-      | minor         | true      | v0.2.0-snapshot   |
-      | minor         | false     | v0.2.0-snapshot   |
-      | major         | true      | v1.0.0-snapshot   |
-      | major         | false     | v1.0.0-snapshot   |
+      | patch         | true      | 0.1.1-snapshot   |
+      | patch         | false     | 0.1.1-snapshot   |
+      | minor         | true      | 0.2.0-snapshot   |
+      | minor         | false     | 0.2.0-snapshot   |
+      | major         | true      | 1.0.0-snapshot   |
+      | major         | false     | 1.0.0-snapshot   |
 
   @snapshot
   Scenario Outline: Create snapshot release with overridden suffix and no hash commit (Auto bump)
@@ -131,9 +131,9 @@ Feature: Snapshot
 
     Examples:
       | bumpComponent | annotated | expectedVersion   |
-      | patch         | true      | v0.1.1-snapshot   |
-      | patch         | false     | v0.1.1-snapshot   |
-      | minor         | true      | v0.2.0-snapshot   |
-      | minor         | false     | v0.2.0-snapshot   |
-      | major         | true      | v1.0.0-snapshot   |
-      | major         | false     | v1.0.0-snapshot   |
+      | patch         | true      | 0.1.1-snapshot   |
+      | patch         | false     | 0.1.1-snapshot   |
+      | minor         | true      | 0.2.0-snapshot   |
+      | minor         | false     | 0.2.0-snapshot   |
+      | major         | true      | 1.0.0-snapshot   |
+      | major         | false     | 1.0.0-snapshot   |
