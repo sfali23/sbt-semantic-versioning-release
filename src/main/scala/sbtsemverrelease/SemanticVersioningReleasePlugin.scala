@@ -229,7 +229,7 @@ object SemanticVersioningReleasePlugin extends AutoPlugin {
     defaultBumpLevel := initializeDefaultBumpLevel.value,
     componentToBump := initializeComponentToBump.value,
     autoBump := AutoBump(),
-    snapshotConfig := snapshotConfig.value,
+    snapshotConfig := SnapshotConfig(),
     preRelease := PreReleaseConfig(),
     hotfixBranchPattern := initializeDefaultHotFixBranchPattern.value,
     extraReleaseBranches := Seq.empty[String],
