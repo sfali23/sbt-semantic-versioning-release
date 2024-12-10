@@ -1,4 +1,4 @@
-Feature: New pre-release force bumping scenarios
+Feature: New pre-release bumping scenarios
 
   @new-pre-release
   Scenario Outline: New pre-release without any previous pre-release version will create new pre-release (Force bump)

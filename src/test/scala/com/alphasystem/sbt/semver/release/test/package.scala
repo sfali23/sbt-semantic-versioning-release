@@ -9,7 +9,7 @@ import io.circe.{Decoder, Encoder, Json}
 import org.scalatest.prop.TableDrivenPropertyChecks.*
 import org.scalatest.prop.TableFor1
 import sbtsemverrelease.AutoBump.*
-import sbtsemverrelease.{AutoBump, PreReleaseConfig}
+import sbtsemverrelease.{AutoBump, PreReleaseConfig, SnapshotConfig}
 import com.typesafe.config.{Config, ConfigFactory}
 
 import scala.util.Try
@@ -72,7 +72,6 @@ package object test {
       SemanticBuildVersionConfiguration(
         startingVersion = src.readFailSafeString("startingVersion", DefaultStartingVersion),
         tagPrefix = src.readFailSafeString("tagPrefix", DefaultTagPrefix),
-        snapshotSuffix = src.readFailSafeString("snapshotSuffix", DefaultSnapshotSuffix),
         forceBump = src.readFailSafeBoolean("forceBump", DefaultForceBump),
         promoteToRelease = src.readFailSafeBoolean("promoteToRelease", DefaultPromoteToRelease),
         snapshot = src.readFailSafeBoolean("snapshot", DefaultSnapshot),
@@ -82,6 +81,8 @@ package object test {
           VersionComponent.valueOf(src.readFailSafeString("defaultBumpLevel", DefaultBumpLevel.name())),
         componentToBump =
           VersionComponent.valueOf(src.readFailSafeString("componentToBump", DefaultComponentToBump.name())),
+        snapshotConfig =
+          if (src.hasPath("snapshotConfig")) src.getConfig("snapshotConfig").toSnapshotConfig else SnapshotConfig(),
         preReleaseConfig =
           if (src.hasPath("preReleaseConfig")) src.getConfig("preReleaseConfig").toPreReleaseConfig
           else PreReleaseConfig(),
@@ -103,7 +104,17 @@ package object test {
         startingVersion = src.readFailSafeString("startingVersion", "RC.1"),
         preReleasePartPattern = src.readFailSafeString("preReleasePartPattern", DefaultPreReleasePattern)
       )
+
+    def toSnapshotConfig: SnapshotConfig =
+      SnapshotConfig(
+        suffix = src.readFailSafeString("suffix", DefaultSnapshotSuffix),
+        appendCommitHash = src.readFailSafeBoolean("appendCommitHash", defaultValue = true),
+        useShortHash = src.readFailSafeBoolean("useShortHash", defaultValue = true)
+      )
+
   }
+
+  def toSnapshotConfig(src: String): SnapshotConfig = ConfigFactory.parseString(src).toSnapshotConfig
 
   def toSemanticBuildVersionConfiguration(
     resourceName: String,

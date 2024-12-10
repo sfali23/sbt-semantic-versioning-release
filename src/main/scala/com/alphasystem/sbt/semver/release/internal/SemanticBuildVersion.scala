@@ -17,7 +17,8 @@ class SemanticBuildVersion(workingDir: File, baseConfig: SemanticBuildVersionCon
   private val logger = LoggerFactory.getLogger(classOf[SemanticBuildVersion])
   private val adapter: JGitAdapter = JGitAdapter(workingDir)
   private val preReleaseConfig = baseConfig.preReleaseConfig
-  private val snapshotSuffix = baseConfig.snapshotSuffix
+  private val snapshotConfig = baseConfig.snapshotConfig
+  private val snapshotSuffix = snapshotConfig.suffix
   private val tagPrefix = baseConfig.tagPrefix
   private val startingVersion = Version(baseConfig.startingVersion, snapshotSuffix, preReleaseConfig)
 
@@ -183,7 +184,14 @@ class SemanticBuildVersion(workingDir: File, baseConfig: SemanticBuildVersionCon
     currentVersion.bumpVersion(getSnapshotInfo, versionComponents.getVersionComponents*)
   }
 
-  private def getSnapshotInfo = Some(Snapshot(baseConfig.snapshotSuffix, Try(adapter.getShortHash).toOption))
+  private def getSnapshotInfo = {
+    val hash =
+      if (snapshotConfig.appendCommitHash) {
+        if (snapshotConfig.useShortHash) Try(adapter.getShortHash).toOption
+        else Try(adapter.getHeadCommit.getName).toOption
+      } else None
+    Some(Snapshot(snapshotSuffix, hash))
+  }
 
   private def addDefaultComponent(versionComponent: VersionComponent) = () =>
     Seq(VersionComponent.MAJOR, VersionComponent.MINOR, VersionComponent.PATCH)

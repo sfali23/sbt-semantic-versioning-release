@@ -27,6 +27,10 @@ class StepDefinitions extends ScalaDsl with EN with Matchers {
     config = toSemanticBuildVersionConfiguration(resourceName, paths.split(",").filterNot(_.isBlank))
   }
 
+  Given("""Load snapshot config \({})""") { (conf: String) =>
+    config = config.copy(snapshotConfig = toSnapshotConfig(conf))
+  }
+
   Given("""Current branch is {string}""") { (branchName: String) =>
     if (repository.getBranchName != branchName) repository.checkoutBranch(branchName)
   }
@@ -78,16 +82,24 @@ class StepDefinitions extends ScalaDsl with EN with Matchers {
   }
 
   Then("""Generated version should be {string}""") { (expectedVersion: String) =>
+    val snapshotConfig = config.snapshotConfig
     val currentTag = adapter.getCurrentHeadTag(
       tagPrefix = config.tagPrefix,
-      snapshotSuffix = config.snapshotSuffix,
+      snapshotSuffix = snapshotConfig.suffix,
       preReleaseConfig = config.preReleaseConfig
     )
     val result =
-      if (currentTag.contains(config.snapshotSuffix)) {
-        s"$expectedVersion+${adapter.getShortHash}"
+      if (currentTag.contains(snapshotConfig.suffix)) {
+        if (snapshotConfig.appendCommitHash) {
+          val hash =
+            if (snapshotConfig.useShortHash) adapter.getShortHash
+            else adapter.getHeadCommit.getName
+
+          s"$expectedVersion+$hash"
+        } else expectedVersion
       } else expectedVersion
 
+    println(result)
     currentTag shouldBe result
   }
 

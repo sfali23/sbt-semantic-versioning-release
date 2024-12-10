@@ -30,10 +30,6 @@ object SemanticVersioningReleasePlugin extends AutoPlugin {
       "This option defines prefix to use when tagging a release. Default value is \"v\"."
     )
 
-    val snapshotSuffix = settingKey[String](
-      "This option defines the suffix for snapshot. Default value is \"SNAPSHOT\"."
-    )
-
     val forceBump = settingKey[Boolean](
       """This option defines the flag to enable forceBump. Default value is "false". This option can be set
         | via system property "sbt.release.forceBump"."""
@@ -83,6 +79,12 @@ object SemanticVersioningReleasePlugin extends AutoPlugin {
       "This option allows you to specify how the build version should be automatically bumped based on the contents of commit messages."
     )
 
+    val snapshotSuffix = settingKey[String](
+      "This option defines the suffix for snapshot. Default value is \"SNAPSHOT\"."
+    )
+
+    val snapshotConfig = settingKey[SnapshotConfig]("This option defines configuration for snapshot")
+
     val preRelease = settingKey[PreReleaseConfig]("This option defines configuration for pre-release")
 
     val hotfixBranchPattern =
@@ -98,10 +100,6 @@ object SemanticVersioningReleasePlugin extends AutoPlugin {
           .stripMargin
           .replaceNewLines
       )
-
-    object ReleaseKeys {
-      val versionToBe = AttributeKey[String]("Next version")
-    }
   }
 
   import autoImport.*
@@ -115,7 +113,6 @@ object SemanticVersioningReleasePlugin extends AutoPlugin {
       SemanticBuildVersionConfiguration(
         startingVersion = startingVersion.value,
         tagPrefix = tagPrefix.value,
-        snapshotSuffix = snapshotSuffix.value,
         forceBump = forceBump.value,
         promoteToRelease = promoteToRelease.value,
         snapshot = snapshot.value,
@@ -126,6 +123,7 @@ object SemanticVersioningReleasePlugin extends AutoPlugin {
           .value
           .map(_.toVersionComponent)
           .getOrElse(DefaultComponentToBump),
+        snapshotConfig = snapshotConfig.value,
         preReleaseConfig = preRelease.value,
         hotfixBranchPattern = DefaultHotfixBranchPattern, // TODO: populate this
         extraReleaseBranches = extraReleaseBranches.value
@@ -231,6 +229,7 @@ object SemanticVersioningReleasePlugin extends AutoPlugin {
     defaultBumpLevel := initializeDefaultBumpLevel.value,
     componentToBump := initializeComponentToBump.value,
     autoBump := AutoBump(),
+    snapshotConfig := snapshotConfig.value,
     preRelease := PreReleaseConfig(),
     hotfixBranchPattern := initializeDefaultHotFixBranchPattern.value,
     extraReleaseBranches := Seq.empty[String],

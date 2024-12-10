@@ -67,7 +67,7 @@ class SetupVersionComponentsForBump {
       VersionComponent.fromIndex(result & PRE_RELEASE.getIndex),
       VersionComponent.fromIndex(result & PROMOTE_TO_RELEASE.getIndex),
       VersionComponent.fromIndex(result & SNAPSHOT.getIndex)
-    ).toSeq.filterNot(_ == VersionComponent.NONE)
+    ).toSeq
 
   def addComponentIfRequired(
     versionComponent: VersionComponent,
