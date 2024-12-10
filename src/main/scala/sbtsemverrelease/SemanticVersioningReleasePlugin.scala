@@ -80,10 +80,6 @@ object SemanticVersioningReleasePlugin extends AutoPlugin {
       "This option allows you to specify how the build version should be automatically bumped based on the contents of commit messages."
     )
 
-    val snapshotSuffix = settingKey[String](
-      "This option defines the suffix for snapshot. Default value is \"SNAPSHOT\"."
-    )
-
     val snapshotConfig = settingKey[SnapshotConfig]("This option defines configuration for snapshot")
 
     val preRelease = settingKey[PreReleaseConfig]("This option defines configuration for pre-release")
@@ -213,7 +209,6 @@ object SemanticVersioningReleasePlugin extends AutoPlugin {
     releaseVersionFile := initializeReleaseVersionFile.value,
     startingVersion := getStartingVersion.value,
     tagPrefix := DefaultTagPrefix,
-    snapshotSuffix := DefaultSnapshotSuffix,
     forceBump := initializeSettingFromSystemProperty(
       ForceBumpSystemPropertyName,
       DefaultForceBump
@@ -245,6 +240,7 @@ object SemanticVersioningReleasePlugin extends AutoPlugin {
     releaseVersion := { _ =>
       determineVersion.value: @sbtUnchecked
     },
+    releaseNextVersion := { _ => "" },
     releaseProcess := Seq[ReleaseStep](
       checkSnapshotDependencies,
       inquireVersions,
