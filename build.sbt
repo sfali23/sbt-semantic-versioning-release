@@ -36,7 +36,8 @@ lazy val `sbt-semantic-versioning-release` = project
         "-Dsbt.ivy.home=" + sbt.Keys.ivyPaths.value.ivyHome.getOrElse("~/.ivy2")
       )
     },
-    coverageEnabled := true,
+    ThisBuild / coverageEnabled := true,
+    ThisBuild / coverageMinimumStmtTotal := 90.0,
     CucumberPlugin.glues := List("steps"),
     addSbtPlugin("com.github.gseitz" % "sbt-release" % "1.0.13"),
     libraryDependencies ++= Seq(
@@ -57,5 +58,5 @@ lazy val `sbt-semantic-versioning-release` = project
 
 addCommandAlias(
   "ctt",
-  "clean; coverageOn; test; cucumber; coverageReport; coverageAggregate; coverageOff"
+  "clean; coverageOn; test; cucumber; scripted; coverageReport; coverageAggregate; coverageOff"
 )
