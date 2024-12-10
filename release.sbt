@@ -5,5 +5,10 @@ releaseProcess := Seq[ReleaseStep](
   inquireVersions,
   runClean,
   releaseStepCommandAndRemaining("^ ct"),
-  setReleaseVersion
+  setReleaseVersion,
+  tagRelease,
+  publishArtifacts,
+  releaseStepCommand("publishSigned"),
+  releaseStepCommand("sonatypeBundleRelease"),
+  pushChanges
 )
