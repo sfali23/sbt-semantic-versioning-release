@@ -7,6 +7,7 @@ import sbt.Keys.*
 import sbt.*
 import sbtrelease.ReleasePlugin
 import sbtrelease.ReleasePlugin.autoImport.*
+import sbtrelease.ReleasePlugin.runtimeVersion
 import sbtrelease.ReleaseStateTransformations.*
 
 import java.io.File
@@ -240,6 +241,7 @@ object SemanticVersioningReleasePlugin extends AutoPlugin {
         config
       ).determineVersion
     },
+    releaseTagName := s"${tagPrefix.value}${runtimeVersion.value}",
     releaseVersion := { _ =>
       determineVersion.value: @sbtUnchecked
     },
