@@ -34,26 +34,6 @@ public enum VersionComponent {
         return index;
     }
 
-    public boolean isMajor() {
-        return index == 0;
-    }
-
-    public boolean isMinor() {
-        return index == 1;
-    }
-
-    public boolean isPatch() {
-        return index == 2;
-    }
-
-    public boolean isPreRelease() {
-        return index == 3;
-    }
-
-    public boolean isNone() {
-        return index == -1;
-    }
-
     public static VersionComponent fromIndex(int index) {
         return indexToComponent.get(index);
     }

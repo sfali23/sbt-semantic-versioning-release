@@ -22,9 +22,7 @@ case class SemanticBuildVersionConfiguration(
 
   private lazy val releaseBranches: Set[String] = (extraReleaseBranches ++ DefaultReleaseBranches).toSet
 
-  def isAutobumpEnabled: Boolean = autoBump.isEnabled
+  def isAutoBumpEnabled: Boolean = autoBump.isEnabled
 
   def isReleaseBranch(branchName: String): Boolean = releaseBranches.contains(branchName)
-
-  def isHotFixBranch(branchName: String): Boolean = hotfixBranchPattern.nonEmpty(branchName)
 }

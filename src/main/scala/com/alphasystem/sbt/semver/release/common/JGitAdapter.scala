@@ -19,8 +19,6 @@ class JGitAdapter(workingDir: File) {
   lazy val repository: Repository = _repository
   lazy val git = new Git(_repository)
 
-  def directory: File = _repository.getDirectory
-
   def getHeadCommit: ObjectId = repository.resolve(Constants.HEAD)
 
   def getShortHash: String = repository.newObjectReader().abbreviate(getHeadCommit).name()
@@ -28,18 +26,6 @@ class JGitAdapter(workingDir: File) {
   def getCurrentBranch: String = repository.getBranch
 
   def getRevWalk: RevWalk = new RevWalk(repository)
-
-  def getTags: Map[String, Ref] = _repository
-    .getRefDatabase
-    .getRefsByPrefix(Constants.R_TAGS)
-    .asScala
-    .toList
-    .map { ref =>
-      ref.getName.replaceAll(Constants.R_TAGS, "") -> ref
-    }
-    .toMap
-
-  def getAllTags: Seq[String] = getTags.values.map(_.getName.replaceAll(Constants.R_TAGS, "")).toList
 
   def getTagsForCurrentBranch: Seq[String] = {
     val tags =
@@ -61,19 +47,6 @@ class JGitAdapter(workingDir: File) {
 
       case _ => Seq.empty
     }
-  }
-
-  def getTagsPointsAtHead: Option[String] = {
-    val headCommit = getRevWalk.parseCommit(getHeadCommit)
-    (if (Option(headCommit).nonEmpty) {
-       git.tagList().call().asScala.flatMap { tagRef =>
-         val taggedCommitId = getRevWalk.parseCommit(tagRef.getNonNullObjectId)
-
-         if (headCommit.getId == taggedCommitId.getId) {
-           Some(tagRef.getName.replaceAll(Constants.R_TAGS, ""))
-         } else None
-       }
-     } else Seq.empty).headOption
   }
 
   def getCommits: List[String] =

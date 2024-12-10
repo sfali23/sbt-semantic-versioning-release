@@ -335,16 +335,14 @@ tagPattern := "^foo".r
 [[id_version_matching]]
 ==== versionMatching
 This option is similar in function to <<id_tag_pattern, `tagPattern`>>, except that it allows you to restrict the set of tags
-considered, based on the explicitly-specified major, minor, or patch versions. When specifying a version component to match,
-preceding components (if any) must also be specified. While the effect of `versionMatching` can also be accomplished by `tagPattern`,
+considered, based on the explicitly-specified major, minor, or patch versions.When specifying a version component to match,
+preceding components (if any) must also be specified.While the effect of `versionMatching` can also be accomplished by `tagPattern`,
 `versionMatching` provides a more convenient way to restrict the set of considered tags based on versions alone.
 
 .Only tags with major-version `2` should be considered:
 ====
 [source,sbt]
 ----
-import sbtsemverrelease.VersionsMatching
-
 versionMatching := VersionsMatching(major = 2)
 ----
 ====
@@ -353,8 +351,6 @@ versionMatching := VersionsMatching(major = 2)
 ====
 [source,sbt]
 ----
-import sbtsemverrelease.VersionsMatching
-
 versionMatching := VersionsMatching(major = 1, minor = 2)
 ----
 ====
@@ -363,8 +359,6 @@ versionMatching := VersionsMatching(major = 1, minor = 2)
 ====
 [source,sbt]
 ----
-import sbtsemverrelease.VersionsMatching
-
 versionMatching := VersionsMatching(major = 1, minor = 2, patch = 0)
 ----
 ====
@@ -373,8 +367,6 @@ versionMatching := VersionsMatching(major = 1, minor = 2, patch = 0)
 ====
 [source,sbt]
 ----
-import sbtsemverrelease.VersionsMatching
-
 versionMatching := VersionsMatching(patch = 2)
 ----
 ====

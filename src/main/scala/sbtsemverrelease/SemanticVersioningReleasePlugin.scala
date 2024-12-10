@@ -149,7 +149,7 @@ object SemanticVersioningReleasePlugin extends AutoPlugin {
         case Nil => DefaultStartingVersion
 
         case head :: _ =>
-          if (VersioningHelper.isValidStartingVersion(head))
+          if (isValidStartingVersion(head))
             head
           else DefaultStartingVersion
       }

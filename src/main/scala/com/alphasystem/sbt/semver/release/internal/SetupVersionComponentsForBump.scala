@@ -52,8 +52,6 @@ class SetupVersionComponentsForBump {
   def hasEssentialComponents: Boolean = hasMajor || hasMinor || hasGivenComponent(PATCH) || hasPromoteToRelease ||
     hasGivenComponent(PRE_RELEASE) || hasGivenComponent(HOT_FIX)
 
-  def isEmpty: Boolean = result == NONE.getIndex
-
   def reset(): SetupVersionComponentsForBump = {
     result = NONE.getIndex
     this
@@ -88,10 +86,6 @@ class SetupVersionComponentsForBump {
 
   private def hasGivenComponent(versionComponent: VersionComponent) =
     (result & versionComponent.getIndex) == versionComponent.getIndex
-
-  override def toString: String =
-    s"""SetupVersionComponentsForBump(MAJOR = ${hasGivenComponent(VersionComponent.MAJOR)},
-       |PROMOTE_TO_RELEASE = ${hasGivenComponent(VersionComponent.PROMOTE_TO_RELEASE)})""".stripMargin.replaceNewLines
 }
 
 object SetupVersionComponentsForBump {

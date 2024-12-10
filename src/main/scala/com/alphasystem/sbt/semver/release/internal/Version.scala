@@ -24,8 +24,6 @@ case class Version(
 
   def isPreRelease: Boolean = preRelease.isDefined
 
-  def isSnapshot: Boolean = snapshot.isDefined
-
   private def bumpMajor: Version = {
     if (preRelease.nonEmpty) {
       throw new IllegalArgumentException("Current version is a a pre-release.")

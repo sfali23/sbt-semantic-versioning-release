@@ -107,7 +107,7 @@ class SemanticBuildVersion(workingDir: File, baseConfig: SemanticBuildVersionCon
 
       // if we have auto bump enabled, there is(are) previous tag(s), and if there are commits added between last tag
       // and current head, then if components to bump are empty at the end of process, then bump default configured bump level
-      val forcePush = baseConfig.isAutobumpEnabled && maybeLatestVersion.isDefined && hasCommits
+      val forcePush = baseConfig.isAutoBumpEnabled && maybeLatestVersion.isDefined && hasCommits
       bumpVersion(forcePush, currentVersion, hotfixRequired, snapshotRequired, versionComponents)
     }
 
