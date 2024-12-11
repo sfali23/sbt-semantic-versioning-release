@@ -6,9 +6,9 @@ releaseProcess := Seq[ReleaseStep](
   runClean,
   runTest,
   setReleaseVersion,
-  tagRelease,
+  // tagRelease,
   publishArtifacts,
   releaseStepCommand("publishSigned"),
-  releaseStepCommand("sonatypeBundleRelease"),
-  pushChanges
+  releaseStepCommand("sonatypeBundleRelease")
+  // pushChanges
 )

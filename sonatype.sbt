@@ -1,8 +1,17 @@
-import xerial.sbt.Sonatype.*
+import xerial.sbt.Sonatype.GitHubHosting
+
+import java.util.Base64
+
+def getEnvVariable(name: String) = new String(Base64.getDecoder.decode(System.getenv(name).getBytes))
 
 sonatypeRepository := "https://s01.oss.sonatype.org/service/local"
 sonatypeCredentialHost := "s01.oss.sonatype.org"
-credentials += Credentials(Path.userHome / ".sbt" / "sonatype-credentials")
+credentials += Credentials(
+  realm = "Sonatype Nexus Repository Manager",
+  host = "s01.oss.sonatype.org",
+  userName = getEnvVariable("SONATYPE_USERNAME"),
+  passwd = getEnvVariable("SONATYPE_PASSWORD")
+)
 publishTo := sonatypePublishToBundle.value
 sonatypeProjectHosting := Some(
   GitHubHosting(
