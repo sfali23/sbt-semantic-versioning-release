@@ -24,7 +24,7 @@ class PreReleaseConfigSpec extends AnyFunSuite {
     "Having leading zeros in prerelease part should result in failed validation"
   ) {
     val caught =
-      intercept[IllegalArgumentException](Version("1.0.0-RC.01", DefaultSnapshotSuffix, PreReleaseConfig()))
+      intercept[IllegalArgumentException](Version("1.0.0-RC.01", DefaultSnapshotPrefix, PreReleaseConfig()))
     assert(
       caught.getMessage === "Invalid version: 1.0.0-RC.01"
     )

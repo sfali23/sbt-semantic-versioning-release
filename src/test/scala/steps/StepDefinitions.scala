@@ -85,11 +85,11 @@ class StepDefinitions extends ScalaDsl with EN with Matchers {
     val snapshotConfig = config.snapshotConfig
     val currentTag = adapter.getCurrentHeadTag(
       tagPrefix = config.tagPrefix,
-      snapshotSuffix = snapshotConfig.suffix,
+      snapshotSuffix = snapshotConfig.prefix,
       preReleaseConfig = config.preReleaseConfig
     )
     val result =
-      if (currentTag.contains(snapshotConfig.suffix)) {
+      if (currentTag.contains(snapshotConfig.prefix)) {
         if (snapshotConfig.appendCommitHash) {
           val hash =
             if (snapshotConfig.useShortHash) adapter.getShortHash

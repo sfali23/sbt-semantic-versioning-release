@@ -8,7 +8,7 @@ package object release {
 
   val DefaultStartingVersion: String = "0.1.0"
   val DefaultTagPrefix: String = "v"
-  val DefaultSnapshotSuffix: String = "SNAPSHOT"
+  val DefaultSnapshotPrefix: String = "SNAPSHOT"
   val DefaultForceBump: Boolean = false
   val DefaultPromoteToRelease: Boolean = false
   val DefaultSnapshot: Boolean = false

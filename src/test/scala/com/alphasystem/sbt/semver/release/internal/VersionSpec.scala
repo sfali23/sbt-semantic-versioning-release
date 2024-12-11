@@ -17,15 +17,15 @@ class VersionSpec extends AnyWordSpec with Matchers {
   "Version parser" should {
 
     "parse simple version" in {
-      Version("0.12.345", DefaultSnapshotSuffix, PreReleaseConfig()) shouldBe Version(0, 12, 345)
+      Version("0.12.345", DefaultSnapshotPrefix, PreReleaseConfig()) shouldBe Version(0, 12, 345)
     }
 
     "parse hot fix version" in {
-      Version("1.89.22.1", DefaultSnapshotSuffix, PreReleaseConfig()) shouldBe Version(1, 89, 22, Some(1))
+      Version("1.89.22.1", DefaultSnapshotPrefix, PreReleaseConfig()) shouldBe Version(1, 89, 22, Some(1))
     }
 
     "parse pre-release version" in {
-      Version("1.89.22-RC.5", DefaultSnapshotSuffix, preReleaseConfig) shouldBe
+      Version("1.89.22-RC.5", DefaultSnapshotPrefix, preReleaseConfig) shouldBe
         Version(
           1,
           89,
@@ -36,30 +36,30 @@ class VersionSpec extends AnyWordSpec with Matchers {
     }
 
     "parse snapshot version without meta info" in {
-      Version("2.123.7-SNAPSHOT", DefaultSnapshotSuffix, preReleaseConfig) shouldBe
-        Version(2, 123, 7, snapshot = Some(Snapshot(DefaultSnapshotSuffix)), preReleaseConfig = preReleaseConfig)
+      Version("2.123.7-SNAPSHOT", DefaultSnapshotPrefix, preReleaseConfig) shouldBe
+        Version(2, 123, 7, snapshot = Some(Snapshot(DefaultSnapshotPrefix)), preReleaseConfig = preReleaseConfig)
     }
 
     "parse snapshot version wit meta info" in {
-      Version("0.45.799-SNAPSHOT+abcde", DefaultSnapshotSuffix, preReleaseConfig) shouldBe
+      Version("0.45.799-SNAPSHOT+abcde", DefaultSnapshotPrefix, preReleaseConfig) shouldBe
         Version(
           0,
           45,
           799,
-          snapshot = Some(Snapshot(DefaultSnapshotSuffix, Some("abcde"))),
+          snapshot = Some(Snapshot(DefaultSnapshotPrefix, Some("abcde"))),
           preReleaseConfig = preReleaseConfig
         )
     }
 
     "parse version containing both pre-release followed by snapshot" in {
-      Version("6.0.13-RC.3-SNAPSHOT+abcd", DefaultSnapshotSuffix, preReleaseConfig) shouldBe
+      Version("6.0.13-RC.3-SNAPSHOT+abcd", DefaultSnapshotPrefix, preReleaseConfig) shouldBe
         Version(
           6,
           0,
           13,
           None,
           Some(PreReleaseVersion("RC.", 3)),
-          Some(Snapshot(DefaultSnapshotSuffix, Some("abcd"))),
+          Some(Snapshot(DefaultSnapshotPrefix, Some("abcd"))),
           preReleaseConfig
         )
     }
@@ -68,12 +68,12 @@ class VersionSpec extends AnyWordSpec with Matchers {
   "Version sort" should {
     "compare simple version" in {
       val actual = Seq(
-        Version("0.12.346", DefaultSnapshotSuffix, preReleaseConfig),
-        Version("0.12.345-RC.2", DefaultSnapshotSuffix, preReleaseConfig),
-        Version("0.12.346.1", DefaultSnapshotSuffix, preReleaseConfig),
-        Version("1.89.22-RC.5", DefaultSnapshotSuffix, preReleaseConfig),
-        Version("0.12.345", DefaultSnapshotSuffix, preReleaseConfig),
-        Version("0.12.345-RC.1", DefaultSnapshotSuffix, preReleaseConfig)
+        Version("0.12.346", DefaultSnapshotPrefix, preReleaseConfig),
+        Version("0.12.345-RC.2", DefaultSnapshotPrefix, preReleaseConfig),
+        Version("0.12.346.1", DefaultSnapshotPrefix, preReleaseConfig),
+        Version("1.89.22-RC.5", DefaultSnapshotPrefix, preReleaseConfig),
+        Version("0.12.345", DefaultSnapshotPrefix, preReleaseConfig),
+        Version("0.12.345-RC.1", DefaultSnapshotPrefix, preReleaseConfig)
       ).sorted.map(_.toStringValue)
       val expected = Seq("1.89.22-RC.5", "0.12.346.1", "0.12.346", "0.12.345", "0.12.345-RC.2", "0.12.345-RC.1")
       actual shouldBe expected
@@ -81,13 +81,13 @@ class VersionSpec extends AnyWordSpec with Matchers {
 
     "sort versions" in {
       val actual = Seq(
-        Version("0.1.0", DefaultSnapshotSuffix, preReleaseConfig),
-        Version("0.2.0", DefaultSnapshotSuffix, preReleaseConfig),
-        Version("0.2.1", DefaultSnapshotSuffix, preReleaseConfig),
-        Version("1.0.0", DefaultSnapshotSuffix, preReleaseConfig),
-        Version("1.1.0", DefaultSnapshotSuffix, preReleaseConfig),
-        Version("1.1.0-RC.1", DefaultSnapshotSuffix, preReleaseConfig),
-        Version("1.1.0-RC.2", DefaultSnapshotSuffix, preReleaseConfig)
+        Version("0.1.0", DefaultSnapshotPrefix, preReleaseConfig),
+        Version("0.2.0", DefaultSnapshotPrefix, preReleaseConfig),
+        Version("0.2.1", DefaultSnapshotPrefix, preReleaseConfig),
+        Version("1.0.0", DefaultSnapshotPrefix, preReleaseConfig),
+        Version("1.1.0", DefaultSnapshotPrefix, preReleaseConfig),
+        Version("1.1.0-RC.1", DefaultSnapshotPrefix, preReleaseConfig),
+        Version("1.1.0-RC.2", DefaultSnapshotPrefix, preReleaseConfig)
       ).sorted.map(_.toStringValue)
       val expected = Seq("1.1.0", "1.1.0-RC.2", "1.1.0-RC.1", "1.0.0", "0.2.1", "0.2.0", "0.1.0")
       actual shouldBe expected

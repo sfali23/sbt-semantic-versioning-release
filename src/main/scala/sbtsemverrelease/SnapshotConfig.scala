@@ -1,8 +1,8 @@
 package sbtsemverrelease
 
-import com.alphasystem.sbt.semver.release.DefaultSnapshotSuffix
+import com.alphasystem.sbt.semver.release.DefaultSnapshotPrefix
 
 case class SnapshotConfig(
-  suffix: String = DefaultSnapshotSuffix,
+  prefix: String = DefaultSnapshotPrefix,
   appendCommitHash: Boolean = true,
   useShortHash: Boolean = true)

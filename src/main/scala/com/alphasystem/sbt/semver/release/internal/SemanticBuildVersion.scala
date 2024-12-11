@@ -18,7 +18,7 @@ class SemanticBuildVersion(workingDir: File, baseConfig: SemanticBuildVersionCon
   private val adapter: JGitAdapter = JGitAdapter(workingDir)
   private val preReleaseConfig = baseConfig.preReleaseConfig
   private val snapshotConfig = baseConfig.snapshotConfig
-  private val snapshotSuffix = snapshotConfig.suffix
+  private val snapshotSuffix = snapshotConfig.prefix
   private val tagPrefix = baseConfig.tagPrefix
   private val startingVersion = Version(baseConfig.startingVersion, snapshotSuffix, preReleaseConfig)
 
