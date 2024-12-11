@@ -26,11 +26,14 @@ case class AutoBump(
 
   private def matchValue(input: String, regex: Option[Regex]): Boolean = {
     // git command line put commit message withing quotation park and if regex has '^', then matching doesn't work
-    // remove starting "
+    // remove starting and end quotation (")
     val result =
-      Option(input)
+      Option(input.trim)
         .map { r =>
-          if (input.startsWith("\"")) r.replaceFirst("\"", "") else r
+          if (input.startsWith("\"")) r.drop(0) else r
+        }
+        .map { r =>
+          if (input.endsWith("\"")) r.dropRight(0) else r
         }
         .getOrElse("")
     regex.exists(_.nonEmpty(result))

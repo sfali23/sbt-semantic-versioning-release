@@ -48,8 +48,6 @@ package object release {
   }
 
   implicit class RegexOps(src: Regex) {
-    def isEmpty(source: String): Boolean = src.findFirstIn(source).isEmpty
-
     def nonEmpty(source: String): Boolean = src.findFirstIn(source).nonEmpty
   }
 
