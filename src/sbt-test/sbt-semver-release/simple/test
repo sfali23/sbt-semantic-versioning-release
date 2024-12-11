@@ -24,8 +24,12 @@
 $ exec git init .
 > update
 $ exec git add .
-$ exec git commit -m "initial commit with bump _major_ version"
+$ exec git commit -m "initial commit"
 > compile
 > release with-defaults
-> checkContentsOfVersionSbt 1.0.0-SNAPSHOT
-$ exists target/scala-2.12/simple_2.12-1.0.0-SNAPSHOT.jar
+$ touch sample.txt
+$ exec git add sample.txt
+$ exec git commit -m "bump _major_ version, custom pattern"
+> release with-defaults
+> checkContentsOfVersionSbt 1.0.0
+$ exists target/scala-2.12/simple_2.12-1.0.0.jar

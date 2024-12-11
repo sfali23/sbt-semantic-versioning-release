@@ -22,7 +22,7 @@
 #################################################################################
 # Initial commit with no pattern in commit message, then sample.txt with pattern in commit message (this
 # will be treated as patch version), then commit another file with "[minor]" pattern
-# final version will be 0.2.1, patch version will take precedence
+# final version will be 0.3.0
 $ exec git init .
 > update
 $ exec git add .
@@ -36,4 +36,4 @@ $ touch sample2.txt
 $ exec git add sample2.txt
 $ exec git commit -m "with [minor] update"
 > release with-defaults
-> checkContentsOfVersionSbt 0.2.1
+> checkContentsOfVersionSbt 0.3.0
