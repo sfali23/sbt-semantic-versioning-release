@@ -28,11 +28,9 @@ class StepDefinitions extends ScalaDsl with EN with Matchers {
   }
 
   Given("""Current branch is {string}""") { (branchName: String) =>
-    println(s">>>> ${repository.getBranchName}")
     if (repository.getBranchName != branchName) Try(repository.checkoutBranch(branchName)) match {
-      case Failure(ex) if branchName == "main" =>
-        println(ex.getMessage)
-        repository.checkoutBranch("master")
+      case Failure(_) if branchName == "main" =>
+        repository.checkout("master")
 
       case _ =>
     }
