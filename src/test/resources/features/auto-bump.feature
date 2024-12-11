@@ -288,3 +288,25 @@ Feature: Branch with Auto bump repository
       | minor            | false     | 0.6.0           |
       | major            | true      | 1.0.0           |
       | major            | false     | 1.0.0           |
+
+  @auto-bump @new
+  Scenario Outline: Custom commit messages
+    Given Record main branch
+    And Load semantic build config from ({autoBump={majorPattern="^BREAKING[- ]CHANGE:", minorPattern="^feat:", patchPattern="^fix:"}})
+    And Following annotated: <annotated> tags (v0.5.1) has been created
+    And Branch 'test' is created and checked out
+    When Make changes and commit with message: '<componentToBump> custom commit pattern'
+    And Main branch is checked out
+    And Merge branch 'test' into current branch
+    And A tag with annotated: (<annotated>) flag is created
+    Then Generated version should be '<expectedVersion>'
+    And Close resources
+
+    Examples:
+      | componentToBump   | annotated | expectedVersion |
+      | fix:              | true      | 0.5.2           |
+      | fix:              | false     | 0.5.2           |
+      | feat:             | true      | 0.6.0           |
+      | feat:             | false     | 0.6.0           |
+      | BREAKING CHANGE:  | true      | 1.0.0           |
+      | BREAKING CHANGE:  | false     | 1.0.0           |
