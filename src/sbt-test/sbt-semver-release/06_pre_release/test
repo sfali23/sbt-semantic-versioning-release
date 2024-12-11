@@ -1,0 +1,50 @@
+#################################################################################
+# sbt scripted plugin testing syntax conventions:
+# #                      ==> starts a one-line comment
+# > {sbt command}        ==> sends a task to sbt (and tests if it succeeds)
+# -> {sbt command}       ==> sends a task to sbt, but expects it to fail
+# $ {file command} arg*  ==> performs a file command (and tests if it succeeds)
+# -$ {file command} arg* ==> performs a file command, but expects it to fail
+# File commands are:
+# touch path+               ==> creates or updates the timestamp on the files
+# delete path+              ==> deletes the files
+# exists path+              ==> checks if the files exist
+# mkdir path+               ==> creates dirs
+# absent path+              ==> checks if the files don’t exist
+# newer source target       ==> checks if source is newer
+# must-mirror source target ==> checks if source is identical to target
+# pause                     ==> pauses until enter is pressed
+# sleep time                ==> sleeps (in milliseconds)
+# exec command args*        ==> runs the command in another process
+# copy-file fromPath toPath ==> copies the file
+# copy fromPath+ toDir      ==> copies the paths to toDir preserving relative structure
+# copy-flat fromPath+ toDir ==> copies the paths to toDir flat
+#################################################################################
+# Make sure compilation works
+$ exec git init .
+$ exec git config user.email "f.syed.ali@gmail.com"
+$ exec git config user.name "Syed Ali"
+> update
+$ exec git add .
+$ exec git commit -m "initial commit"
+> release with-defaults
+$ touch sample.txt
+$ exec git add sample.txt
+$ exec git commit -m "[new-pre-release] with [major] bump"
+> release with-defaults
+> checkContentsOfVersionSbt 1.0.0-RC.1
+$ touch sample1.txt
+$ exec git add sample1.txt
+$ exec git commit -m "[minor] bump will be ignored"
+> release with-defaults
+> checkContentsOfVersionSbt 1.0.0-RC.2
+$ touch sample2.txt
+$ exec git add sample2.txt
+$ exec git commit -m "another pre-release bump"
+> release with-defaults
+> checkContentsOfVersionSbt 1.0.0-RC.3
+$ touch sample3.txt
+$ exec git add sample3.txt
+$ exec git commit -m "[promote] to release"
+> release with-defaults
+> checkContentsOfVersionSbt 1.0.0

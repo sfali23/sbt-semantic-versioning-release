@@ -71,7 +71,7 @@ releaseTagName := s"${tagPrefix.value}${runtimeVersion.value}"
 
 [[id_component_to_bump]]
 === componentToBump
-This property bumps the version. It can be set to the values `MAJOR`, `MINOR`, or `PATCH`. This property is **required** if you are using <<id_forcebump, force bump>>. This property has no effect when using <<id_autobump_on_commit, auto-bump>>.
+This property bumps the version. It can be set to the values `MAJOR`, `MINOR`, or `PATCH`. This property is **required** if you are using <<id_forcebump, force bump>>. This property has no effect when using <<id_autobump_on_commit, auto-bump>>. This property can be set via system property *sbt.release.componentToBump*.
 
 Assuming that the base version is `x.y.z`, and the value of `componentToBump` is:
 
