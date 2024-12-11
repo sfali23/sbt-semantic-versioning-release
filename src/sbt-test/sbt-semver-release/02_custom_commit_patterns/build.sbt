@@ -8,7 +8,7 @@ publishTo := Some(Resolver.file("file", new File(".")))
 lazy val root = (project in file("."))
   .settings(
     organization := "com.example",
-    name := "simple",
+    name := "02_custom_commit_patterns",
     ThisBuild / version := "0.1.0-SNAPSHOT",
     autoBump := AutoBump(majorPattern = Some("_major_".r)),
     Global / onChangedBuildSource := ReloadOnSourceChanges,
