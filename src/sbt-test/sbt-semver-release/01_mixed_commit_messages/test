@@ -31,6 +31,7 @@ $ exec git add .
 $ exec git commit -m "initial commit"
 > compile
 > release with-defaults
+# version should be 0.2.0, since startingVersion is 0.2.0
 $ touch sample.txt
 $ exec git add sample.txt
 $ exec git commit -m "with no pattern in commit message"

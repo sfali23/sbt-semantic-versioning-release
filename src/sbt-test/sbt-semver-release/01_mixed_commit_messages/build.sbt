@@ -8,7 +8,7 @@ publishTo := Some(Resolver.file("file", new File(".")))
 lazy val root = (project in file("."))
   .settings(
     organization := "com.example",
-    name := "patch-then-minor",
+    name := "01_mixed_commit_messages",
     startingVersion := "0.2.0",
     Global / onChangedBuildSource := ReloadOnSourceChanges,
     releaseProcess := Seq[ReleaseStep](
