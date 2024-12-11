@@ -10,7 +10,11 @@ lazy val root = (project in file("."))
     organization := "com.example",
     name := "02_custom_commit_patterns",
     ThisBuild / version := "0.1.0-SNAPSHOT",
-    autoBump := AutoBump(majorPattern = Some("_major_".r)),
+    autoBump := AutoBump(
+      majorPattern = Some("^BREAKING[- ]CHANGE:".r),
+      minorPattern = Some("^feat:".r),
+      patchPattern = Some("^fix:".r)
+    ),
     Global / onChangedBuildSource := ReloadOnSourceChanges,
     releaseProcess := Seq[ReleaseStep](
       checkSnapshotDependencies,

@@ -27,11 +27,19 @@ $ exec git config user.name "Syed Ali"
 > update
 $ exec git add .
 $ exec git commit -m "initial commit"
-> compile
 > release with-defaults
 $ touch sample.txt
 $ exec git add sample.txt
-$ exec git commit -m "bump _major_ version, custom pattern"
+$ exec git commit -m "BREAKING CHANGE: major bump"
 > release with-defaults
 > checkContentsOfVersionSbt 1.0.0
-$ exists target/scala-2.12/simple_2.12-1.0.0.jar
+$ touch sample1.txt
+$ exec git add sample1.txt
+$ exec git commit -m "feat: minor bump"
+> release with-defaults
+> checkContentsOfVersionSbt 1.1.0
+$ touch sample2.txt
+$ exec git add sample2.txt
+$ exec git commit -m "fix: patch bump"
+> release with-defaults
+> checkContentsOfVersionSbt 1.1.1
