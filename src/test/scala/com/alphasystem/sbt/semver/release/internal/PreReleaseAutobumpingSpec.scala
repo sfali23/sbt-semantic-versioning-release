@@ -6,7 +6,6 @@ import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.prop.TableDrivenPropertyChecks
 
-// Working
 class PreReleaseAutobumpingSpec extends AnyFunSuite with TableDrivenPropertyChecks with Matchers {
 
   forAll(AnnotatedTestData) { (annotated: Boolean) =>

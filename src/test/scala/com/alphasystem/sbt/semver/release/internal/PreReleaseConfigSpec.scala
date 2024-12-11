@@ -7,7 +7,6 @@ package internal
 import org.scalatest.funsuite.AnyFunSuite
 import sbtsemverrelease.PreReleaseConfig
 
-// Working
 class PreReleaseConfigSpec extends AnyFunSuite {
 
   test("Providing valid data should result in providing pattern") {

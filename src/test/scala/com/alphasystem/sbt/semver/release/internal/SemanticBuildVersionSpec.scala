@@ -7,7 +7,6 @@ import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.prop.TableDrivenPropertyChecks
 
-// Working
 class SemanticBuildVersionSpec extends AnyFunSpec with TableDrivenPropertyChecks with Matchers {
 
   describe("test various latest version variants") {
