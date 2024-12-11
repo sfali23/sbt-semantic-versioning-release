@@ -235,7 +235,7 @@ Feature: Branch with Auto bump repository
   @auto-bump
   Scenario Outline: Override tagPrefix will generate tags with given prefix
     Given Current branch is 'main'
-    And Read build config from resource 'configs/auto-bump' at paths (tagPrefix)
+    And Load semantic build config from ({tagPrefix=alpha.})
     And Following annotated: <annotated> tags (alpha.0.1.0) has been created
     And Branch 'test' is created and checked out
     When Make changes and commit with message: '[major] version update'
@@ -253,7 +253,7 @@ Feature: Branch with Auto bump repository
   @auto-bump
   Scenario Outline: Ignore unmatched tags with prefix other than configured prefix
     Given Current branch is 'main'
-    And Read build config from resource 'configs/auto-bump' at paths (tagPrefix)
+    And Load semantic build config from ({tagPrefix=alpha.})
     And Following annotated: <annotated> tags (v.0.1.0,alpha.0.1.0,v1.0.0) has been created
     And Branch 'test' is created and checked out
     When Make changes and commit with message: '[major] version update'

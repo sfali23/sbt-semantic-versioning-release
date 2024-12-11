@@ -46,9 +46,9 @@ package object test {
 
   implicit class JGitAdapterOps(src: JGitAdapter) {
     def getCurrentHeadTag(
-                           tagPrefix: String = DefaultTagPrefix,
-                           snapshotSuffix: String = DefaultSnapshotPrefix,
-                           preReleaseConfig: PreReleaseConfig = PreReleaseConfig()
+      tagPrefix: String = DefaultTagPrefix,
+      snapshotSuffix: String = DefaultSnapshotPrefix,
+      preReleaseConfig: PreReleaseConfig = PreReleaseConfig()
     ): String =
       src
         .getTagsForCurrentBranch
@@ -107,14 +107,14 @@ package object test {
 
     def toSnapshotConfig: SnapshotConfig =
       SnapshotConfig(
-        prefix = src.readFailSafeString("suffix", DefaultSnapshotPrefix),
+        prefix = src.readFailSafeString("prefix", DefaultSnapshotPrefix),
         appendCommitHash = src.readFailSafeBoolean("appendCommitHash", defaultValue = true),
         useShortHash = src.readFailSafeBoolean("useShortHash", defaultValue = true)
       )
-
   }
 
-  def toSnapshotConfig(src: String): SnapshotConfig = ConfigFactory.parseString(src).toSnapshotConfig
+  def toSemanticBuildVersionConfiguration(src: String): SemanticBuildVersionConfiguration =
+    ConfigFactory.parseString(src).toSemanticBuildVersionConfiguration
 
   def toSemanticBuildVersionConfiguration(
     resourceName: String,

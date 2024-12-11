@@ -23,12 +23,8 @@ class StepDefinitions extends ScalaDsl with EN with Matchers {
     Option(value).exists(_.toBoolean)
   }
 
-  Given("""Read build config from resource {string} at paths \({})""") { (resourceName: String, paths: String) =>
-    config = toSemanticBuildVersionConfiguration(resourceName, paths.split(",").filterNot(_.isBlank))
-  }
-
-  Given("""Load snapshot config \({})""") { (conf: String) =>
-    config = config.copy(snapshotConfig = toSnapshotConfig(conf))
+  Given("""Load semantic build config from \({})""") { (conf: String) =>
+    config = toSemanticBuildVersionConfiguration(conf)
   }
 
   Given("""Current branch is {string}""") { (branchName: String) =>
