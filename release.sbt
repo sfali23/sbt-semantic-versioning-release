@@ -4,7 +4,7 @@ releaseProcess := Seq[ReleaseStep](
   checkSnapshotDependencies,
   inquireVersions,
   runClean,
-  releaseStepCommandAndRemaining("^ ct"),
+  runTest,
   setReleaseVersion,
   tagRelease,
   publishArtifacts,
