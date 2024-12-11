@@ -10,7 +10,7 @@ import org.scalatest.matchers.should.Matchers
 import java.io.File
 import java.nio.file.Files
 import java.util.UUID
-import scala.util.Try
+import scala.util.{Failure, Success, Try}
 
 class StepDefinitions extends ScalaDsl with EN with Matchers {
 
@@ -28,7 +28,14 @@ class StepDefinitions extends ScalaDsl with EN with Matchers {
   }
 
   Given("""Current branch is {string}""") { (branchName: String) =>
-    if (repository.getBranchName != branchName) repository.checkoutBranch(branchName)
+    println(s">>>> ${repository.getBranchName}")
+    if (repository.getBranchName != branchName) Try(repository.checkoutBranch(branchName)) match {
+      case Failure(ex) if branchName == "main" =>
+        println(ex.getMessage)
+        repository.checkoutBranch("master")
+
+      case _ =>
+    }
   }
 
   Given("""Following annotated: {bool} tags \({}) has been created""") { (annotated: Boolean, tags: String) =>
