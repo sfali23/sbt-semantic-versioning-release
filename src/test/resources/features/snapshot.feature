@@ -2,12 +2,12 @@ Feature: Snapshot
 
   @snapshot
   Scenario Outline: Create snapshot release with overridden prefix (Force bump)
-    Given Current branch is 'main'
+    Given Record main branch
     And Load semantic build config from ({forceBump=true, componentToBump=<bumpComponent>, snapshot=true, snapshotConfig={prefix=snapshot}})
     And Following annotated: <annotated> tags (v0.1.0) has been created
     And Branch 'test' is created and checked out
     When Make changes and commit with message: 'snapshot'
-    And Branch 'main' is checked out
+    And Main branch is checked out
     And Merge branch 'test' into current branch
     And A tag with annotated: (<annotated>) flag is created
     Then Generated version should be '<expectedVersion>'
@@ -24,12 +24,12 @@ Feature: Snapshot
 
   @snapshot
   Scenario Outline: Create snapshot release with overridden prefix and using long hash commit (Force bump)
-    Given Current branch is 'main'
+    Given Record main branch
     And Load semantic build config from ({forceBump=true, componentToBump=<bumpComponent>, snapshot=true, snapshotConfig={prefix=snapshot, useShortHash=false}})
     And Following annotated: <annotated> tags (v0.1.0) has been created
     And Branch 'test' is created and checked out
     When Make changes and commit with message: 'snapshot'
-    And Branch 'main' is checked out
+    And Main branch is checked out
     And Merge branch 'test' into current branch
     And A tag with annotated: (<annotated>) flag is created
     Then Generated version should be '<expectedVersion>'
@@ -46,12 +46,12 @@ Feature: Snapshot
 
   @snapshot
   Scenario Outline: Create snapshot release with overridden suffix and no hash commit (Force bump)
-    Given Current branch is 'main'
+    Given Record main branch
     And Load semantic build config from ({forceBump=true, componentToBump=<bumpComponent>, snapshot=true, snapshotConfig={prefix=snapshot, appendCommitHash=false}})
     And Following annotated: <annotated> tags (v0.1.0) has been created
     And Branch 'test' is created and checked out
     When Make changes and commit with message: 'snapshot'
-    And Branch 'main' is checked out
+    And Main branch is checked out
     And Merge branch 'test' into current branch
     And A tag with annotated: (<annotated>) flag is created
     Then Generated version should be '<expectedVersion>'
@@ -68,12 +68,12 @@ Feature: Snapshot
 
   @snapshot
   Scenario Outline: Create snapshot release with overridden prefix (Auto bump)
-    Given Current branch is 'main'
+    Given Record main branch
     And Load semantic build config from ({snapshot=true, snapshotConfig={prefix=snapshot}})
     And Following annotated: <annotated> tags (v0.1.0) has been created
     And Branch 'test' is created and checked out
     When Make changes and commit with message: 'snapshot creation with [<bumpComponent>]'
-    And Branch 'main' is checked out
+    And Main branch is checked out
     And Merge branch 'test' into current branch
     And A tag with annotated: (<annotated>) flag is created
     Then Generated version should be '<expectedVersion>'
@@ -90,12 +90,12 @@ Feature: Snapshot
 
   @snapshot
   Scenario Outline: Create snapshot release with overridden prefix and using long hash commit (Auto bump)
-    Given Current branch is 'main'
+    Given Record main branch
     And Load semantic build config from ({snapshot=true, snapshotConfig={prefix=snapshot, useShortHash=false}})
     And Following annotated: <annotated> tags (v0.1.0) has been created
     And Branch 'test' is created and checked out
     When Make changes and commit with message: 'snapshot with [<bumpComponent>]'
-    And Branch 'main' is checked out
+    And Main branch is checked out
     And Merge branch 'test' into current branch
     And A tag with annotated: (<annotated>) flag is created
     Then Generated version should be '<expectedVersion>'
@@ -112,12 +112,12 @@ Feature: Snapshot
 
   @snapshot
   Scenario Outline: Create snapshot release with overridden suffix and no hash commit (Auto bump)
-    Given Current branch is 'main'
+    Given Record main branch
     And Load semantic build config from ({snapshot=true, snapshotConfig={prefix=snapshot, appendCommitHash=false}})
     And Following annotated: <annotated> tags (v0.1.0) has been created
     And Branch 'test' is created and checked out
     When Make changes and commit with message: 'snapshot with [<bumpComponent>]'
-    And Branch 'main' is checked out
+    And Main branch is checked out
     And Merge branch 'test' into current branch
     And A tag with annotated: (<annotated>) flag is created
     Then Generated version should be '<expectedVersion>'

@@ -2,12 +2,12 @@ Feature: New pre-release bumping scenarios
 
   @new-pre-release
   Scenario Outline: New pre-release without any previous pre-release version will create new pre-release (Force bump)
-    Given Current branch is 'main'
+    Given Record main branch
     And Load semantic build config from ({forceBump=true, componentToBump=<bumpComponent>,newPreRelease=true,snapshot=<snapshotFlag>})
     And Following annotated: <annotated> tags (v0.1.0) has been created
     And Branch 'test' is created and checked out
     When Make changes and commit with message: 'new pre-release creation'
-    And Branch 'main' is checked out
+    And Main branch is checked out
     And Merge branch 'test' into current branch
     And A tag with annotated: (<annotated>) flag is created
     Then Generated version should be '<expectedVersion>'
@@ -30,12 +30,12 @@ Feature: New pre-release bumping scenarios
 
   @new-pre-release
   Scenario Outline: With previous pre-release version will bump pre-release version (Force bump)
-    Given Current branch is 'main'
+    Given Record main branch
     And Load semantic build config from ({forceBump=true, snapshot=<snapshotFlag>})
     And Following annotated: <annotated> tags (v0.1.0,<previousVersion>) has been created
     And Branch 'test' is created and checked out
     When Make changes and commit with message: 'bump pre-release version'
-    And Branch 'main' is checked out
+    And Main branch is checked out
     And Merge branch 'test' into current branch
     And A tag with annotated: (<annotated>) flag is created
     Then Generated version should be '<expectedVersion>'
@@ -58,12 +58,12 @@ Feature: New pre-release bumping scenarios
 
   @new-pre-release
   Scenario Outline: With current version is pre-release, promote to release (Force bump)
-    Given Current branch is 'main'
+    Given Record main branch
     And Load semantic build config from ({forceBump=true, promoteToRelease=true, snapshot=<snapshotFlag>})
     And Following annotated: <annotated> tags (v0.1.0,<previousVersion>) has been created
     And Branch 'test' is created and checked out
     When Make changes and commit with message: 'promote to release'
-    And Branch 'main' is checked out
+    And Main branch is checked out
     And Merge branch 'test' into current branch
     And A tag with annotated: (<annotated>) flag is created
     Then Generated version should be '<expectedVersion>'
@@ -86,12 +86,12 @@ Feature: New pre-release bumping scenarios
 
   @new-pre-release
   Scenario Outline: New pre-release without any previous pre-release version will create new pre-release (Auto bump)
-    Given Current branch is 'main'
+    Given Record main branch
     And Load semantic build config from ({snapshot=<snapshotFlag>})
     And Following annotated: <annotated> tags (v0.1.0) has been created
     And Branch 'test' is created and checked out
     When Make changes and commit with message: '[new-pre-release] creation with [<bumpComponent>]'
-    And Branch 'main' is checked out
+    And Main branch is checked out
     And Merge branch 'test' into current branch
     And A tag with annotated: (<annotated>) flag is created
     Then Generated version should be '<expectedVersion>'
@@ -114,12 +114,12 @@ Feature: New pre-release bumping scenarios
 
   @new-pre-release
   Scenario Outline: With previous pre-release version will bump pre-release version (Auto bump)
-    Given Current branch is 'main'
+    Given Record main branch
     And Load semantic build config from ({snapshot=<snapshotFlag>})
     And Following annotated: <annotated> tags (v0.1.0,<previousVersion>) has been created
     And Branch 'test' is created and checked out
     When Make changes and commit with message: 'bump pre-release version, [MAJOR] should be ignored'
-    And Branch 'main' is checked out
+    And Main branch is checked out
     And Merge branch 'test' into current branch
     And A tag with annotated: (<annotated>) flag is created
     Then Generated version should be '<expectedVersion>'
@@ -142,12 +142,12 @@ Feature: New pre-release bumping scenarios
 
   @new-pre-release
   Scenario Outline: With current version is pre-release, promote to release (Auto bump)
-    Given Current branch is 'main'
+    Given Record main branch
     And Load semantic build config from ({snapshot=<snapshotFlag>})
     And Following annotated: <annotated> tags (v0.1.0,<previousVersion>) has been created
     And Branch 'test' is created and checked out
     When Make changes and commit with message: '[promote] to release, [MINOR] should be ignored'
-    And Branch 'main' is checked out
+    And Main branch is checked out
     And Merge branch 'test' into current branch
     And A tag with annotated: (<annotated>) flag is created
     Then Generated version should be '<expectedVersion>'

@@ -18,6 +18,7 @@ class StepDefinitions extends ScalaDsl with EN with Matchers {
   private val repository: TestRepository = TestRepository(workingDirectory)
   private val adapter: JGitAdapter = JGitAdapter(workingDirectory)
   private var config: SemanticBuildVersionConfiguration = SemanticBuildVersionConfiguration()
+  private var mainBranchName = ""
 
   ParameterType("bool", ".*") { (value: String) =>
     Option(value).exists(_.toBoolean)
@@ -27,13 +28,8 @@ class StepDefinitions extends ScalaDsl with EN with Matchers {
     config = toSemanticBuildVersionConfiguration(conf)
   }
 
-  Given("""Current branch is {string}""") { (branchName: String) =>
-    if (repository.getBranchName != branchName) Try(repository.checkoutBranch(branchName)) match {
-      case Failure(_) if branchName == "main" =>
-        repository.checkout("master")
-
-      case _ =>
-    }
+  Given("Record main branch") { () =>
+    mainBranchName = repository.getBranchName
   }
 
   Given("""Following annotated: {bool} tags \({}) has been created""") { (annotated: Boolean, tags: String) =>
@@ -42,6 +38,10 @@ class StepDefinitions extends ScalaDsl with EN with Matchers {
 
   When("""Branch {string} is created and checked out""") { (branchName: String) =>
     repository.createAndCheckout(branchName)
+  }
+
+  When("Main branch is checked out") { () =>
+    repository.checkoutBranch(mainBranchName)
   }
 
   When("""Branch {string} is checked out""") { (branchName: String) =>
