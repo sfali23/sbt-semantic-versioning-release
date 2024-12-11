@@ -267,3 +267,24 @@ Feature: Branch with Auto bump repository
       | annotated |
       | true      |
       | false     |
+
+  @auto-bump
+  Scenario Outline: Non semantic version tags should be ignored
+    Given Current branch is 'main'
+    And Following annotated: <annotated> tags (v.0.1.0,v1.0,alpha.1.0.0,v0.5.1) has been created
+    And Branch 'test' is created and checked out
+    When Make changes and commit with message: 'version update for [<componentToBump>]'
+    And Branch 'main' is checked out
+    And Merge branch 'test' into current branch
+    And A tag with annotated: (<annotated>) flag is created
+    Then Generated version should be '<expectedVersion>'
+    And Close resources
+
+    Examples:
+      | componentToBump  | annotated | expectedVersion |
+      | patch            | true      | 0.5.2           |
+      | patch            | false     | 0.5.2           |
+      | minor            | true      | 0.6.0           |
+      | minor            | false     | 0.6.0           |
+      | major            | true      | 1.0.0           |
+      | major            | false     | 1.0.0           |

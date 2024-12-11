@@ -314,3 +314,24 @@ Feature: Branch with Force bump repository
       | true      |
       | false     |
 
+  @force-bump
+  Scenario Outline: Non semantic version tags should be ignored
+    Given Current branch is 'main'
+    And Load semantic build config from ({forceBump=true, componentToBump=<componentToBump>})
+    And Following annotated: <annotated> tags (v.0.1.0,v1.0,alpha.1.0.0,v0.5.1) has been created
+    And Branch 'test' is created and checked out
+    When Make changes and commit with message: 'version update'
+    And Branch 'main' is checked out
+    And Merge branch 'test' into current branch
+    And A tag with annotated: (<annotated>) flag is created
+    Then Generated version should be '<expectedVersion>'
+    And Close resources
+
+    Examples:
+    | componentToBump  | annotated | expectedVersion |
+    | PATCH            | true      | 0.5.2           |
+    | PATCH            | false     | 0.5.2           |
+    | MINOR            | true      | 0.6.0           |
+    | MINOR            | false     | 0.6.0           |
+    | MAJOR            | true      | 1.0.0           |
+    | MAJOR            | false     | 1.0.0           |
