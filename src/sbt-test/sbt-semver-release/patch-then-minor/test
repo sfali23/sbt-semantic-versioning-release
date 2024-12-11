@@ -24,6 +24,8 @@
 # will be treated as patch version), then commit another file with "[minor]" pattern
 # final version will be 0.3.0
 $ exec git init .
+$ exec git config user.email "f.syed.ali@gmail.com"
+$ exec git config user.name "Syed Ali"
 > update
 $ exec git add .
 $ exec git commit -m "initial commit"
