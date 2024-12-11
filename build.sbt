@@ -6,12 +6,9 @@ lazy val `sbt-semantic-versioning-release` = project
   .settings(
     organization := "io.github.sfali23",
     name := "sbt-semver-release",
-    ThisBuild / version := "0.2.0-SNAPSHOT",
+    ThisBuild / version := "0.1.0-SNAPSHOT",
     ThisBuild / scalaVersion := "2.12.20",
     javacOptions ++= Seq("-source", "17", "-target", "17"),
-    // Don't update crossSbtVersions!
-    // https://github.com/sbt/sbt/issues/5049
-    // crossSbtVersions := Vector("0.13.18", "1.1.6"),
     publishMavenStyle := true,
     licenses := Seq(
       "APL2" -> url("http://www.apache.org/licenses/LICENSE-2.0.txt")
@@ -36,6 +33,7 @@ lazy val `sbt-semantic-versioning-release` = project
         "-Dsbt.ivy.home=" + sbt.Keys.ivyPaths.value.ivyHome.getOrElse("~/.ivy2")
       )
     },
+    ThisBuild / githubWorkflowJavaVersions += JavaSpec.temurin("17"),
     CucumberPlugin.glues := List("steps"),
     addSbtPlugin("com.github.gseitz" % "sbt-release" % "1.0.13"),
     libraryDependencies ++= Seq(
