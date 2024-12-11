@@ -22,16 +22,6 @@ class SemanticBuildVersion(workingDir: File, baseConfig: SemanticBuildVersionCon
   private val tagPrefix = baseConfig.tagPrefix
   private val startingVersion = Version(baseConfig.startingVersion, snapshotSuffix, preReleaseConfig)
 
-  def latestVersion: Option[Version] = {
-    val tagsForCurrentBranch = adapter
-      .getTagsForCurrentBranch
-      .map(tag => tag.replaceAll(tagPrefix, ""))
-      .flatMap(version => Try(Version(version, snapshotSuffix, preReleaseConfig)).toOption)
-      .sorted
-
-    tagsForCurrentBranch.headOption
-  }
-
   def determineVersion: String = {
     val currentBranch = adapter.getCurrentBranch
     val hotfixRequired = baseConfig.hotfixBranchPattern.nonEmpty(currentBranch)
@@ -54,7 +44,13 @@ class SemanticBuildVersion(workingDir: File, baseConfig: SemanticBuildVersionCon
       (notAReleaseBranch || hasUncommitedChanges || snapshotFlag) && !hotfixRequired
     }
 
-    val maybeLatestVersion = latestVersion
+    val tagsForCurrentBranch = adapter
+      .getTagsForCurrentBranch
+      .map(tag => tag.replaceAll(tagPrefix, ""))
+      .flatMap(version => Try(Version(version, snapshotSuffix, preReleaseConfig)).toOption)
+      .sorted
+
+    val maybeLatestVersion = tagsForCurrentBranch.headOption
     val currentVersion = maybeLatestVersion.getOrElse(startingVersion)
     val newVersion = determineVersion(currentVersion, hotfixRequired, snapshotRequired, maybeLatestVersion)
     if (currentVersion == newVersion && maybeLatestVersion.isDefined) {
