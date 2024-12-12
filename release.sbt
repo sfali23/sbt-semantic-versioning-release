@@ -14,10 +14,4 @@ def publishingSteps: Seq[ReleaseStep] = Seq(
   releaseStepCommand("sonatypeBundleRelease")
 )
 
-releaseProcess := initialSteps ++ {
-  if (version.value.contains("SNAPSHOT")) Seq.empty[ReleaseStep]
-  else Seq[ReleaseStep](tagRelease)
-} ++ publishingSteps ++ {
-  if (version.value.contains("SNAPSHOT")) Seq.empty[ReleaseStep]
-  else Seq[ReleaseStep](pushChanges)
-}
+releaseProcess := initialSteps ++ Seq[ReleaseStep](tagRelease) ++ publishingSteps ++ Seq[ReleaseStep](pushChanges)
