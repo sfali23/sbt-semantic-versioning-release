@@ -36,7 +36,8 @@ lazy val `sbt-semantic-versioning-release` = project
     },
     CucumberPlugin.glues := List("steps"),
     addSbtPlugin("com.github.gseitz" % "sbt-release" % "1.0.13"),
-    libraryDependencies ++= Dependencies
+    libraryDependencies ++= Dependencies,
+    publishConfiguration := publishConfiguration.value.withOverwrite(true)
   )
 
 addCommandAlias("ct", "clean; test; cucumber; scripted;")
