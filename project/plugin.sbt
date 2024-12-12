@@ -7,7 +7,7 @@ addSbtPlugin("com.github.sbt" % "sbt-native-packager" % "1.10.4")
 addSbtPlugin("org.xerial.sbt" % "sbt-sonatype" % "3.12.2")
 addSbtPlugin("com.github.sbt" % "sbt-pgp" % "2.3.0")
 addSbtPlugin("com.awwsmm.sbt" % "sbt-dependency-updater" % "0.4.0")
-addSbtPlugin("io.github.sfali23" % "sbt-semver-release" % "0.5.0-SNAPSHOT+dd7face")
+addSbtPlugin("io.github.sfali23" % "sbt-semver-release" % "0.5.0")
 addSbtPlugin(
   "com.waioeka.sbt" % "cucumber-plugin" % "0.3.1" excludeAll
     ExclusionRule(organization = "org.scala-lang.modules", name = "scala-xml_2.12")

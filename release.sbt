@@ -14,4 +14,4 @@ def publishingSteps: Seq[ReleaseStep] = Seq(
   releaseStepCommand("sonatypeBundleRelease")
 )
 
-releaseProcess := initialSteps ++ Seq[ReleaseStep](tagRelease) ++ Seq[ReleaseStep](pushChanges)
+releaseProcess := initialSteps ++ Seq[ReleaseStep](tagRelease) ++ publishingSteps ++ Seq[ReleaseStep](pushChanges)
