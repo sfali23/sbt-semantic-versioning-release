@@ -1,17 +1,15 @@
 import sbt.Keys.publishMavenStyle
+import Settings.*
 
 lazy val `sbt-semantic-versioning-release` = project
   .in(file("."))
-  .enablePlugins(SbtPlugin, ScalafmtPlugin)
+  .enablePlugins(SbtPlugin, ScalafmtPlugin, CucumberPlugin, DependencyUpdaterPlugin)
   .settings(
     organization := "io.github.sfali23",
     name := "sbt-semver-release",
     ThisBuild / version := "0.1.0-SNAPSHOT",
     ThisBuild / scalaVersion := "2.12.20",
     javacOptions ++= Seq("-source", "17", "-target", "17"),
-    // Don't update crossSbtVersions!
-    // https://github.com/sbt/sbt/issues/5049
-    // crossSbtVersions := Vector("0.13.18", "1.1.6"),
     publishMavenStyle := true,
     licenses := Seq(
       "APL2" -> url("http://www.apache.org/licenses/LICENSE-2.0.txt")
@@ -36,13 +34,9 @@ lazy val `sbt-semantic-versioning-release` = project
         "-Dsbt.ivy.home=" + sbt.Keys.ivyPaths.value.ivyHome.getOrElse("~/.ivy2")
       )
     },
+    CucumberPlugin.glues := List("steps"),
     addSbtPlugin("com.github.gseitz" % "sbt-release" % "1.0.13"),
-    libraryDependencies ++= Seq(
-      "org.eclipse.jgit" % "org.eclipse.jgit"       % "7.0.0.202409031743-r",
-      "io.circe"        %% "circe-core"             % "0.14.10"              % Test,
-      "io.circe"        %% "circe-generic"          % "0.14.10"              % Test,
-      "io.circe"        %% "circe-parser"           % "0.14.10"              % Test,
-      "org.eclipse.jgit" % "org.eclipse.jgit.junit" % "7.0.0.202409031743-r" % Test,
-      "org.scalatest"   %% "scalatest"              % "3.3.0-SNAP4"          % Test
-    )
+    libraryDependencies ++= Dependencies
   )
+
+addCommandAlias("ct", "clean; test; cucumber; scripted;")

@@ -1,27 +1,28 @@
 package com.alphasystem.sbt.semver.release.internal
 
 import com.alphasystem.sbt.semver.release.*
-import sbtsemverrelease.{ AutoBump, PreReleaseConfig, VersionsMatching }
+import sbtsemverrelease.{AutoBump, PreReleaseConfig, SnapshotConfig}
 
 import scala.util.matching.Regex
 
 case class SemanticBuildVersionConfiguration(
   startingVersion: String = DefaultStartingVersion,
-  overrideStartingVersion: Option[String] = None,
   tagPrefix: String = DefaultTagPrefix,
-  tagPattern: Regex = DefaultTagPattern,
-  snapshotSuffix: String = DefaultSnapshotSuffix,
   forceBump: Boolean = DefaultForceBump,
   promoteToRelease: Boolean = DefaultPromoteToRelease,
   snapshot: Boolean = DefaultSnapshot,
   newPreRelease: Boolean = DefaultNewPreRelease,
   autoBump: AutoBump = AutoBump(),
-  versionsMatching: VersionsMatching = VersionsMatching(),
+  defaultBumpLevel: VersionComponent = DefaultBumpLevel,
   componentToBump: VersionComponent = DefaultComponentToBump,
+  snapshotConfig: SnapshotConfig = SnapshotConfig(),
   preReleaseConfig: PreReleaseConfig = PreReleaseConfig(),
-  preReleaseBump: (PreReleaseConfig, String) => String =
-    defaultPreReleaseBump) {
+  hotfixBranchPattern: Regex = DefaultHotfixBranchPattern,
+  extraReleaseBranches: Seq[String] = Seq.empty) {
 
-  def isAutobumpEnabled: Boolean = autoBump.isEnabled
+  private lazy val releaseBranches: Set[String] = (extraReleaseBranches ++ DefaultReleaseBranches).toSet
 
+  def isAutoBumpEnabled: Boolean = autoBump.isEnabled
+
+  def isReleaseBranch(branchName: String): Boolean = releaseBranches.contains(branchName)
 }

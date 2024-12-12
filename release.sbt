@@ -1,15 +1,23 @@
 import ReleaseTransformations.*
 
-releaseProcess := Seq[ReleaseStep](
+def initialSteps: Seq[ReleaseStep] = Seq(
   checkSnapshotDependencies,
   inquireVersions,
   runClean,
   runTest,
-  releaseStepCommandAndRemaining("^ scripted"),
-  setReleaseVersion,
-  tagRelease,
+  setReleaseVersion
+)
+
+def publishingSteps: Seq[ReleaseStep] = Seq(
   publishArtifacts,
   releaseStepCommand("publishSigned"),
-  releaseStepCommand("sonatypeBundleRelease"),
-  pushChanges
+  releaseStepCommand("sonatypeBundleRelease")
 )
+
+releaseProcess := initialSteps ++ {
+  if (version.value.contains("SNAPSHOT")) Seq.empty[ReleaseStep]
+  else Seq[ReleaseStep](tagRelease)
+} ++ publishingSteps ++ {
+  if (version.value.contains("SNAPSHOT")) Seq.empty[ReleaseStep]
+  else Seq[ReleaseStep](pushChanges)
+}

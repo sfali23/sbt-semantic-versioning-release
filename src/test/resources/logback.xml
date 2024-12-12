@@ -1,0 +1,23 @@
+<!-- https://www.playframework.com/documentation/latest/SettingsLogger -->
+<configuration>
+    <variable name="LOG_LEVEL_GENERAL" value="${LOG_LEVEL_GENERAL:-INFO}"/>
+    <variable name="LOG_LEVEL_TEST_REPOSITORY" value="${LOG_LEVEL_GENERAL:-INFO}"/>
+
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>%date{yyyy-MM-dd HH:mm:ss.SSS} %highlight(%-5level) %cyan(%logger) %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="ASYNCSTDOUT" class="ch.qos.logback.classic.AsyncAppender">
+        <appender-ref ref="STDOUT" />
+    </appender>
+
+    <logger name="ch.qos.logback" level="OFF" additivity="false" />
+    <logger name="com.alphasystem.sbt.semver.release.common.TestRepository" level="${LOG_LEVEL_TEST_REPOSITORY}"/>
+
+    <root level="${LOG_LEVEL_GENERAL}">
+        <appender-ref ref="ASYNCSTDOUT" />
+    </root>
+
+</configuration>

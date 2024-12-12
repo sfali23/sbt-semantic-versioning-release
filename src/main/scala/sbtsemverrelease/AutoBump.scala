@@ -10,8 +10,7 @@ case class AutoBump(
   minorPattern: Option[Regex] = Some(DefaultMinorPattern),
   patchPattern: Option[Regex] = Some(DefaultPatchPattern),
   newPreReleasePattern: Option[Regex] = Some(DefaultNewPreReleasePattern),
-  promoteToReleasePattern: Option[Regex] =
-    Some(DefaultPromoteToReleasePattern)) {
+  promoteToReleasePattern: Option[Regex] = Some(DefaultPromoteToReleasePattern)) {
 
   def major(input: String): Boolean = matchValue(input, majorPattern)
 
@@ -25,8 +24,20 @@ case class AutoBump(
   def promoteToRelease(input: String): Boolean =
     matchValue(input, promoteToReleasePattern)
 
-  private def matchValue(input: String, regex: Option[Regex]): Boolean =
-    regex.exists(_.nonEmpty(input))
+  private def matchValue(input: String, regex: Option[Regex]): Boolean = {
+    // git command line put commit message withing quotation park and if regex has '^', then matching doesn't work
+    // remove starting and end quotation (")
+    val result =
+      Option(input.trim)
+        .map { r =>
+          if (input.startsWith("\"")) r.drop(1) else r
+        }
+        .map { r =>
+          if (input.endsWith("\"")) r.dropRight(1) else r
+        }
+        .getOrElse("")
+    regex.exists(_.nonEmpty(result))
+  }
 
   def isEnabled: Boolean =
     majorPattern.nonEmpty ||

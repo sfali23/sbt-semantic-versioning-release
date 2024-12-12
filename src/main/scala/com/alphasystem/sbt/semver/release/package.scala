@@ -1,6 +1,6 @@
-package com.alphasystem.sbt.semver
-
-import sbtsemverrelease.PreReleaseConfig
+package com.alphasystem
+package sbt
+package semver
 
 import scala.util.matching.Regex
 
@@ -8,55 +8,55 @@ package object release {
 
   val DefaultStartingVersion: String = "0.1.0"
   val DefaultTagPrefix: String = "v"
-  val DefaultTagPattern: Regex = "\\d++\\.\\d++\\.\\d++".r
-  val DefaultSnapshotSuffix: String = "SNAPSHOT"
-  val DefaultPreReleaseStartingVersion: String = "RC.1"
+  val DefaultSnapshotPrefix: String = "SNAPSHOT"
   val DefaultForceBump: Boolean = false
   val DefaultPromoteToRelease: Boolean = false
-  val DefaultSnapshot: Boolean = true
+  val DefaultSnapshot: Boolean = false
   val DefaultNewPreRelease: Boolean = false
+  val DefaultBumpLevel: VersionComponent = VersionComponent.PATCH
   val DefaultComponentToBump: VersionComponent = VersionComponent.NONE
+  val DefaultHotfixBranchPattern: Regex = initializeHotfixBranchPattern()
+  val DefaultReleaseBranches: Seq[String] = Seq("main", "master")
 
-  def defaultPreReleaseBump(
-    config: PreReleaseConfig,
-    latestVersion: String
-  ): String = {
-    val preReleaseComponents = config.splitComponents(latestVersion)
-    val prefix = preReleaseComponents.dropRight(1).mkString("")
-    val nextVersion = preReleaseComponents.last.toInt + 1
-    s"$prefix$nextVersion"
-  }
+  private val VersionStartRegex: Regex = "^(\\d+\\.\\d+\\.\\d+)".r
+
+  def isValidStartingVersion(version: String): Boolean =
+    VersionStartRegex.nonEmpty(version)
 
   private val SystemPropertyNamePrefix = "sbt.release."
 
-  val StartingVersionSystemPropertyName =
-    s"${SystemPropertyNamePrefix}startingVersion"
-
   val ForceBumpSystemPropertyName = s"${SystemPropertyNamePrefix}forceBump"
 
-  val NewPreReleaseSystemPropertyName =
-    s"${SystemPropertyNamePrefix}newPreRelease"
+  val NewPreReleaseSystemPropertyName = s"${SystemPropertyNamePrefix}newPreRelease"
 
-  val PromoteToReleaseSystemPropertyName =
-    s"${SystemPropertyNamePrefix}promoteToRelease"
+  val PromoteToReleaseSystemPropertyName = s"${SystemPropertyNamePrefix}promoteToRelease"
 
   val SnapshotSystemPropertyName = s"${SystemPropertyNamePrefix}snapshot"
 
-  val ComponentToBumpSystemPropertyName =
-    s"${SystemPropertyNamePrefix}componentToBump"
+  val DefaultBumpLevelSystemPropertyName = s"${SystemPropertyNamePrefix}defaultBumpLevel"
+
+  val ComponentToBumpSystemPropertyName = s"${SystemPropertyNamePrefix}componentToBump"
+
+  val HotfixBranchPatternSystemPropertyName = s"${SystemPropertyNamePrefix}hotFixBranchPattern"
+
+  def initializeHotfixBranchPattern(tagPrefix: String = DefaultTagPrefix): Regex =
+    s"^$tagPrefix(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\+$$".r
 
   implicit class StringOps(src: String) {
     def replaceNewLines: String = src.replaceAll(System.lineSeparator(), "")
   }
 
-  implicit class VersionComponentOps(src: VersionComponent) {
-    def <(other: VersionComponent): Boolean = src.ordinal() < other.ordinal()
+  implicit class RegexOps(src: Regex) {
+    def nonEmpty(source: String): Boolean = src.findFirstIn(source).nonEmpty
   }
 
-  implicit class RegexOps(src: Regex) {
-    def isEmpty(source: String): Boolean = src.findFirstIn(source).isEmpty
-
-    def nonEmpty(source: String): Boolean = src.findFirstIn(source).nonEmpty
+  implicit class ComponentToBumpOps(src: ComponentToBump) {
+    def toVersionComponent: VersionComponent =
+      src match {
+        case ComponentToBump.MAJOR => VersionComponent.MAJOR
+        case ComponentToBump.MINOR => VersionComponent.MINOR
+        case ComponentToBump.PATCH => VersionComponent.PATCH
+      }
   }
 
 }

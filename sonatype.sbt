@@ -1,8 +1,13 @@
-import xerial.sbt.Sonatype.*
+import xerial.sbt.Sonatype.GitHubHosting
 
 sonatypeRepository := "https://s01.oss.sonatype.org/service/local"
 sonatypeCredentialHost := "s01.oss.sonatype.org"
-credentials += Credentials(Path.userHome / ".sbt" / "sonatype-credentials")
+credentials += Credentials(
+  realm = "Sonatype Nexus Repository Manager",
+  host = "s01.oss.sonatype.org",
+  userName = System.getenv("SONATYPE_USERNAME"),
+  passwd = System.getenv("SONATYPE_PASSWORD")
+)
 publishTo := sonatypePublishToBundle.value
 sonatypeProjectHosting := Some(
   GitHubHosting(
