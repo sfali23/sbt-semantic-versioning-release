@@ -12,7 +12,7 @@ class VersionSpec extends AnyWordSpec with Matchers {
 
   import VersionComponent.*
 
-  private val preReleaseConfig = PreReleaseConfig()
+  private val preReleaseConfig: PreReleaseConfig = PreReleaseConfig()
 
   "Version parser" should {
 
@@ -33,6 +33,14 @@ class VersionSpec extends AnyWordSpec with Matchers {
           preRelease = Some(PreReleaseVersion("RC.", 5)),
           preReleaseConfig = preReleaseConfig
         )
+    }
+
+    "Having leading zeros in prerelease part should result in failed validation" in {
+      val caught =
+        intercept[IllegalArgumentException](Version("1.0.0-RC.01", DefaultSnapshotPrefix, PreReleaseConfig()))
+      assert(
+        caught.getMessage === "Invalid version: 1.0.0-RC.01"
+      )
     }
 
     "parse snapshot version without meta info" in {
@@ -79,7 +87,7 @@ class VersionSpec extends AnyWordSpec with Matchers {
       actual shouldBe expected
     }
 
-    "sort versions" in {
+    "sort versions with default preReleaseConfig" in {
       val actual = Seq(
         Version("0.1.0", DefaultSnapshotPrefix, preReleaseConfig),
         Version("0.2.0", DefaultSnapshotPrefix, preReleaseConfig),
@@ -90,6 +98,21 @@ class VersionSpec extends AnyWordSpec with Matchers {
         Version("1.1.0-RC.2", DefaultSnapshotPrefix, preReleaseConfig)
       ).sorted.map(_.toStringValue)
       val expected = Seq("1.1.0", "1.1.0-RC.2", "1.1.0-RC.1", "1.0.0", "0.2.1", "0.2.0", "0.1.0")
+      actual shouldBe expected
+    }
+
+    "sort versions with custom preReleaseConfig" in {
+      val preReleaseConfig = PreReleaseConfig(prefix = "alpha", separator = "-")
+      val actual = Seq(
+        Version("0.1.0", DefaultSnapshotPrefix, preReleaseConfig),
+        Version("0.2.0", DefaultSnapshotPrefix, preReleaseConfig),
+        Version("0.2.1", DefaultSnapshotPrefix, preReleaseConfig),
+        Version("1.0.0", DefaultSnapshotPrefix, preReleaseConfig),
+        Version("1.1.0", DefaultSnapshotPrefix, preReleaseConfig),
+        Version("1.1.0-alpha-2", DefaultSnapshotPrefix, preReleaseConfig),
+        Version("1.1.0-alpha-1", DefaultSnapshotPrefix, preReleaseConfig)
+      ).sorted.map(_.toStringValue)
+      val expected = Seq("1.1.0", "1.1.0-alpha-2", "1.1.0-alpha-1", "1.0.0", "0.2.1", "0.2.0", "0.1.0")
       actual shouldBe expected
     }
   }

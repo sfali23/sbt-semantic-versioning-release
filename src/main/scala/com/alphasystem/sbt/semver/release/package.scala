@@ -17,7 +17,6 @@ package object release {
   val DefaultComponentToBump: VersionComponent = VersionComponent.NONE
   val DefaultHotfixBranchPattern: Regex = initializeHotfixBranchPattern()
   val DefaultReleaseBranches: Seq[String] = Seq("main", "master")
-  val DefaultPreReleasePattern: String = "^(RC)(.)([1-9]\\d*)$"
 
   private val VersionStartRegex: Regex = "^(\\d+\\.\\d+\\.\\d+)".r
 

@@ -24,26 +24,11 @@ case class Version(
 
   def isPreRelease: Boolean = preRelease.isDefined
 
-  private def bumpMajor: Version = {
-    if (preRelease.nonEmpty) {
-      throw new IllegalArgumentException("Current version is a a pre-release.")
-    }
-    copy(major = major + 1, minor = 0, patch = 0, hotfix = None, preRelease = None)
-  }
+  private def bumpMajor: Version = copy(major = major + 1, minor = 0, patch = 0, hotfix = None, preRelease = None)
 
-  private def bumpMinor: Version = {
-    if (preRelease.nonEmpty) {
-      throw new IllegalArgumentException("Current version is a a pre-release.")
-    }
-    copy(minor = minor + 1, patch = 0)
-  }
+  private def bumpMinor: Version = copy(minor = minor + 1, patch = 0)
 
-  private def bumpPatch: Version = {
-    if (preRelease.nonEmpty) {
-      throw new IllegalArgumentException("Current version is a a pre-release.")
-    }
-    copy(patch = patch + 1)
-  }
+  private def bumpPatch: Version = copy(patch = patch + 1)
 
   private def bumpHotfix: Version = {
     if (preRelease.nonEmpty) {
@@ -143,7 +128,7 @@ object Version {
       }
 
     val maybeSnapshot = maybePreReleaseOrSnapshot
-      .map(_.replaceAll(preReleaseConfig.preReleasePartPattern, ""))
+      .map(_.replaceAll(preReleaseConfig.preReleasePartPattern.regex, ""))
       .filter(_.contains(snapshotSuffix))
       .map(_ => Snapshot(snapshotSuffix, metaInfo))
 

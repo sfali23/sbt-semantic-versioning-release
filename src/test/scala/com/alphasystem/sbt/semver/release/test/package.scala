@@ -39,6 +39,9 @@ package object test {
     def readFailSafeString(path: String, defaultValue: String): String =
       if (src.hasPath(path)) src.getString(path) else defaultValue
 
+    def readFailSafeInt(path: String, defaultValue: Int): Int =
+      if (src.hasPath(path)) src.getInt(path) else defaultValue
+
     def readFailSafeBoolean(path: String, defaultValue: Boolean): Boolean =
       if (src.hasPath(path)) src.getBoolean(path) else defaultValue
 
@@ -78,8 +81,9 @@ package object test {
 
     def toPreReleaseConfig: PreReleaseConfig =
       PreReleaseConfig(
-        startingVersion = src.readFailSafeString("startingVersion", "RC.1"),
-        preReleasePartPattern = src.readFailSafeString("preReleasePartPattern", DefaultPreReleasePattern)
+        prefix = src.readFailSafeString("prefix", "RC"),
+        separator = src.readFailSafeString("separator", "."),
+        startingVersion = src.readFailSafeInt("startingVersion", 1)
       )
 
     def toSnapshotConfig: SnapshotConfig =

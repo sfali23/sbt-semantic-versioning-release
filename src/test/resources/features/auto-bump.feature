@@ -289,7 +289,7 @@ Feature: Branch with Auto bump repository
       | major            | true      | 1.0.0           |
       | major            | false     | 1.0.0           |
 
-  @auto-bump @new
+  @auto-bump
   Scenario Outline: Custom commit messages
     Given Record main branch
     And Load semantic build config from ({autoBump={majorPattern="^BREAKING[- ]CHANGE:", minorPattern="^feat:", patchPattern="^fix:"}})

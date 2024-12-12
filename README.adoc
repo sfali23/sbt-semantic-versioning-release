@@ -157,22 +157,17 @@ that some extra configuration is required if you want to generate pre-release ve
 ----
 import sbtsemverrelease.PreReleaseConfig
 
-preRelease := PreReleaseConfig(startingVersion = "pre.1", preReleasePartPattern = "^(pre)(.)([1-9]\\d*)$")
+preRelease := PreReleaseConfig(prefix = "RC", separator = ".", startingVersion = 1)
 ----
+
+==== prefix and separator
+These options define `prefix` and `separator` of pre-release version.
 
 [[id_pre_release_starting_version]]
 ==== startingVersion
 This option is required and describes the starting pre-release version of a new pre-release. This value will be used if
 <<id_new_pre_release, `newPreRelease`>> is invoked (either explicitly or via <<id_autobump_on_commit, Automatic bumping based on commit messages>>).
-The default value is `RC.1`.
-
-[[id_pre_release_pattern]]
-==== preReleasePattern
-This option has a function similar to <<id_tag_pattern, `tagPattern`>>, except that it allows you to restrict the set of tags
-considered to those tags with pre-release versions matching `pattern`. The value for this has to be a regular expression as a
-`String`. Its default value is `^(RC)(.)([1-9]\\d*)$`.
-
-NOTE: The regular expression defines three groups.
+The default value is `1`, this value has to greater or equal to 1.
 
 [[id_autobump_on_commit]]
 === Automatic bumping based on commit messages

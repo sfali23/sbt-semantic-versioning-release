@@ -1,14 +1,16 @@
 package sbtsemverrelease
 
-import com.alphasystem.sbt.semver.release.DefaultPreReleasePattern
-
 import scala.util.matching.Regex
 
 case class PreReleaseConfig(
-  startingVersion: String = "RC.1",
-  preReleasePartPattern: String = DefaultPreReleasePattern) {
+  prefix: String = "RC",
+  separator: String = ".",
+  startingVersion: Int = 1) {
 
-  lazy val preReleasePartPatternRegEx: Regex = preReleasePartPattern.r
+  require(Option(prefix).isDefined && !prefix.isBlank, "prefix cannot be null or empty string")
+  require(Option(separator).isDefined && !separator.isBlank, "separator cannot be null or empty string")
+  require(startingVersion > 0, "startingVersion must be positive integer greater than 0")
 
-  lazy val pattern: Regex = ("\\d++\\.\\d++\\.\\d++-" + preReleasePartPattern).r
+  lazy val preReleasePartPattern: Regex = s"^($prefix)(.)([1-9]\\d*)$$".r
+
 }

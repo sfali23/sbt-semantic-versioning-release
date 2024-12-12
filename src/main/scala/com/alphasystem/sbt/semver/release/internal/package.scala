@@ -11,10 +11,12 @@ package object internal {
 
   implicit class PreReleaseConfigOps(src: PreReleaseConfig) {
 
-    def toInitialPreReleaseVersion: Option[PreReleaseVersion] = toPreReleaseVersion(src.startingVersion)
+    def toInitialPreReleaseVersion: Option[PreReleaseVersion] = Some(
+      PreReleaseVersion(prefix = s"${src.prefix}${src.separator}", version = src.startingVersion, suffix = None)
+    )
 
     def toPreReleaseVersion(version: String): Option[PreReleaseVersion] = {
-      val matchIterator = src.preReleasePartPatternRegEx.findAllIn(version)
+      val matchIterator = src.preReleasePartPattern.findAllIn(version)
       if (matchIterator.nonEmpty) {
         // skip group 0, since it contains entire matched string
         val v =
