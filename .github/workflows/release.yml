@@ -11,6 +11,10 @@ env:
 jobs:
   build:
     name: Build and Release
+    env:
+      PGP_PASSPHRASE: ${{ secrets.PGP_PASSPHRASE }}
+      SONATYPE_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
+      SONATYPE_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
     strategy:
       matrix:
         os: [ubuntu-latest]
@@ -44,8 +48,4 @@ jobs:
         run: gpg -K
 
       - name: Run Release
-        with:
-          PGP_PASSPHRASE: ${{ secrets.PGP_PASSPHRASE }}
-          SONATYPE_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
-          SONATYPE_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
         run: sbt '++ ${{ matrix.scala }}' "release with-defaults"
