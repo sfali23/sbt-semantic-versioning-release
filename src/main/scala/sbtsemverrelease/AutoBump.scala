@@ -30,10 +30,10 @@ case class AutoBump(
     val result =
       Option(input.trim)
         .map { r =>
-          if (input.startsWith("\"")) r.drop(0) else r
+          if (input.startsWith("\"")) r.drop(1) else r
         }
         .map { r =>
-          if (input.endsWith("\"")) r.dropRight(0) else r
+          if (input.endsWith("\"")) r.dropRight(1) else r
         }
         .getOrElse("")
     regex.exists(_.nonEmpty(result))
