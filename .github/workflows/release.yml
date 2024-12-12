@@ -1,17 +1,19 @@
-name: Run tests
+name: Release
 
-on:
-  pull_request:
-    branches:
-      - main
-      - v*\+ # Run on hotfix branch
+on: workflow_dispatch
+
+permissions:
+  contents: write
 
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  PGP_PASSPHRASE: ${{ secrets.PGP_PASSPHRASE }}
+  SONATYPE_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
+  SONATYPE_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
 
 jobs:
   build:
-    name: Build and Test
+    name: Build and Release
     strategy:
       matrix:
         os: [ubuntu-latest]
@@ -35,5 +37,5 @@ jobs:
       - name: Setup sbt
         uses: sbt/setup-sbt@v1
 
-      - name: Run tests
-        run: sbt '++ ${{ matrix.scala }}' ct
+      - name: Run Release
+        run: sbt '++ ${{ matrix.scala }}' "release with-defaults"
