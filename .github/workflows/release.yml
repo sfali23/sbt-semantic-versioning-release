@@ -7,13 +7,14 @@ permissions:
 
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  PGP_PASSPHRASE: ${{ secrets.PGP_PASSPHRASE }}
-  SONATYPE_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
-  SONATYPE_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
 
 jobs:
   build:
     name: Build and Release
+    env:
+      PGP_PASSPHRASE: ${{ secrets.PGP_PASSPHRASE }}
+      SONATYPE_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
+      SONATYPE_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
     strategy:
       matrix:
         os: [ubuntu-latest]
@@ -38,4 +39,5 @@ jobs:
         uses: sbt/setup-sbt@v1
 
       - name: Run Release
+
         run: sbt '++ ${{ matrix.scala }}' "release with-defaults"
