@@ -28,6 +28,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          token: '${{ github.token }}'
 
       - name: Setup Java (temurin@17)
         if: matrix.java == 'temurin@17'
@@ -45,6 +46,11 @@ jobs:
         with:
           gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
           passphrase: ${{ secrets.PGP_PASSPHRASE }}
+
+      - name: "Config Git"
+        run: |
+          git config --global user.email "$GIT_AUTHOR_EMAIL"
+          git config --global user.name "$GIT_AUTHOR_NAME"
 
       - name: Run Release
         run: sbt '++ ${{ matrix.scala }}' "release with-defaults"
