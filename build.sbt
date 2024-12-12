@@ -3,7 +3,7 @@ import Settings.*
 
 lazy val `sbt-semantic-versioning-release` = project
   .in(file("."))
-  .enablePlugins(SbtPlugin, ScalafmtPlugin, CucumberPlugin)
+  .enablePlugins(SbtPlugin, ScalafmtPlugin, CucumberPlugin, DependencyUpdaterPlugin)
   .settings(
     organization := "io.github.sfali23",
     name := "sbt-semver-release",
