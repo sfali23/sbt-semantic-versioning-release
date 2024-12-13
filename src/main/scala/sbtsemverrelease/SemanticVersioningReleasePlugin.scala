@@ -18,9 +18,9 @@ object SemanticVersioningReleasePlugin extends AutoPlugin {
 
   object autoImport {
 
-    val determineVersion = taskKey[String](
-      "A task to determine the next version to be without bumping actual version."
-    )
+    val determineVersion = taskKey[String]("A task to determine the next version to be without bumping actual version.")
+
+    val printDetermineVersion = taskKey[Unit]("A task to print next version to be without bumping actual version.")
 
     val startingVersion = settingKey[String](
       """This option defines the starting version of the build in case there is no tag available to determine next version. 
@@ -235,6 +235,9 @@ object SemanticVersioningReleasePlugin extends AutoPlugin {
         baseDirectory.value,
         config
       ).determineVersion
+    },
+    printDetermineVersion := {
+      scala.Console.println(s"Next determined version is: ${scala.Console.BOLD}${scala.Console.RED}${determineVersion.value}${scala.Console.RESET}")
     },
     releaseTagName := s"${tagPrefix.value}${runtimeVersion.value}",
     releaseVersion := { _ =>
