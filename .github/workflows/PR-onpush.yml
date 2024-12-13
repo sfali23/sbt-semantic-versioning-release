@@ -8,6 +8,8 @@ on:
 
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  GIT_AUTHOR_EMAIL: ${{ secrets.GIT_AUTHOR_EMAIL }}
+  GIT_AUTHOR_NAME: ${{ secrets.GIT_AUTHOR_NAME }}
 
 jobs:
   build:
@@ -34,6 +36,11 @@ jobs:
 
       - name: Setup sbt
         uses: sbt/setup-sbt@v1
+
+      - name: "Config Git"
+        run: |
+          git config --global user.email "$GIT_AUTHOR_EMAIL"
+          git config --global user.name "$GIT_AUTHOR_NAME"   
 
       - name: Run tests
         run: sbt '++ ${{ matrix.scala }}' ct

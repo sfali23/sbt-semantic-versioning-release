@@ -22,8 +22,6 @@
 #################################################################################
 # Make sure compilation works
 $ exec git init .
-$ exec git config user.email "f.syed.ali@gmail.com"
-$ exec git config user.name "Syed Ali"
 > update
 $ exec git add .
 $ exec git commit -m "initial commit"
