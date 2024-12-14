@@ -16,5 +16,5 @@ lazy val publishingSteps: Seq[ReleaseStep] = Seq(
 
 releaseProcess := initialSteps ++
   Seq[ReleaseStep](tagRelease) ++
-  // publishingSteps ++
+  publishingSteps ++
   Seq[ReleaseStep](pushChanges)
