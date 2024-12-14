@@ -20,7 +20,10 @@ lazy val publishingSteps: Seq[ReleaseStep] = Seq(
 def conditionalSteps(cond: Boolean, steps: ReleaseStep*): Seq[ReleaseStep] =
   if (cond) Seq.empty[ReleaseStep] else steps
 
-releaseProcess := initialSteps ++
-  conditionalSteps(checkSnapshotVersion.value, tagRelease) ++
-  publishingSteps ++
-  conditionalSteps(checkSnapshotVersion.value, pushChanges)
+def releaseSteps(snapshot: Boolean) =
+  initialSteps ++
+    conditionalSteps(snapshot, tagRelease) ++
+    publishingSteps ++
+    conditionalSteps(snapshot, pushChanges)
+
+releaseProcess := releaseSteps(checkSnapshotVersion.value)
