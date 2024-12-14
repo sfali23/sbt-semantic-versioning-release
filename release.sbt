@@ -1,6 +1,9 @@
 import ReleaseTransformations.*
 
-def initialSteps: Seq[ReleaseStep] = Seq(
+val checkSnapshotVersion = settingKey[Boolean]("Check if current version is snapshot")
+checkSnapshotVersion := IO.read(releaseVersionFile.value).contains(snapshotConfig.value.prefix)
+
+lazy val initialSteps: Seq[ReleaseStep] = Seq(
   checkSnapshotDependencies,
   inquireVersions,
   runClean,
@@ -8,10 +11,19 @@ def initialSteps: Seq[ReleaseStep] = Seq(
   setReleaseVersion
 )
 
-def publishingSteps: Seq[ReleaseStep] = Seq(
+lazy val publishingSteps: Seq[ReleaseStep] = Seq(
   publishArtifacts,
   releaseStepCommand("publishSigned"),
   releaseStepCommand("sonatypeBundleRelease")
 )
 
-releaseProcess := initialSteps ++ Seq[ReleaseStep](tagRelease) ++ publishingSteps ++ Seq[ReleaseStep](pushChanges)
+def conditionalSteps(cond: Boolean, steps: ReleaseStep*): Seq[ReleaseStep] =
+  if (cond) Seq.empty[ReleaseStep] else steps
+
+def releaseSteps(snapshot: Boolean) =
+  initialSteps ++
+    conditionalSteps(snapshot, tagRelease) ++
+    publishingSteps ++
+    conditionalSteps(snapshot, pushChanges)
+
+releaseProcess := releaseSteps(checkSnapshotVersion.value)
