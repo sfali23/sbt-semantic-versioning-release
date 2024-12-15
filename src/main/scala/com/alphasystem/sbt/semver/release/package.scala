@@ -6,13 +6,10 @@ import scala.util.matching.Regex
 
 package object release {
 
+  val DefaultBooleanValue = false
   val DefaultStartingVersion: String = "0.1.0"
   val DefaultTagPrefix: String = "v"
   val DefaultSnapshotPrefix: String = "SNAPSHOT"
-  val DefaultForceBump: Boolean = false
-  val DefaultPromoteToRelease: Boolean = false
-  val DefaultSnapshot: Boolean = false
-  val DefaultNewPreRelease: Boolean = false
   val DefaultBumpLevel: VersionComponent = VersionComponent.PATCH
   val DefaultComponentToBump: VersionComponent = VersionComponent.NONE
   val DefaultHotfixBranchPattern: Regex = initializeHotfixBranchPattern()
@@ -38,6 +35,9 @@ package object release {
   val ComponentToBumpSystemPropertyName = s"${SystemPropertyNamePrefix}componentToBump"
 
   val HotfixBranchPatternSystemPropertyName = s"${SystemPropertyNamePrefix}hotFixBranchPattern"
+
+  val AddUnReleasedCommitsToTagSummarySystemPropertyName =
+    s"${SystemPropertyNamePrefix}addUnReleasedCommitsToTagSummary"
 
   def initializeHotfixBranchPattern(tagPrefix: String = DefaultTagPrefix): Regex =
     s"^$tagPrefix(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\+$$".r

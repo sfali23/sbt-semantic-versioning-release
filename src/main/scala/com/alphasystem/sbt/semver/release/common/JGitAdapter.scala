@@ -5,7 +5,7 @@ package release
 package common
 
 import org.eclipse.jgit.api.Git
-import org.eclipse.jgit.lib.{Constants, ObjectId, Ref, Repository}
+import org.eclipse.jgit.lib.{Constants, ObjectId, Repository}
 import org.eclipse.jgit.revwalk.RevWalk
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder
 
@@ -21,7 +21,9 @@ class JGitAdapter(workingDir: File) {
 
   def getHeadCommit: ObjectId = repository.resolve(Constants.HEAD)
 
-  def getShortHash: String = repository.newObjectReader().abbreviate(getHeadCommit).name()
+  private def getShortHash(id: ObjectId): String = repository.newObjectReader().abbreviate(id).name()
+
+  def getShortHash: String = getShortHash(getHeadCommit)
 
   def getCurrentBranch: String = repository.getBranch
 
@@ -57,6 +59,29 @@ class JGitAdapter(workingDir: File) {
       .asScala
       .map(_.getFullMessage)
       .toList
+
+  def getUnReleasedCommits(
+    start: String,
+    end: String = Constants.HEAD
+  ): List[String] = {
+    val startId = repository.resolve(start)
+    val endId = repository.resolve(end)
+    val walk = getRevWalk
+    (Try(walk.parseCommit(startId)).toOption, Try(walk.parseCommit(endId)).toOption) match {
+      case (Some(startCommit), Some(endCommit)) =>
+        val commits = git.log().addRange(startCommit, endCommit).call()
+        commits
+          .asScala
+          .map { commit =>
+            val shortHash = getShortHash(commit.getId)
+            val message = commit.getShortMessage
+            s"Commit($shortHash, $message)"
+          }
+          .toList
+
+      case _ => List.empty
+    }
+  }
 
   def getCommitBetween(
     start: String,

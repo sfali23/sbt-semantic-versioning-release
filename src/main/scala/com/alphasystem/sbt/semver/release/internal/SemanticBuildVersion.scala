@@ -22,6 +22,18 @@ class SemanticBuildVersion(workingDir: File, baseConfig: SemanticBuildVersionCon
   private val tagPrefix = baseConfig.tagPrefix
   private val startingVersion = Version(baseConfig.startingVersion, snapshotSuffix, preReleaseConfig)
 
+  def latestVersion: Option[Version] = {
+    val tagsForCurrentBranch = adapter
+      .getTagsForCurrentBranch
+      .map(tag => tag.replaceAll(tagPrefix, ""))
+      .flatMap(version => Try(Version(version, snapshotSuffix, preReleaseConfig)).toOption)
+      .sorted
+
+    tagsForCurrentBranch.headOption
+  }
+
+  def getUnReleasedCommits(version: String): List[String] = adapter.getUnReleasedCommits(s"$tagPrefix$version")
+
   def determineVersion: String = {
     val currentBranch = adapter.getCurrentBranch
     val hotfixRequired = baseConfig.hotfixBranchPattern.nonEmpty(currentBranch)
@@ -44,13 +56,7 @@ class SemanticBuildVersion(workingDir: File, baseConfig: SemanticBuildVersionCon
       (notAReleaseBranch || hasUncommitedChanges || snapshotFlag) && !hotfixRequired
     }
 
-    val tagsForCurrentBranch = adapter
-      .getTagsForCurrentBranch
-      .map(tag => tag.replaceAll(tagPrefix, ""))
-      .flatMap(version => Try(Version(version, snapshotSuffix, preReleaseConfig)).toOption)
-      .sorted
-
-    val maybeLatestVersion = tagsForCurrentBranch.headOption
+    val maybeLatestVersion = latestVersion
     val currentVersion = maybeLatestVersion.getOrElse(startingVersion)
     val newVersion = determineVersion(currentVersion, hotfixRequired, snapshotRequired, maybeLatestVersion)
     if (currentVersion == newVersion && maybeLatestVersion.isDefined) {
@@ -92,7 +98,7 @@ class SemanticBuildVersion(workingDir: File, baseConfig: SemanticBuildVersionCon
         maybeLatestVersion
           .map { version =>
             // if last tag exists then get commits between last tag and current head, otherwise get all commits
-            val commits = adapter.getCommitBetween(s"${baseConfig.tagPrefix}${version.toStringValue}")
+            val commits = adapter.getCommitBetween(s"$tagPrefix${version.toStringValue}")
             (commits.nonEmpty, commits)
           }
           .getOrElse((false, adapter.getCommits))

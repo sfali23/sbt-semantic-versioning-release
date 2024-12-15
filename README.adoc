@@ -255,7 +255,7 @@ This option specifies whether to use short commit hash. Default value is *true*.
 
 [NOTE]
 ====
-Release has strict regular expression for version, when using commit hash in the snapshot then configure `releaseNextVersion` property as follows:
+Release plugin has strict regular expression for version, when using commit hash in the snapshot then configure `releaseNextVersion` property as follows:
 
 [source, sbt]
 ----
@@ -273,4 +273,17 @@ set to *true*, *false* otherwise.
 . If the current branch is one of `main, `master`, or specified in `extraReleaseBranches`.
 
 === hotfixBranchPattern &mdash; Checking out a tag
-It is useful to check out a tag when you want to create a build of an older version. Once you check out specific tag create a branch by using following pattern: `<tag-prefix>major.minor.patch+`, for example: if the tag was `v1.2.3` then branch name should be `v1.2.3+`. Any subsequent build will only bump `hot fix` version, so next version will be, `v1.2.3.1` and so on. **It is not possible to bump any other part version once you have a tag chceked out.**
+It is useful to check out a tag when you want to create a build of an older version. Once you check out specific tag create a branch by using following pattern: `<tag-prefix>major.minor.patch+`, for example: if the tag was `v1.2.3` then branch name should be `v1.2.3+`. Any subsequent build will only bump `hot fix` version, so next version will be, `v1.2.3.1` and so on. **It is not possible to bump any other part of version once you have a tag checked out.**
+
+=== unReleasedCommits
+Collects un-released commits to be added into `releaseTagComment` if `addUnReleasedCommitsToTagComment` settings is set to __true__.
+
+=== addUnReleasedCommitsToTagComment
+Default comment of the release tag is `Release <version_to_be_released>`, this setting allows to add un-released commits to tag summary. With setting on tag comment will be:
+
+```
+Release <version_to_be_released>
+
+
+Commit(<short_hash>, <commit_message>)
+```
