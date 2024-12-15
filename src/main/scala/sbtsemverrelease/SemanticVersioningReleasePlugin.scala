@@ -100,7 +100,7 @@ object SemanticVersioningReleasePlugin extends AutoPlugin {
 
     val addUnReleasedCommitsToTagComment = settingKey[Boolean]("Add un released commits to tag summary.")
 
-    val unReleasedCommits = settingKey[String]("Add un released commits to tag summary.")
+    val unReleasedCommits = taskKey[String]("Add un released commits to tag summary.")
   }
 
   import autoImport.*
