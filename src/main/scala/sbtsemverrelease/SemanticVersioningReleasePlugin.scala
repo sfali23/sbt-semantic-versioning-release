@@ -98,7 +98,9 @@ object SemanticVersioningReleasePlugin extends AutoPlugin {
           .replaceNewLines
       )
 
-    val addUnReleasedCommitsToTagSummary = settingKey[Boolean]("Add un released commits to tag summary.")
+    val addUnReleasedCommitsToTagComment = settingKey[Boolean]("Add un released commits to tag summary.")
+
+    val unReleasedCommits = settingKey[String]("Add un released commits to tag summary.")
   }
 
   import autoImport.*
@@ -233,7 +235,13 @@ object SemanticVersioningReleasePlugin extends AutoPlugin {
     preRelease := PreReleaseConfig(),
     hotfixBranchPattern := initializeDefaultHotFixBranchPattern.value,
     extraReleaseBranches := Seq.empty[String],
-    addUnReleasedCommitsToTagSummary := initializeAddUnReleasedCommitsToTagSummary.value,
+    unReleasedCommits := {
+      val config = toConfiguration.value
+      val semanticBuildVersion = SemanticBuildVersion(baseDirectory.value, config)
+      val latestVersion = semanticBuildVersion.latestVersion.map(_.toStringValue).getOrElse(config.startingVersion)
+      semanticBuildVersion.getUnReleasedCommits(latestVersion).mkString(System.lineSeparator())
+    },
+    addUnReleasedCommitsToTagComment := initializeAddUnReleasedCommitsToTagSummary.value,
     determineVersionInternal := {
       SemanticBuildVersion(
         baseDirectory.value,
@@ -245,13 +253,10 @@ object SemanticVersioningReleasePlugin extends AutoPlugin {
     },
     releaseTagName := s"${tagPrefix.value}${runtimeVersion.value}",
     releaseTagComment := {
-      if (addUnReleasedCommitsToTagSummary.value) {
-        val config = toConfiguration.value
-        val semanticBuildVersion = SemanticBuildVersion(baseDirectory.value, config)
-        val latestVersion = semanticBuildVersion.latestVersion.map(_.toStringValue).getOrElse(config.startingVersion)
-        val commits = semanticBuildVersion.getUnReleasedCommits(latestVersion).mkString(System.lineSeparator())
-        Seq(releaseTagComment.value, commits).mkString(s"${System.lineSeparator()}${System.lineSeparator()}")
-      } else releaseTagComment.value
+      if (addUnReleasedCommitsToTagComment.value)
+        Seq(releaseTagComment.value, unReleasedCommits.value)
+          .mkString(s"${System.lineSeparator()}${System.lineSeparator()}")
+      else releaseTagComment.value
     },
     releaseVersion := { _ => determineVersionInternal.value: @sbtUnchecked },
     releaseNextVersion := { _ => "" },

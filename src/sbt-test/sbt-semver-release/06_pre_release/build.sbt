@@ -12,7 +12,7 @@ lazy val root = (project in file("."))
     name := "06_pre_release",
     ThisBuild / version := "0.1.0-SNAPSHOT",
     Global / onChangedBuildSource := ReloadOnSourceChanges,
-    addUnReleasedCommitsToTagSummary := true,
+    addUnReleasedCommitsToTagComment := true,
     releaseProcess := Seq[ReleaseStep](
       checkSnapshotDependencies,
       inquireVersions,
