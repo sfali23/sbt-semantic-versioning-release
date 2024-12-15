@@ -52,10 +52,10 @@ package object test {
       SemanticBuildVersionConfiguration(
         startingVersion = src.readFailSafeString("startingVersion", DefaultStartingVersion),
         tagPrefix = src.readFailSafeString("tagPrefix", DefaultTagPrefix),
-        forceBump = src.readFailSafeBoolean("forceBump", DefaultForceBump),
-        promoteToRelease = src.readFailSafeBoolean("promoteToRelease", DefaultPromoteToRelease),
-        snapshot = src.readFailSafeBoolean("snapshot", DefaultSnapshot),
-        newPreRelease = src.readFailSafeBoolean("newPreRelease", DefaultNewPreRelease),
+        forceBump = src.readFailSafeBoolean("forceBump", DefaultBooleanValue),
+        promoteToRelease = src.readFailSafeBoolean("promoteToRelease", DefaultBooleanValue),
+        snapshot = src.readFailSafeBoolean("snapshot", DefaultBooleanValue),
+        newPreRelease = src.readFailSafeBoolean("newPreRelease", DefaultBooleanValue),
         autoBump = if (src.hasPath("autoBump")) src.getConfig("autoBump").toAutoBump else AutoBump(),
         defaultBumpLevel =
           VersionComponent.valueOf(src.readFailSafeString("defaultBumpLevel", DefaultBumpLevel.name())),

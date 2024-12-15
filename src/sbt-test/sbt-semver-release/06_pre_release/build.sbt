@@ -1,7 +1,7 @@
 import sbtrelease.ReleasePlugin.autoImport.releaseVersionFile
 import ReleaseTransformations.*
 import com.alphasystem.sbt.semver.release.ComponentToBump
-import sbtsemverrelease.AutoBump
+import sbtsemverrelease.*
 import sbt.complete.DefaultParsers.*
 
 publishTo := Some(Resolver.file("file", new File(".")))
@@ -12,6 +12,7 @@ lazy val root = (project in file("."))
     name := "06_pre_release",
     ThisBuild / version := "0.1.0-SNAPSHOT",
     Global / onChangedBuildSource := ReloadOnSourceChanges,
+    addUnReleasedCommitsToTagSummary := true,
     releaseProcess := Seq[ReleaseStep](
       checkSnapshotDependencies,
       inquireVersions,

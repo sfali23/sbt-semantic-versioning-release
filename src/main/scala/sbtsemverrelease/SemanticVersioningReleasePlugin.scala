@@ -1,7 +1,6 @@
 package sbtsemverrelease
 
 import com.alphasystem.sbt.semver.release.*
-import com.alphasystem.sbt.semver.release.common.JGitAdapter
 import com.alphasystem.sbt.semver.release.internal.*
 import sbt.Keys.*
 import sbt.*
@@ -98,6 +97,8 @@ object SemanticVersioningReleasePlugin extends AutoPlugin {
           .stripMargin
           .replaceNewLines
       )
+
+    val addUnReleasedCommitsToTagSummary = settingKey[Boolean]("Add un released commits to tag summary.")
   }
 
   import autoImport.*
@@ -123,7 +124,7 @@ object SemanticVersioningReleasePlugin extends AutoPlugin {
           .getOrElse(DefaultComponentToBump),
         snapshotConfig = snapshotConfig.value,
         preReleaseConfig = preRelease.value,
-        hotfixBranchPattern = DefaultHotfixBranchPattern, // TODO: populate this
+        hotfixBranchPattern = hotfixBranchPattern.value,
         extraReleaseBranches = extraReleaseBranches.value
       )
     }
@@ -152,16 +153,10 @@ object SemanticVersioningReleasePlugin extends AutoPlugin {
     }
 
   private def initializeSnapshot =
-    // JGitAdapter doesn't work well in tests where git is not initialized
     Def.setting {
-      val computedValue =
-        Try(JGitAdapter(baseDirectory.value))
-          .toOption
-          .map(_.hasUncommittedChanges)
-          .getOrElse(DefaultSnapshot)
       initializeSettingFromSystemProperty(
         SnapshotSystemPropertyName,
-        computedValue
+        DefaultBooleanValue
       )
     }
 
@@ -184,6 +179,14 @@ object SemanticVersioningReleasePlugin extends AutoPlugin {
         case Some(value) => s"$value".r
         case None        => initializeHotfixBranchPattern(tagPrefix.value)
       }
+    }
+
+  private def initializeAddUnReleasedCommitsToTagSummary =
+    Def.setting {
+      initializeSettingFromSystemProperty(
+        AddUnReleasedCommitsToTagSummarySystemPropertyName,
+        DefaultBooleanValue
+      )
     }
 
   private def initializeReleaseVersionFile =
@@ -212,16 +215,16 @@ object SemanticVersioningReleasePlugin extends AutoPlugin {
     tagPrefix := DefaultTagPrefix,
     forceBump := initializeSettingFromSystemProperty(
       ForceBumpSystemPropertyName,
-      DefaultForceBump
+      DefaultBooleanValue
     ),
     promoteToRelease := initializeSettingFromSystemProperty(
       PromoteToReleaseSystemPropertyName,
-      DefaultPromoteToRelease
+      DefaultBooleanValue
     ),
     snapshot := initializeSnapshot.value,
     newPreRelease := initializeSettingFromSystemProperty(
       NewPreReleaseSystemPropertyName,
-      DefaultNewPreRelease
+      DefaultBooleanValue
     ),
     defaultBumpLevel := initializeDefaultBumpLevel.value,
     componentToBump := initializeComponentToBump.value,
@@ -230,17 +233,26 @@ object SemanticVersioningReleasePlugin extends AutoPlugin {
     preRelease := PreReleaseConfig(),
     hotfixBranchPattern := initializeDefaultHotFixBranchPattern.value,
     extraReleaseBranches := Seq.empty[String],
+    addUnReleasedCommitsToTagSummary := initializeAddUnReleasedCommitsToTagSummary.value,
     determineVersionInternal := {
-      val config = toConfiguration.value
       SemanticBuildVersion(
         baseDirectory.value,
-        config
+        toConfiguration.value
       ).determineVersion
     },
     determineVersion := {
       scala.Console.println(s"Next determined version is: ${scala.Console.BOLD}${scala.Console.RED}${determineVersionInternal.value}${scala.Console.RESET}")
     },
     releaseTagName := s"${tagPrefix.value}${runtimeVersion.value}",
+    releaseTagComment := {
+      if (addUnReleasedCommitsToTagSummary.value) {
+        val config = toConfiguration.value
+        val semanticBuildVersion = SemanticBuildVersion(baseDirectory.value, config)
+        val latestVersion = semanticBuildVersion.latestVersion.map(_.toStringValue).getOrElse(config.startingVersion)
+        val commits = semanticBuildVersion.getUnReleasedCommits(latestVersion).mkString(System.lineSeparator())
+        Seq(releaseTagComment.value, commits).mkString(s"${System.lineSeparator()}${System.lineSeparator()}")
+      } else releaseTagComment.value
+    },
     releaseVersion := { _ => determineVersionInternal.value: @sbtUnchecked },
     releaseNextVersion := { _ => "" },
     releaseProcess := Seq[ReleaseStep](
