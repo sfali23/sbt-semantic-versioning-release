@@ -1,4 +1,4 @@
-import ReleaseTransformations.*
+import sbtrelease.ReleaseStateTransformations.{checkSnapshotDependencies, inquireVersions, publishArtifacts, pushChanges, runClean, runTest, setReleaseVersion, tagRelease}
 
 lazy val initialSteps: Seq[ReleaseStep] = Seq(
   checkSnapshotDependencies,
@@ -11,7 +11,8 @@ lazy val initialSteps: Seq[ReleaseStep] = Seq(
 lazy val publishingSteps: Seq[ReleaseStep] = Seq(
   publishArtifacts,
   releaseStepCommand("publishSigned"),
-  releaseStepCommand("sonatypeBundleRelease")
+  releaseStepCommand("sonaUpload"),
+  releaseStepCommand("sonaRelease")
 )
 
 releaseProcess := initialSteps ++
