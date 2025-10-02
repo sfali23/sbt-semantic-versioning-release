@@ -43,9 +43,7 @@ releaseProcess := Seq[ReleaseStep](
 
 [source,sbt]
 ----
-resolvers += "Sonatype OSS" at "https://s01.oss.sonatype.org/content/groups/public/"
-
-addSbtPlugin("io.github.sfali23" % "sbt-semver-release"  % "0.5.0")
+addSbtPlugin("io.github.sfali23" % "sbt-semver-release"  % "0.5.4")
 ----
 
 == Plugin Settings
